@@ -84,8 +84,8 @@ private:
   define a start index for all of our entries (though it may just be (0,0) for most)
   We also define where they end (which will usually just be the size of the sheet)
   */
-  static map<string, Vector2i> m_startingIndicies;
-  static map<string, Vector2i> m_endingIndicies;
+  static map<string, Vector2i> m_startingIndices;
+  static map<string, Vector2i> m_endingIndices;
 
   // The former will be for the number of frames in a sheet, while the latter
   // is the actual size of each frame in the sheets
@@ -109,6 +109,8 @@ private:
 
   static map<string, int> m_timesBetweenUpdate;
 public:
+
+  static void forceUpdate(string animation, Sprite &sprite);
 
   static void update(string animation, Sprite& sprite);
 
@@ -138,6 +140,9 @@ public:
   static void setAnimationTexture(string animation, Texture texture);
   static void setAnimationStartingIndex(string animation, Vector2i index);
   static void setAnimationEndingIndex(string animation, Vector2i index);
+
+  static sf::Vector2i getAnimationStartingIndex(string animation);
+  static sf::Vector2i getAnimationEndingIndex(string animation);
 
 
   static void resetAnimationIndex(string animation);

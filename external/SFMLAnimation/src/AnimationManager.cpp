@@ -3,8 +3,8 @@
 // Map definitions
 map<string, Texture> AnimationManager::m_textures;
 map<string, Vector2i> AnimationManager::m_indices;
-map<string, Vector2i> AnimationManager::m_startingIndicies;
-map<string, Vector2i> AnimationManager::m_endingIndicies;
+map<string, Vector2i> AnimationManager::m_startingIndices;
+map<string, Vector2i> AnimationManager::m_endingIndices;
 map<string, Vector2i> AnimationManager::m_sheetSizes;
 map<string, Vector2i> AnimationManager::m_spriteSizes;
 map<string, int> AnimationManager::m_frequencies;
@@ -20,6 +20,11 @@ animation - This is the string key that corresponds to the animation we are upda
 sprite - This sprite will have its texture changed to the next one in its
   animation sequence
 */
+void AnimationManager::forceUpdate(string animation, Sprite &sprite)
+{
+    m_timesBetweenUpdate[animation] = m_frequencies[animation];
+    update(animation, sprite);
+}
 void AnimationManager::update(string animation, Sprite &sprite) {
   if (m_timesBetweenUpdate[animation] < m_frequencies[animation])
   {
@@ -35,6 +40,9 @@ void AnimationManager::update(string animation, Sprite &sprite) {
 //        m_indices[animation].y * m_spriteSizes[animation].y,
 //        m_spriteSizes[animation].x, m_spriteSizes[animation].y);
 
+    /*******************************************************/
+    /*        Modification: Fix Rect template error        */
+    /*******************************************************/
     IntRect rect(Vector2i(m_indices[animation].x * m_spriteSizes[animation].x,
         m_indices[animation].y * m_spriteSizes[animation].y),
         m_spriteSizes[animation]);
@@ -56,16 +64,16 @@ void AnimationManager::update(string animation, Sprite &sprite) {
     /*        Modification: Implement Starting/Ending Indices        */
     /*****************************************************************/
     if (m_indices[animation].y < m_sheetSizes[animation].y &&
-        m_indices[animation].y < m_endingIndicies[animation].y) {
+        m_indices[animation].y < m_endingIndices[animation].y) {
       m_indices[animation].y++;
     } else {
       // Otherwise, we move over one column and go back to the top
-      m_indices[animation].y = m_startingIndicies[animation].y;
+      m_indices[animation].y = m_startingIndices[animation].y;
       m_indices[animation].x++;
       // And then reset the sheet if we are past the width of the sheet
       if (m_indices[animation].x >= m_sheetSizes[animation].x ||
-          m_indices[animation].x >= m_endingIndicies[animation].x)
-        m_indices[animation].x = m_startingIndicies[animation].x;
+          m_indices[animation].x >= m_endingIndices[animation].x)
+        m_indices[animation].x = m_startingIndices[animation].x;
     }
 
     // Now we update the texture on our sprite reference
@@ -125,12 +133,12 @@ void AnimationManager::addAnimation(string animation, Texture texture,
   m_indices[animation].y = index.y;
 
   // Our starting index vector
-  m_startingIndicies[animation].x = startingIndex.x;
-  m_startingIndicies[animation].y = startingIndex.y;
+  m_startingIndices[animation].x = startingIndex.x;
+  m_startingIndices[animation].y = startingIndex.y;
 
   // Our ending index vector
-  m_endingIndicies[animation].x = sheetSize.x;
-  m_endingIndicies[animation].y = sheetSize.y;
+  m_endingIndices[animation].x = sheetSize.x;
+  m_endingIndices[animation].y = sheetSize.y;
 
   // Our update rate (frequency)
   m_frequencies[animation] = frequency;
@@ -151,12 +159,12 @@ void AnimationManager::deleteAnimation(string animation) {
   // We just erase each entry in every map
   m_textures.erase(animation);
   m_indices.erase(animation);
-  m_startingIndicies.erase(animation);
+  m_startingIndices.erase(animation);
   m_sheetSizes.erase(animation);
   m_spriteSizes.erase(animation);
   m_frequencies.erase(animation);
   m_timesUpdated.erase(animation);
-  m_endingIndicies.erase(animation);
+  m_endingIndices.erase(animation);
   // Ez pz
 }
 
@@ -190,16 +198,26 @@ void AnimationManager::setAnimationTexture(string animation, Texture texture) {
 }
 
 void AnimationManager::resetAnimationIndex(string animation) {
-  m_indices[animation].x = m_startingIndicies[animation].x;
-  m_indices[animation].y = m_startingIndicies[animation].y;
+  m_indices[animation].x = m_startingIndices[animation].x;
+  m_indices[animation].y = m_startingIndices[animation].y;
 }
 
 void AnimationManager::setAnimationStartingIndex(string animation, Vector2i index) {
-  m_startingIndicies[animation].x = index.x;
-  m_startingIndicies[animation].y = index.y;
+  m_startingIndices[animation].x = index.x;
+  m_startingIndices[animation].y = index.y;
 }
 
 void AnimationManager::setAnimationEndingIndex(string animation, Vector2i index) {
-  m_endingIndicies[animation].x = index.x;
-  m_endingIndicies[animation].y = index.y;
+  m_endingIndices[animation].x = index.x;
+  m_endingIndices[animation].y = index.y;
+}
+
+sf::Vector2i AnimationManager::getAnimationStartingIndex(string animation)
+{
+    return m_startingIndices[animation];
+}
+
+sf::Vector2i AnimationManager::getAnimationEndingIndex(string animation)
+{
+    return m_endingIndices[animation];
 }

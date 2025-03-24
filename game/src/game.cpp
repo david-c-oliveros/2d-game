@@ -25,20 +25,18 @@ void Game::Create()
 
     LoadResources();
     shape = sf::RectangleShape({ 1.0f, 1.0f });
-    shape.setFillColor(sf::Color::Green);
+    shape.setFillColor(sf::Color(250, 150, 100));
     shape.setOutlineThickness(0.0f);
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
-    cTileWorld.Create(glm::ivec2(64, 64), glm::vec2(100.0f));
+    cCamera = sf::View(sf::FloatRect({ 0.0f, 0.0f }, { 1920.0f, 1080.0f }));
+    cWindow.setView(cCamera);
 
-    if (!font.openFromFile("../../res/font/Pixel Game.otf"))
-        std::cout << "ERROR loading font" << std::endl;
+    cTileWorld.Create(glm::ivec2(64, 64), glm::vec2(100.0f));
 
     cText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
     cOtherText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
     cOtherText->setPosition({ 0.0f, 100.0f });
-
-    EnableFollowCamera();
 }
 
 
@@ -68,8 +66,6 @@ void Game::Update()
     {
         e->Update();
     }
-
-    LerpCamera(m_pPlayer->vWorldPos);
 }
 
 
@@ -89,8 +85,8 @@ void Game::Render()
             /****************************************/
             /*        Set Position and Scale        */
             /****************************************/
-            glm::vec2 _vWorldPos(i, j);
-            glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(_vWorldPos);
+            sf::Vector2f _vWorldPos(i, j);
+//            glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(_vWorldPos);
 
 
             shape.setPosition(Util::glm_to_sf_vec2(_vScreenPos));
@@ -182,13 +178,24 @@ void Game::LerpCamera(glm::vec2 _vTarget)
 
 void Game::LoadResources()
 {
+    if (!font.openFromFile("../../res/font/Pixel Game.otf"))
+        std::cout << "ERROR loading font" << std::endl;
+
 //    pMap.LoadFromFile("../../res/tilemaps/rpg_world_pack_demo/Tilesets and props/rpg_demo.json");
     pMap.LoadFromFile("sample map demo.json");
     m_pPlayer->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
-    m_pPlayer->AddAnimation("walking", glm::ivec2(0, 0), glm::ivec2(4, 0));
-    m_pPlayer->SetAnimationFrequency("walking", 8);
-    m_pPlayer->SetCurrentAnimation("walking");
+    m_pPlayer->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
+    m_pPlayer->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
+    m_pPlayer->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
+    m_pPlayer->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
+
+    m_pPlayer->SetAnimationFrequency("walk_back", 8);
+    m_pPlayer->SetAnimationFrequency("walk_left", 8);
+    m_pPlayer->SetAnimationFrequency("walk_right", 8);
+    m_pPlayer->SetAnimationFrequency("walk_forward", 8);
+
+    m_pPlayer->SetCurrentAnimation("walk_right");
 
 //    std::shared_ptr<Character> _c = std::make_shared<Character>(glm::vec2(0, 0));
 //    _c->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png",
@@ -217,6 +224,11 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
         {
             cWindow.close();
         }
+
+        else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
+        {
+            m_pPlayer->Update();
+        }
     }
 
     /*********************/
@@ -226,31 +238,31 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
     {
         if (mouseButtonPressed->button == sf::Mouse::Button::Middle)
         {
-//            if (!m_bPanning)
-//            {
-//                cTileWorld.StartPan(vCursorPos);
-//                m_bPanning = true;
-//            }
+            if (!m_bPanning)
+            {
+                cTileWorld.StartPan(vCursorPos);
+                m_bPanning = true;
+            }
         }
     }
     else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonReleased>())
     {
         if (mouseButtonPressed->button == sf::Mouse::Button::Middle)
         {
-//            if (m_bPanning)
-//            {
-//                cTileWorld.EndPan(vCursorPos);
-//                m_bPanning = false;
-//            }
+            if (m_bPanning)
+            {
+                cTileWorld.EndPan(vCursorPos);
+                m_bPanning = false;
+            }
         }
     }
 
     else if (const auto* mouseMoved = event->getIf<sf::Event::MouseMoved>())
     {
-//        if (m_bPanning)
-//        {
-//            cTileWorld.UpdatePan(vCursorPos);
-//        }
+        if (m_bPanning)
+        {
+            cTileWorld.UpdatePan(vCursorPos);
+        }
     }
 
     /**********************/

@@ -7,6 +7,28 @@
 
 
 
+enum class MoveDir
+{
+    FORWARD,
+    BACK,
+    LEFT,
+    RIGHT,
+    FORWARD_LEFT,
+    FORWARD_RIGHT,
+    BACK_LEFT,
+    BACK_RIGHT
+};
+
+
+
+enum class State
+{
+    IDLE,
+    WALK
+};
+
+
+
 class Character : public Entity
 {
     public:
@@ -34,11 +56,14 @@ class Character : public Entity
         std::unique_ptr<sf::Texture> m_pTexture;
         std::unique_ptr<sf::Sprite> m_pSprite;
         std::string m_sCurrentAnimation;
+        std::string m_sPreviousAnimation;
 
         sf::Vector2i m_vSpriteSize;
         sf::Vector2i m_vFrameRect;
 
         bool bAnimated = false;
+
+        MoveDir eDir;
 
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 };

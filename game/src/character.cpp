@@ -57,7 +57,7 @@ void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::i
     AnimationManager::addAnimation(_sName, *m_pTexture, m_vFrameRect, m_vSpriteSize);
     AnimationManager::setAnimationStartingIndex(_sName, Util::glm_to_sf_ivec2(_vStartIndex));
     AnimationManager::setAnimationEndingIndex(_sName, Util::glm_to_sf_ivec2(_vEndIndex));
-    AnimationManager::update(_sName, *m_pSprite);
+//    AnimationManager::update(_sName, *m_pSprite);
 }
 
 
@@ -71,5 +71,14 @@ void Character::SetAnimationFrequency(std::string _sName, int32_t _nFreq)
 
 void Character::SetCurrentAnimation(std::string _sName)
 {
+
+    m_sPreviousAnimation = m_sCurrentAnimation;
     m_sCurrentAnimation = _sName;
+
+    if (_sName !=  m_sPreviousAnimation)
+    {
+        AnimationManager::setAnimationIndex(m_sCurrentAnimation,
+                                            AnimationManager::getAnimationStartingIndex(m_sCurrentAnimation));
+        AnimationManager::forceUpdate(m_sCurrentAnimation, *m_pSprite);
+    }
 }

@@ -13,6 +13,7 @@ class Player : public Character
         ~Player();
 
         void Update();
+        void Move();
 
 
     private:

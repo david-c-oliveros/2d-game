@@ -65,6 +65,7 @@ class Game
         std::array<glm::ivec2, 64> vecMap;
 
     private:
+        sf::View cCamera;
         bool m_bPanning = false;
         glm::ivec2 m_vHoveredTile;
 
