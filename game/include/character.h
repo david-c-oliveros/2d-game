@@ -38,7 +38,7 @@ class Character : public Entity
         std::shared_ptr<sf::Texture> GetTexture();
 
         void Update();
-        void Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld);
+        void Draw(sf::RenderWindow &cWindow);
 
 
         void AttachAnimatedSprite(std::string _sFilepath,

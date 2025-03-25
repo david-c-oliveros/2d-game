@@ -20,7 +20,7 @@ class Map
         Map();
         ~Map();
 
-        void Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld);
+        void Draw(sf::RenderWindow &cWindow);
 
         void LoadFromFile(const std::string &_sFilepath);
 

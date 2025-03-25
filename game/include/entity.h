@@ -18,7 +18,7 @@ class Entity
 
         void Create();
         virtual void Update() = 0;
-        virtual void Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld) = 0;
+        virtual void Draw(sf::RenderWindow &cWindow) = 0;
 
 
     public:

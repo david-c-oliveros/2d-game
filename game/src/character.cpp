@@ -25,13 +25,9 @@ void Character::Update()
 
 
 
-void Character::Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld)
+void Character::Draw(sf::RenderWindow &cWindow)
 {
-    glm::vec2 _vScalar = cTileWorld.GetWorldScale();
-    glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(vWorldPos);
-
-    m_pSprite->setPosition(Util::glm_to_sf_vec2(_vScreenPos));
-    m_pSprite->setScale(Util::glm_to_sf_vec2(_vScalar * m_vDefaultScalar));
+    m_pSprite->setPosition(Util::glm_to_sf_vec2(vWorldPos));
 
     cWindow.draw(*m_pSprite);
 }
@@ -57,7 +53,6 @@ void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::i
     AnimationManager::addAnimation(_sName, *m_pTexture, m_vFrameRect, m_vSpriteSize);
     AnimationManager::setAnimationStartingIndex(_sName, Util::glm_to_sf_ivec2(_vStartIndex));
     AnimationManager::setAnimationEndingIndex(_sName, Util::glm_to_sf_ivec2(_vEndIndex));
-//    AnimationManager::update(_sName, *m_pSprite);
 }
 
 
@@ -71,7 +66,6 @@ void Character::SetAnimationFrequency(std::string _sName, int32_t _nFreq)
 
 void Character::SetCurrentAnimation(std::string _sName)
 {
-
     m_sPreviousAnimation = m_sCurrentAnimation;
     m_sCurrentAnimation = _sName;
 

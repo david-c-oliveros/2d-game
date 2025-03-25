@@ -14,6 +14,7 @@
 #include "character.h"
 #include "player.h"
 #include "map.h"
+#include "camera.h"
 
 
 
@@ -32,6 +33,8 @@ class Game
         void Start();
         void Update();
         void Render();
+        void RenderGameWorld();
+        void RenderUI();
 
         glm::vec2 GetCursorScreenPos();
         glm::vec2 GetCursorWorldPos();
@@ -39,6 +42,7 @@ class Game
 
         void EnableFollowCamera();
         void LerpCamera(glm::vec2 _vTarget);
+        void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
 
         void LoadResources();
 
@@ -49,10 +53,6 @@ class Game
         sf::RenderWindow cWindow;
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
-
-        TileWorld cTileWorld;
-
-        AnimationManager am;
 
         sf::Font font;
         std::unique_ptr<sf::Text> cText;
@@ -65,7 +65,6 @@ class Game
         std::array<glm::ivec2, 64> vecMap;
 
     private:
-        sf::View cCamera;
         bool m_bPanning = false;
         glm::ivec2 m_vHoveredTile;
 

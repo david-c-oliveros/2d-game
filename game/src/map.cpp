@@ -15,7 +15,7 @@ Map::~Map()
 
 
 
-void Map::Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld)
+void Map::Draw(sf::RenderWindow &cWindow)
 {
     for (auto &_layer : pMap->getLayers())
     {
@@ -31,8 +31,8 @@ void Map::Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld)
                 /*        Convert to TileWorld coordinates        */
                 /**************************************************/
                 glm::vec2 _vWorldPos = glm::vec2(_vTilePos.x, _vTilePos.y) * m_vDefaultScalar;
-                glm::vec2 _vScalar = cTileWorld.GetWorldScale();
-                glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(_vWorldPos);
+//                glm::vec2 _vScalar = cTileWorld.GetWorldScale();
+//                glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(_vWorldPos);
 
                 sf::Sprite* sprite = storeAndLoadImage(tileset->getImage().u8string(), {0, 0});
 
@@ -41,9 +41,9 @@ void Map::Draw(sf::RenderWindow &cWindow, TileWorld &cTileWorld)
                     sprite->setTextureRect(sf::Rect( sf::Vector2i(drawingRect.x, drawingRect.y),
                                                        sf::Vector2i(drawingRect.width, drawingRect.height)) );
 
-//                    sprite->setPosition({ _vTilePos.x, _vTilePos.y});
-                    sprite->setPosition(Util::glm_to_sf_vec2(_vScreenPos));
-                    sprite->setScale(Util::glm_to_sf_vec2(_vScalar * m_vDefaultScalar));
+                    sprite->setPosition({ _vTilePos.x, _vTilePos.y});
+//                    sprite->setPosition(Util::glm_to_sf_vec2(_vScreenPos));
+//                    sprite->setScale(Util::glm_to_sf_vec2(_vScalar * m_vDefaultScalar));
                     cWindow.draw(*sprite);
                 }
             }
