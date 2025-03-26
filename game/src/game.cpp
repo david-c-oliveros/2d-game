@@ -31,6 +31,7 @@ void Game::Create()
 
     Camera::SetCameraView(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
     Camera::SetZoom(cWindow, 0.2f);
+    Camera::EnableFollow();
 
     cText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
     cOtherText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
@@ -62,6 +63,8 @@ void Game::Update()
     cText->setString("Camera center: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getCenter())));
     cOtherText->setString("Camera size: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getSize())));
     m_pPlayer->Update();
+
+    Camera::UpdateFollow(Util::glm_to_sf_vec2(m_pPlayer->vWorldPos + (glm::vec2)Util::sf_to_glm_ivec2(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto e : vecEntities)
     {

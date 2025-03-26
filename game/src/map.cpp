@@ -41,7 +41,7 @@ void Map::Draw(sf::RenderWindow &cWindow)
                     sprite->setTextureRect(sf::Rect( sf::Vector2i(drawingRect.x, drawingRect.y),
                                                        sf::Vector2i(drawingRect.width, drawingRect.height)) );
 
-                    sprite->setPosition({ _vTilePos.x, _vTilePos.y});
+                    sprite->setPosition({ _vTilePos.x, _vTilePos.y });
 //                    sprite->setPosition(Util::glm_to_sf_vec2(_vScreenPos));
 //                    sprite->setScale(Util::glm_to_sf_vec2(_vScalar * m_vDefaultScalar));
                     cWindow.draw(*sprite);

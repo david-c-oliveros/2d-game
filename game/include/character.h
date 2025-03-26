@@ -52,6 +52,8 @@ class Character : public Entity
         void SetAnimationFrequency(std::string _sName, int32_t _nFreq);
         void SetCurrentAnimation(std::string _sName);
 
+        sf::Vector2i GetSpriteSize();
+
     protected:
         std::unique_ptr<sf::Texture> m_pTexture;
         std::unique_ptr<sf::Sprite> m_pSprite;

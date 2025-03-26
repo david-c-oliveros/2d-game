@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>

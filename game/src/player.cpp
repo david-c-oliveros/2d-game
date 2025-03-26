@@ -62,18 +62,11 @@ void Player::Move()
     /*********************************/
     /*        Update position        */
     /*********************************/
-    if (nFrameCount < 1)
-    {
-        nFrameCount++;
-        return;
-    }
-
     if (glm::length(m_vVelocity) > 0.0f)
     {
-        vWorldPos += (float)nFrameCount * (glm::normalize(m_vVelocity) * m_speedScalar);
+        vWorldPos += (glm::normalize(m_vVelocity) * m_speedScalar);
     }
 
-    nFrameCount = 0;
     m_vVelocity = glm::vec2(0.0f);
 }
 
@@ -96,6 +89,9 @@ void Player::handleInput()
     {
         m_vVelocity.x -= 1.0f;
 
+        /*********************************/
+        /*        Handle diagonal        */
+        /*********************************/
         if (m_vVelocity.y < 0)
             eDir = MoveDir::FORWARD_LEFT;
         else if (m_vVelocity.y > 0)
@@ -107,6 +103,9 @@ void Player::handleInput()
     {
         m_vVelocity.x += 1.0f;
 
+        /*********************************/
+        /*        Handle diagonal        */
+        /*********************************/
         if (m_vVelocity.y < 0)
             eDir = MoveDir::FORWARD_RIGHT;
         else if (m_vVelocity.y > 0)

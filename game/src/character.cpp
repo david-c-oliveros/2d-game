@@ -76,3 +76,10 @@ void Character::SetCurrentAnimation(std::string _sName)
         AnimationManager::forceUpdate(m_sCurrentAnimation, *m_pSprite);
     }
 }
+
+
+
+sf::Vector2i Character::GetSpriteSize()
+{
+    return m_vSpriteSize;
+}

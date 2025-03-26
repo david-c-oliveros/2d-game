@@ -91,7 +91,7 @@ void Camera::SetZoom(sf::RenderWindow &cWindow, float _fZoom)
 
 
 
-void Game::EnableFollow()
+void Camera::EnableFollow()
 {
     bFollow = true;
 }
@@ -110,14 +110,6 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow)
         return;
 
-    cView.setCenter();
-}
-
-
-
-void Game::LerpCamera(glm::vec2 _vTarget)
-{
-    sf::Vector2u _vScreenSize = cWindow.getSize();
-    glm::vec2 vCenter = cTileWorld.ScreenToWorld(glm::vec2(_vScreenSize.x, _vScreenSize.y));
-    glm::vec2 vDelta = glm::mix(vCenter, _vTarget, 0.5f);
+    sf::Vector2f vNewCenter(Util::glm_to_sf_vec2(glm::mix(Util::sf_to_glm_vec2(cView.getCenter()), Util::sf_to_glm_vec2(_vTarget), 0.1f)));
+    cView.setCenter(vNewCenter);
 }

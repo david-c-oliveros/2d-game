@@ -1,6 +1,11 @@
 #pragma once
 
+#include <iostream>
+
+#include <glm/glm.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "util.h"
 
 
 class Camera
@@ -11,9 +16,10 @@ class Camera
         static void ZoomViewAt(sf::RenderWindow &cWindow, sf::Vector2i vPixel, float fZoom);
         static void SetSize(sf::RenderWindow &cWindow, sf::Vector2f _vZoom);
         static void SetZoom(sf::RenderWindow &cWindow, float _fZoom);
-        static void EnableFollowCamera();
-        static void DisableFollowCamera();
-        static void UpdateFollowCamera();
+        static void EnableFollow();
+        static void DisableFollow();
+        static void UpdateFollow();
+        static void UpdateFollow(sf::Vector2f _vTarget);
 
 
     public:
