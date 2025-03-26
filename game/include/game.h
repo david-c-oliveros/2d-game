@@ -71,5 +71,7 @@ class Game
         glm::ivec2 m_vHoveredTile;
 
         std::unique_ptr<Player> m_pPlayer;
-        Map pMap;
+        Map m_pMap;
+
+        uint8_t m_nFrameCount = 1;
 };

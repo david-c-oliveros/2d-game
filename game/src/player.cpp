@@ -64,7 +64,7 @@ void Player::Move()
     /*********************************/
     if (glm::length(m_vVelocity) > 0.0f)
     {
-        vWorldPos += (glm::normalize(m_vVelocity) * m_speedScalar);
+        vWorldPos += glm::normalize(m_vVelocity) * m_fSpeedScalar;
     }
 
     m_vVelocity = glm::vec2(0.0f);

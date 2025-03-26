@@ -62,8 +62,8 @@ void Game::Update()
 {
     cText->setString("Camera center: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getCenter())));
     cOtherText->setString("Camera size: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getSize())));
-    m_pPlayer->Update();
 
+    m_pPlayer->Update();
     Camera::UpdateFollow(Util::glm_to_sf_vec2(m_pPlayer->vWorldPos + (glm::vec2)Util::sf_to_glm_ivec2(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto e : vecEntities)
@@ -89,7 +89,7 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     cWindow.setView(Camera::cView);
-    pMap.Draw(cWindow);
+    m_pMap.Draw(cWindow);
 
     for (int32_t i = 0; i < 1;  i++)
     {
@@ -174,7 +174,7 @@ void Game::LoadResources()
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
         std::cout << "ERROR loading font" << std::endl;
 
-    pMap.LoadFromFile("sample map demo.json");
+    m_pMap.LoadFromFile("sample map demo.json");
     m_pPlayer->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
     m_pPlayer->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));

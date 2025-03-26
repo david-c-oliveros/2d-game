@@ -111,5 +111,5 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
         return;
 
     sf::Vector2f vNewCenter(Util::glm_to_sf_vec2(glm::mix(Util::sf_to_glm_vec2(cView.getCenter()), Util::sf_to_glm_vec2(_vTarget), 0.1f)));
-    cView.setCenter(vNewCenter);
+    cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
 }
