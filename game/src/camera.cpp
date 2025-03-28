@@ -20,6 +20,7 @@ void Camera::HandleMouseInput(sf::RenderWindow &cWindow, std::optional<sf::Event
             vOldPos = cWindow.mapPixelToCoords(sf::Vector2i(mouseButtonPressed->position.x, mouseButtonPressed->position.y));
         }
     }
+
     else if (const auto* mouseButtonReleased = cEvent->getIf<sf::Event::MouseButtonReleased>())
     {
         if (mouseButtonReleased->button == sf::Mouse::Button::Middle)
@@ -110,6 +111,6 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow)
         return;
 
-    sf::Vector2f vNewCenter(Util::glm_to_sf_vec2(glm::mix(Util::sf_to_glm_vec2(cView.getCenter()), Util::sf_to_glm_vec2(_vTarget), 0.1f)));
+    sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
     cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
 }

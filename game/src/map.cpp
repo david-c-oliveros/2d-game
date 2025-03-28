@@ -23,16 +23,14 @@ void Map::Draw(sf::RenderWindow &cWindow)
         {
             for (auto &[pos, tileObject] : _layer.getTileObjects())
             {
+                /**************************************************/
+                /*        Convert to TileWorld coordinates        */
+                /**************************************************/
                 tson::Tileset *tileset = tileObject.getTile()->getTileset();
                 tson::Rect drawingRect = tileObject.getDrawingRect();
                 tson::Vector2f _vTilePos = tileObject.getPosition();
 
-                /**************************************************/
-                /*        Convert to TileWorld coordinates        */
-                /**************************************************/
                 glm::vec2 _vWorldPos = glm::vec2(_vTilePos.x, _vTilePos.y) * m_vDefaultScalar;
-//                glm::vec2 _vScalar = cTileWorld.GetWorldScale();
-//                glm::vec2 _vScreenPos = cTileWorld.WorldToScreen(_vWorldPos);
 
                 sf::Sprite* sprite = storeAndLoadImage(tileset->getImage().u8string(), {0, 0});
 

@@ -27,7 +27,7 @@ void Character::Update()
 
 void Character::Draw(sf::RenderWindow &cWindow)
 {
-    m_pSprite->setPosition(Util::glm_to_sf_vec2(vWorldPos));
+    m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
 
     cWindow.draw(*m_pSprite);
 }
@@ -42,8 +42,8 @@ void Character::AttachAnimatedSprite(std::string _sFilepath, glm::ivec2 _vSprite
 
     m_pSprite = std::make_unique<sf::Sprite>(*m_pTexture);
 
-    m_vFrameRect = Util::glm_to_sf_ivec2(_vFrameRect);
-    m_vSpriteSize = Util::glm_to_sf_ivec2(_vSpriteSize);
+    m_vFrameRect  = Util::convert_vector<sf::Vector2i>(_vFrameRect);
+    m_vSpriteSize = Util::convert_vector<sf::Vector2i>(_vSpriteSize);
 }
 
 
@@ -51,8 +51,8 @@ void Character::AttachAnimatedSprite(std::string _sFilepath, glm::ivec2 _vSprite
 void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::ivec2 _vEndIndex)
 {
     AnimationManager::addAnimation(_sName, *m_pTexture, m_vFrameRect, m_vSpriteSize);
-    AnimationManager::setAnimationStartingIndex(_sName, Util::glm_to_sf_ivec2(_vStartIndex));
-    AnimationManager::setAnimationEndingIndex(_sName, Util::glm_to_sf_ivec2(_vEndIndex));
+    AnimationManager::setAnimationStartingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
+    AnimationManager::setAnimationEndingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
 }
 
 

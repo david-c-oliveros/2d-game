@@ -60,11 +60,11 @@ void Game::Start()
 
 void Game::Update()
 {
-    cText->setString("Camera center: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getCenter())));
-    cOtherText->setString("Camera size: " + glm::to_string(Util::sf_to_glm_vec2(Camera::cView.getSize())));
+    cText->setString("Camera center: " + glm::to_string(Util::convert_vector<glm::vec2>(Camera::cView.getCenter())));
+    cOtherText->setString("Camera size: " + glm::to_string(Util::convert_vector<glm::vec2>(Camera::cView.getSize())));
 
     m_pPlayer->Update();
-    Camera::UpdateFollow(Util::glm_to_sf_vec2(m_pPlayer->vWorldPos + (glm::vec2)Util::sf_to_glm_ivec2(m_pPlayer->GetSpriteSize()) / 2.0f));
+    Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto e : vecEntities)
     {
@@ -107,13 +107,13 @@ void Game::RenderGameWorld()
     /***************************************/
     /*        Draw Highlighted Tile        */
     /***************************************/
-    glm::ivec2 _vCursorTile = GetHoveredTile();
+    sf::Vector2i _vCursorTile = GetHoveredTile();
     if (true)
     {
         shape.setOutlineColor(sf::Color(150, 150, 100));
         shape.setFillColor(sf::Color(150, 150, 100));
 
-        sf::Vector2i _vScreenPos = cWindow.mapCoordsToPixel(sf::Vector2f(Util::glm_to_sf_ivec2(GetHoveredTile())));
+        sf::Vector2i _vScreenPos = cWindow.mapCoordsToPixel(sf::Vector2f(GetHoveredTile().x, GetHoveredTile().y));
         shape.setPosition(sf::Vector2f(_vScreenPos));
         cWindow.draw(shape);
 
@@ -140,27 +140,27 @@ void Game::RenderUI()
 
 
 
-glm::vec2 Game::GetCursorScreenPos()
+sf::Vector2i Game::GetCursorScreenPos()
 {
     sf::Vector2i _vCursorScreen = sf::Mouse::getPosition(cWindow);
-    return glm::vec2(_vCursorScreen.x, _vCursorScreen.y);
+    return _vCursorScreen;
 }
 
 
 
-glm::vec2 Game::GetCursorWorldPos()
+sf::Vector2f Game::GetCursorWorldPos()
 {
     sf::Vector2f _vCursorWorld  = cWindow.mapPixelToCoords(sf::Mouse::getPosition(cWindow));
-    return glm::vec2(_vCursorWorld.x, _vCursorWorld.y);
+    return _vCursorWorld;
 }
 
 
 
 // TODO - This is broken
-glm::ivec2 Game::GetHoveredTile()
+sf::Vector2i Game::GetHoveredTile()
 {
-    glm::vec2 _vHoveredTileFloat = GetCursorWorldPos();
-    glm::ivec2 vHoveredTile;
+    sf::Vector2f _vHoveredTileFloat = GetCursorWorldPos();
+    sf::Vector2i vHoveredTile;
     vHoveredTile.x = _vHoveredTileFloat.x < 0.0 ? (int32_t)(_vHoveredTileFloat.x - 1) : (int32_t)(_vHoveredTileFloat.x);
     vHoveredTile.y = _vHoveredTileFloat.y < 0.0 ? (int32_t)(_vHoveredTileFloat.y - 1) : (int32_t)(_vHoveredTileFloat.y);
 
@@ -204,7 +204,7 @@ void Game::LoadResources()
 
 void Game::handleInputEvent(std::optional<sf::Event> event)
 {
-    glm::vec2 vCursorPos = GetCursorScreenPos();
+    sf::Vector2i vCursorPos = GetCursorScreenPos();
 
     if (event->is<sf::Event::Closed>())
     {

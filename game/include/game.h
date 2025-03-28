@@ -38,9 +38,9 @@ class Game
         void RenderGameWorld();
         void RenderUI();
 
-        glm::vec2 GetCursorScreenPos();
-        glm::vec2 GetCursorWorldPos();
-        glm::ivec2 GetHoveredTile();
+        sf::Vector2i GetCursorScreenPos();
+        sf::Vector2f GetCursorWorldPos();
+        sf::Vector2i GetHoveredTile();
 
         void EnableFollowCamera();
         void LerpCamera(glm::vec2 _vTarget);
