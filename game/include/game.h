@@ -31,6 +31,9 @@ class Game
         Game(int32_t _nCanvasWidth, int32_t _nCanvasHeight);
         ~Game();
 
+        void Test();
+        void OtherTest();
+
         void Create();
         void Start();
         void Update();
@@ -50,6 +53,7 @@ class Game
 
     private:
         void handleInputEvent(std::optional<sf::Event> event);
+        uint32_t getNewID();
 
     public:
         sf::RenderWindow cWindow;
@@ -74,4 +78,6 @@ class Game
         Map m_pMap;
 
         uint8_t m_nFrameCount = 1;
+
+        uint32_t m_nCurrentID = 0;
 };

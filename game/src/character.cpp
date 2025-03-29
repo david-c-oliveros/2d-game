@@ -2,9 +2,17 @@
 
 
 
-Character::Character(glm::vec2 _vWorldPos)
-    : Entity(_vWorldPos)
+Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
+    : Entity(_ID, _vWorldPos)
 {
+}
+
+
+
+Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
+    : sName(_sName), Entity(_ID, _vWorldPos)
+{
+    std::cout << sName << " ID: " << m_ID << "\n";
 }
 
 
@@ -34,7 +42,7 @@ void Character::Draw(sf::RenderWindow &cWindow)
 
 
 
-void Character::AttachAnimatedSprite(std::string _sFilepath, glm::ivec2 _vSpriteSize, glm::ivec2 _vFrameRect)
+void Character::AttachAnimatedSprite(const std::string _sFilepath, glm::ivec2 _vSpriteSize, glm::ivec2 _vFrameRect)
 {
     m_vDefaultScalar /= _vSpriteSize;
     bAnimated = true;
@@ -50,7 +58,7 @@ void Character::AttachAnimatedSprite(std::string _sFilepath, glm::ivec2 _vSprite
 
 void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::ivec2 _vEndIndex)
 {
-    AnimationManager::addAnimation(_sName, *m_pTexture, m_vFrameRect, m_vSpriteSize);
+    AnimationManager::addAnimation(_sName, m_pSprite->getTexture(), m_vFrameRect, m_vSpriteSize);
     AnimationManager::setAnimationStartingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
     AnimationManager::setAnimationEndingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
 }

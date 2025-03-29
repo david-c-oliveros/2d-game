@@ -108,8 +108,14 @@ private:
   static map<string, int> m_timesUpdated;
 
   static map<string, int> m_timesBetweenUpdate;
+
+  /*
+   * This map stores the
+   */
+  static map<uint32_t, string> m_animations;
 public:
 
+  static void printTextures();
   static void forceUpdate(string animation, Sprite &sprite);
 
   static void update(string animation, Sprite& sprite);

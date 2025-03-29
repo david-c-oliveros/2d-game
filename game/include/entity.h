@@ -13,7 +13,7 @@
 class Entity
 {
     public:
-        Entity(glm::vec2 _vWorldPos);
+        Entity(uint32_t _ID, glm::vec2 _vWorldPos);
         ~Entity();
 
         void Create();
@@ -23,4 +23,5 @@ class Entity
 
     public:
         glm::vec2 vWorldPos;
+        uint32_t m_ID;
 };

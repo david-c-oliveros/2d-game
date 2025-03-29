@@ -2,8 +2,15 @@
 
 
 
-Player::Player(glm::vec2 _vWorldPos)
-    : Character(_vWorldPos)
+Player::Player(uint32_t _ID, glm::vec2 _vWorldPos)
+    : Character(_ID, _vWorldPos)
+{
+}
+
+
+
+Player::Player(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
+    : Character(_ID, _sName, _vWorldPos)
 {
 }
 

@@ -9,7 +9,8 @@
 class Player : public Character
 {
     public:
-        Player(glm::vec2 _vWorldPos);
+        Player(uint32_t _ID, glm::vec2 _vWorldPos);
+        Player(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
         ~Player();
 
         void Update();

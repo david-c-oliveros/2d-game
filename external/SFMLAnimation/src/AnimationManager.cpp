@@ -11,6 +11,7 @@ map<string, int> AnimationManager::m_frequencies;
 map<string, int> AnimationManager::m_timesUpdated;
 map<string, int> AnimationManager::m_timesBetweenUpdate;
 
+map<uint32_t, string> AnimationManager::m_animations;
 
 /*
 update(string animation, Sprite& sprite)
@@ -25,6 +26,8 @@ void AnimationManager::forceUpdate(string animation, Sprite &sprite)
     m_timesBetweenUpdate[animation] = m_frequencies[animation];
     update(animation, sprite);
 }
+
+
 void AnimationManager::update(string animation, Sprite &sprite) {
   if (m_timesBetweenUpdate[animation] < m_frequencies[animation])
   {
@@ -77,7 +80,7 @@ void AnimationManager::update(string animation, Sprite &sprite) {
     }
 
     // Now we update the texture on our sprite reference
-    sprite.setTexture(m_textures[animation]);
+    //sprite.setTexture(m_textures[animation]);
     sprite.setTextureRect(rect);
 
     m_timesBetweenUpdate[animation] = 0;
@@ -118,7 +121,9 @@ sheetSize - The vector containing the number of animation frames in our image
 void AnimationManager::addAnimation(string animation, Texture texture,
    Vector2i sheetSize, Vector2i spriteSize, Vector2i index, int frequency,
    Vector2i startingIndex) {
-  // First, we want to make an entry in the texture map
+  // First, we make a entry to the animations map
+  animation = animation;
+  // Next, we want to make an entry in the texture map
   m_textures[animation] = texture;
   // Next, we make sheet size entry
   m_sheetSizes[animation].x = sheetSize.x;

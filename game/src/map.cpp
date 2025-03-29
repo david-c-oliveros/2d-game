@@ -23,9 +23,9 @@ void Map::Draw(sf::RenderWindow &cWindow)
         {
             for (auto &[pos, tileObject] : _layer.getTileObjects())
             {
-                /**************************************************/
-                /*        Convert to TileWorld coordinates        */
-                /**************************************************/
+                /**********************************/
+                /*        Get Tilemap data        */
+                /**********************************/
                 tson::Tileset *tileset = tileObject.getTile()->getTileset();
                 tson::Rect drawingRect = tileObject.getDrawingRect();
                 tson::Vector2f _vTilePos = tileObject.getPosition();
@@ -34,6 +34,9 @@ void Map::Draw(sf::RenderWindow &cWindow)
 
                 sf::Sprite* sprite = storeAndLoadImage(tileset->getImage().u8string(), {0, 0});
 
+                /****************************/
+                /*        Draw Tiles        */
+                /****************************/
                 if (sprite != nullptr)
                 {
                     sprite->setTextureRect(sf::Rect( sf::Vector2i(drawingRect.x, drawingRect.y),

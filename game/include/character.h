@@ -32,7 +32,9 @@ enum class State
 class Character : public Entity
 {
     public:
-        Character(glm::vec2 _vWorldPos);
+        Character(uint32_t _ID, glm::vec2 _vWorldPos);
+
+        Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
         ~Character();
 
         std::shared_ptr<sf::Texture> GetTexture();
@@ -41,11 +43,11 @@ class Character : public Entity
         void Draw(sf::RenderWindow &cWindow);
 
 
-        void AttachAnimatedSprite(std::string _sFilepath,
+        void AttachAnimatedSprite(const std::string _sFilepath,
                                   glm::ivec2 _vSpriteSize,
                                   glm::ivec2 _vFrameRect);
 
-        void AddAnimation(std::string _sName,
+        void AddAnimation(const std::string _sName,
                           glm::ivec2 _vStartIndex,
                           glm::ivec2 _vEndIndex);
 
@@ -54,9 +56,13 @@ class Character : public Entity
 
         sf::Vector2i GetSpriteSize();
 
+    public:
+        std::string sName;
+
     protected:
-        std::unique_ptr<sf::Texture> m_pTexture;
         std::unique_ptr<sf::Sprite> m_pSprite;
+        std::unique_ptr<sf::Texture> m_pTexture;
+
         std::string m_sCurrentAnimation;
         std::string m_sPreviousAnimation;
 

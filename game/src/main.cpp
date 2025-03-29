@@ -12,6 +12,9 @@ int main(int argc, const char* argv[])
     /*        Create Window        */
     /*******************************/
 
+//    game.Test();
+//    game.OtherTest();
+
     game.Create();
     game.Start();
 

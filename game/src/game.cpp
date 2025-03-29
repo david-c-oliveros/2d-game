@@ -21,7 +21,7 @@ Game::~Game() {}
 
 void Game::Create()
 {
-    m_pPlayer = std::make_unique<Player>(glm::vec2(0.0f));
+    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0.0f));
 
     LoadResources();
     shape = sf::RectangleShape({ 1.0f, 1.0f });
@@ -175,6 +175,7 @@ void Game::LoadResources()
         std::cout << "ERROR loading font" << std::endl;
 
     m_pMap.LoadFromFile("sample map demo.json");
+
     m_pPlayer->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
     m_pPlayer->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
@@ -189,15 +190,23 @@ void Game::LoadResources()
 
     m_pPlayer->SetCurrentAnimation("walk_right");
 
-//    std::shared_ptr<Character> _c = std::make_shared<Character>(glm::vec2(0, 0));
-//    _c->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png",
-//                                    glm::ivec2(32, 32), glm::ivec2(3, 4));
-//
-//    _c->AddAnimation("walking", glm::ivec2(0, 0), glm::ivec2(4, 0));
-//    _c->SetAnimationFrequency("walking", 8);
-//    _c->SetCurrentAnimation("walking");
-//
-//    vecEntities.push_back(_c);
+
+    std::shared_ptr<Character> _c = std::make_shared<Character>(getNewID(), "Enemy", glm::vec2(8, 8));
+    _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
+
+    _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
+    _c->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
+    _c->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
+    _c->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
+
+    _c->SetAnimationFrequency("walk_back", 8);
+    _c->SetAnimationFrequency("walk_left", 8);
+    _c->SetAnimationFrequency("walk_right", 8);
+    _c->SetAnimationFrequency("walk_forward", 8);
+
+    _c->SetCurrentAnimation("walk_forward");
+
+    vecEntities.push_back(_c);
 }
 
 
@@ -217,4 +226,11 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
             cWindow.close();
         }
     }
+}
+
+
+
+uint32_t Game::getNewID()
+{
+    return m_nCurrentID++;
 }
