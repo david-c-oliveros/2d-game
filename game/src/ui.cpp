@@ -1,40 +1,53 @@
 #include "ui.h"
 
 
-std::map<std::string, std::unique_ptr<sf::Text>> UI::mTexts;
-sf::Font UI::cFont;
+std::map<std::string, std::unique_ptr<Label>> UI::mLabels;
+std::map<std::string, std::unique_ptr<Button>> UI::mButtons;
+std::shared_ptr<sf::Font> UI::m_pDefaultFont;
+uint32_t UI::m_nDefaultFontSize;
 
 
 
 void UI::Render(sf::RenderWindow &cWindow)
 {
-    for (auto &text : mTexts)
+    for (auto &label : mLabels)
     {
-        cWindow.draw(*text.second);
+        label.second->Draw(cWindow);
+    }
+
+    for (auto &button : mButtons)
+    {
+        button.second->Draw(cWindow);
     }
 }
 
 
 
-void UI::AddText(std::string sName, std::string sContents)
+void UI::AddText(std::string sName, std::string _sLabelText)
 {
-    mTexts[sName] = std::make_unique<sf::Text>(cFont, sContents);
-    mTexts[sName]->setPosition(sf::Vector2f(0.0f, (mTexts.size() - 1) * 100.0f));
+    mLabels[sName] = std::make_unique<Label>(_sLabelText, *m_pDefaultFont);
+    mLabels[sName]->SetFontSize(m_nDefaultFontSize);
+    mLabels[sName]->SetPosition(sf::Vector2f(0.0f, (mLabels.size() - 1) * m_nDefaultFontSize * 1.5));
 }
 
 
 
-void UI::SetFont(sf::Font &_cFont)
+//void UI::AddButton(std::string sName, std::string sLabel, sf::Rect cPosDim)
+void UI::AddButton(std::string sName)
 {
-    cFont = _cFont;
+    mButtons[sName] = std::make_unique<Button>("My Button", *m_pDefaultFont, m_nDefaultFontSize);
 }
 
 
 
-void UI::SetFontSize(int size)
+void UI::SetDefaultFont(sf::Font &_cFont)
 {
-    for (auto &text : mTexts)
-    {
-        text.second->setCharacterSize(size);
-    }
+    m_pDefaultFont = std::make_shared<sf::Font>(_cFont);
+}
+
+
+
+void UI::SetDefaultFontSize(uint32_t size)
+{
+    m_nDefaultFontSize = size;
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cstddef>
 
 #include <glm/glm.hpp>
 
@@ -47,6 +48,7 @@ class Game
         void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
 
         void LoadResources();
+        void AddEntity(std::unique_ptr<Entity> _pE);
 
     private:
         void handleInputEvent(std::optional<sf::Event> event);
@@ -60,9 +62,7 @@ class Game
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
-        std::vector<std::shared_ptr<Entity>> vecEntities;
-
-        std::array<glm::ivec2, 64> vecMap;
+        std::array<std::unique_ptr<Entity>, 80> aEntities = { nullptr };
 
     private:
         bool m_bPanning = false;

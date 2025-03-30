@@ -35,6 +35,7 @@ void Game::Create()
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_position", "Cursor Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetHoveredTile())));
+    UI::AddButton("My Button");
 }
 
 
@@ -59,13 +60,16 @@ void Game::Start()
 
 void Game::Update()
 {
-    UI::mTexts["player_position"]->setString("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
+    UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
 
     m_pPlayer->Update();
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
-    for (auto e : vecEntities)
+    for (auto &e : aEntities)
     {
+        if (e == nullptr)
+            continue;
+
         e->Update();
     }
 }
@@ -89,24 +93,11 @@ void Game::RenderGameWorld()
     cWindow.setView(Camera::cView);
     m_pMap.Draw(cWindow);
 
-    for (int32_t i = 0; i < 1;  i++)
-    {
-        for (int32_t j = 0; j < 1; j++)
-        {
-            /****************************************/
-            /*        Set Position and Scale        */
-            /****************************************/
-            sf::Vector2f _vWorldPos(i, j);
-
-            cWindow.draw(shape);
-        }
-    }
-
     /***************************************/
     /*        Draw Highlighted Tile        */
     /***************************************/
     sf::Vector2i _vCursorTile(GetHoveredTile().x * Globals::TILE_SIZE.x, GetHoveredTile().y * Globals::TILE_SIZE.y);
-    UI::mTexts["cursor_position"]->setString("Cursor position: " + glm::to_string(Util::convert_vector<glm::vec2>(_vCursorTile)));
+    UI::mLabels["cursor_position"]->SetText("Cursor position: " + glm::to_string(Util::convert_vector<glm::vec2>(_vCursorTile)));
 
     shape.setOutlineColor(sf::Color(150, 150, 100));
     shape.setFillColor(sf::Color(50, 50, 100));
@@ -116,10 +107,17 @@ void Game::RenderGameWorld()
 
     cWindow.draw(shape);
 
+
+    /*******************************/
+    /*        Draw Entities        */
+    /*******************************/
     m_pPlayer->Draw(cWindow);
 
-    for (auto &e : vecEntities)
+    for (auto &e : aEntities)
     {
+        if (e == nullptr)
+            continue;
+
         e->Draw(cWindow);
     }
 }
@@ -131,11 +129,6 @@ void Game::RenderUI()
     cWindow.setView(cWindow.getDefaultView());
 
     UI::Render(cWindow);
-
-//    cWindow.draw(*pText);
-//    cWindow.draw(*pOtherText);
-//    cWindow.draw(*pPlayerPosText);
-//    cWindow.draw(*pCursorPosText);
 }
 
 
@@ -175,7 +168,8 @@ void Game::LoadResources()
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
         std::cout << "ERROR loading font" << std::endl;
 
-    UI::SetFont(font);
+    UI::SetDefaultFont(font);
+    UI::SetDefaultFontSize(40);
 
     m_pMap.LoadFromFile("sample map demo.json");
 
@@ -194,7 +188,7 @@ void Game::LoadResources()
     m_pPlayer->SetCurrentAnimation("walk_right");
 
 
-    std::shared_ptr<Character> _c = std::make_shared<Character>(getNewID(), "Enemy", glm::vec2(8, 8));
+    std::unique_ptr<Character> _c = std::make_unique<Character>(getNewID(), "Enemy", glm::vec2(8, 8));
     _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
     _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
@@ -209,7 +203,21 @@ void Game::LoadResources()
 
     _c->SetCurrentAnimation("walk_forward");
 
-    vecEntities.push_back(_c);
+    AddEntity(std::move(_c));
+}
+
+
+
+void Game::AddEntity(std::unique_ptr<Entity> _pE)
+{
+    for (auto &entity : aEntities)
+    {
+        if (entity == nullptr)
+        {
+            entity = std::move(_pE);
+            break;
+        }
+    }
 }
 
 

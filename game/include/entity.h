@@ -1,9 +1,7 @@
 #pragma once
 
 #include <iostream>
-
 #include <SFML/Graphics.hpp>
-
 #include <glm/glm.hpp>
 
 #include "tile_world.h"
