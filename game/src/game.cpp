@@ -33,9 +33,8 @@ void Game::Create()
     Camera::SetZoom(cWindow, 0.2f);
     Camera::EnableFollow();
 
-    cText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
-    cOtherText = std::make_unique<sf::Text>(font, "Hello SFML", 50);
-    cOtherText->setPosition({ 0.0f, 100.0f });
+    UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
+    UI::AddText("cursor_position", "Cursor Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetHoveredTile())));
 }
 
 
@@ -60,8 +59,7 @@ void Game::Start()
 
 void Game::Update()
 {
-    cText->setString("Camera center: " + glm::to_string(Util::convert_vector<glm::vec2>(Camera::cView.getCenter())));
-    cOtherText->setString("Camera size: " + glm::to_string(Util::convert_vector<glm::vec2>(Camera::cView.getSize())));
+    UI::mTexts["player_position"]->setString("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
 
     m_pPlayer->Update();
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
@@ -107,18 +105,16 @@ void Game::RenderGameWorld()
     /***************************************/
     /*        Draw Highlighted Tile        */
     /***************************************/
-    sf::Vector2i _vCursorTile = GetHoveredTile();
-    if (true)
-    {
-        shape.setOutlineColor(sf::Color(150, 150, 100));
-        shape.setFillColor(sf::Color(150, 150, 100));
+    sf::Vector2i _vCursorTile(GetHoveredTile().x * Globals::TILE_SIZE.x, GetHoveredTile().y * Globals::TILE_SIZE.y);
+    UI::mTexts["cursor_position"]->setString("Cursor position: " + glm::to_string(Util::convert_vector<glm::vec2>(_vCursorTile)));
 
-        sf::Vector2i _vScreenPos = cWindow.mapCoordsToPixel(sf::Vector2f(GetHoveredTile().x, GetHoveredTile().y));
-        shape.setPosition(sf::Vector2f(_vScreenPos));
-        cWindow.draw(shape);
+    shape.setOutlineColor(sf::Color(150, 150, 100));
+    shape.setFillColor(sf::Color(50, 50, 100));
 
-        shape.setOutlineColor(sf::Color(250, 150, 100));
-    }
+    shape.setPosition(sf::Vector2f(_vCursorTile));
+    shape.setScale(Globals::TILE_SIZE);
+
+    cWindow.draw(shape);
 
     m_pPlayer->Draw(cWindow);
 
@@ -134,8 +130,12 @@ void Game::RenderUI()
 {
     cWindow.setView(cWindow.getDefaultView());
 
-    cWindow.draw(*cText);
-    cWindow.draw(*cOtherText);
+    UI::Render(cWindow);
+
+//    cWindow.draw(*pText);
+//    cWindow.draw(*pOtherText);
+//    cWindow.draw(*pPlayerPosText);
+//    cWindow.draw(*pCursorPosText);
 }
 
 
@@ -150,19 +150,19 @@ sf::Vector2i Game::GetCursorScreenPos()
 
 sf::Vector2f Game::GetCursorWorldPos()
 {
+    cWindow.setView(Camera::cView);
     sf::Vector2f _vCursorWorld  = cWindow.mapPixelToCoords(sf::Mouse::getPosition(cWindow));
     return _vCursorWorld;
 }
 
 
 
-// TODO - This is broken
 sf::Vector2i Game::GetHoveredTile()
 {
-    sf::Vector2f _vHoveredTileFloat = GetCursorWorldPos();
-    sf::Vector2i vHoveredTile;
-    vHoveredTile.x = _vHoveredTileFloat.x < 0.0 ? (int32_t)(_vHoveredTileFloat.x - 1) : (int32_t)(_vHoveredTileFloat.x);
-    vHoveredTile.y = _vHoveredTileFloat.y < 0.0 ? (int32_t)(_vHoveredTileFloat.y - 1) : (int32_t)(_vHoveredTileFloat.y);
+    sf::Vector2f _vCursorPos = GetCursorWorldPos();
+    sf::Vector2i vHoveredTile({ 0, 0 });
+    vHoveredTile.x = _vCursorPos.x < 0.0f ?  (int32_t)(_vCursorPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(_vCursorPos.x) / Globals::TILE_SIZE.x;
+    vHoveredTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
 
     return vHoveredTile;
 }
@@ -171,8 +171,11 @@ sf::Vector2i Game::GetHoveredTile()
 
 void Game::LoadResources()
 {
+    sf::Font font;
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
         std::cout << "ERROR loading font" << std::endl;
+
+    UI::SetFont(font);
 
     m_pMap.LoadFromFile("sample map demo.json");
 

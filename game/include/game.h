@@ -10,6 +10,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <AnimationManager.hpp>
 
+#include "globals.h"
 #include "util.h"
 #include "tile_world.h"
 #include "entity.h"
@@ -17,12 +18,8 @@
 #include "player.h"
 #include "map.h"
 #include "camera.h"
+#include "ui.h"
 
-
-
-#define RECT_SIZE sf::Vector2f(0.9f, 0.9f)
-#define RECT_OL_SIZE sf::Vector2f(0.1f, 0.1f)
-#define TILE_SIZE glm::vec2(32.0f)
 
 
 class Game
@@ -60,9 +57,6 @@ class Game
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
 
-        sf::Font font;
-        std::unique_ptr<sf::Text> cText;
-        std::unique_ptr<sf::Text> cOtherText;
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
