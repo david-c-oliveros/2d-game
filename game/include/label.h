@@ -21,5 +21,4 @@ class Label
 
     private:
         std::unique_ptr<sf::Text> m_pText;
-//        sf::Font cFont;
 };

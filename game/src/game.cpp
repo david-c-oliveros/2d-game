@@ -62,6 +62,7 @@ void Game::Update()
 {
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
 
+    UI::UpdateButtons(GetCursorScreenPos());
     m_pPlayer->Update();
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 

@@ -8,6 +8,16 @@ uint32_t UI::m_nDefaultFontSize;
 
 
 
+void UI::UpdateButtons(sf::Vector2i vCursorPos)
+{
+    for (auto &button : mButtons)
+    {
+        button.second->Check(vCursorPos);
+    }
+}
+
+
+
 void UI::Render(sf::RenderWindow &cWindow)
 {
     for (auto &label : mLabels)

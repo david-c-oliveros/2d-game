@@ -11,6 +11,7 @@
 class UI
 {
     public:
+        static void UpdateButtons(sf::Vector2i vCursorPos);
         static void Render(sf::RenderWindow &cWindow);
         static void AddText(std::string sName, std::string sContents);
 //        static void AddButton(std::string sName, std::string sLabel, sf::Rect cPosDim);
