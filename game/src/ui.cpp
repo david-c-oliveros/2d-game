@@ -5,6 +5,7 @@ std::map<std::string, std::unique_ptr<Label>> UI::mLabels;
 std::map<std::string, std::unique_ptr<Button>> UI::mButtons;
 std::shared_ptr<sf::Font> UI::m_pDefaultFont;
 uint32_t UI::m_nDefaultFontSize;
+std::string UI::m_sHoveredButton = "";
 
 
 
@@ -12,7 +13,14 @@ void UI::UpdateButtons(sf::Vector2i vCursorPos)
 {
     for (auto &button : mButtons)
     {
-        button.second->Check(vCursorPos);
+        if (button.second->Check(vCursorPos))
+        {
+            m_sHoveredButton = button.first;
+        }
+        else
+        {
+            m_sHoveredButton = "";
+        }
     }
 }
 
@@ -60,4 +68,26 @@ void UI::SetDefaultFont(sf::Font &_cFont)
 void UI::SetDefaultFontSize(uint32_t size)
 {
     m_nDefaultFontSize = size;
+}
+
+
+
+void UI::HandleInput(sf::RenderWindow &cWindow, const std::optional<sf::Event> event)
+{
+    if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
+    {
+        if (mouseButtonPressed->button == sf::Mouse::Button::Left &&
+            m_sHoveredButton != "")
+        {
+            mButtons[m_sHoveredButton]->Press();
+        }
+    }
+    else if (const auto* mouseButtonReleased = event->getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (mouseButtonReleased->button == sf::Mouse::Button::Left &&
+            m_sHoveredButton != "")
+        {
+            mButtons[m_sHoveredButton]->Release();
+        }
+    }
 }

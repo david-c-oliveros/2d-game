@@ -49,6 +49,7 @@ void Game::Start()
             handleInputEvent(event);
             cWindow.setView(Camera::cView);
             Camera::HandleMouseInput(cWindow, event);
+            UI::HandleInput(cWindow, event);
         }
 
         Update();

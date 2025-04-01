@@ -22,8 +22,8 @@ Button::~Button()
 
 void Button::Draw(sf::RenderWindow &cWindow)
 {
-    m_pLabel->Draw(cWindow);
     cWindow.draw(m_cShape);
+    m_pLabel->Draw(cWindow);
 }
 
 
@@ -35,16 +35,44 @@ void Button::SetFontSize(uint32_t size)
 
 
 
-void Button::Check(sf::Vector2i vCursorPos)
+bool Button::Check(sf::Vector2i vCursorPos)
 {
-    if (isHovered(vCursorPos))
+    if (isHovered(vCursorPos) && !m_bPressed)
     {
         m_cShape.setFillColor(sf::Color::Blue);
+        return true;
     }
-    else
+    else if (isHovered(vCursorPos) && m_bPressed)
     {
-        m_cShape.setFillColor(sf::Color::Cyan);
+        return true;
     }
+
+    m_cShape.setFillColor(sf::Color::Cyan);
+    return false;
+}
+
+
+
+void Button::Press()
+{
+    PerformAction();
+    m_cShape.setFillColor(sf::Color::Green);
+    m_bPressed = true;
+}
+
+
+
+void Button::Release()
+{
+    m_cShape.setFillColor(sf::Color::Cyan);
+    m_bPressed = false;
+}
+
+
+
+void Button::PerformAction()
+{
+    std::cout << "Doing button action\n";
 }
 
 

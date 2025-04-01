@@ -17,7 +17,10 @@ class Button
 
         void Draw(sf::RenderWindow &cWindow);
         void SetFontSize(uint32_t size);
-        void Check(sf::Vector2i vCursorPos);
+        bool Check(sf::Vector2i vCursorPos);
+        void Press();
+        void Release();
+        void PerformAction();
 
 
     private:
@@ -25,6 +28,7 @@ class Button
 
 
     private:
+        bool m_bPressed = false;
         sf::Vector2i vVec;
         sf::Rect<int32_t> cButtonRect;
         sf::RectangleShape m_cShape;

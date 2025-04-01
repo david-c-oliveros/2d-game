@@ -18,6 +18,7 @@ class UI
         static void AddButton(std::string sName);
         static void SetDefaultFont(sf::Font &_cFont);
         static void SetDefaultFontSize(uint32_t size);
+        static void HandleInput(sf::RenderWindow &cWindow, const std::optional<sf::Event> event);
 
     public:
         static std::map<std::string, std::unique_ptr<Label>> mLabels;
@@ -26,4 +27,5 @@ class UI
     private:
         static std::shared_ptr<sf::Font> m_pDefaultFont;
         static uint32_t m_nDefaultFontSize;
+        static std::string m_sHoveredButton;
 };
