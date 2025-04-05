@@ -21,7 +21,7 @@ enum class MoveDir
 
 
 
-enum class State
+enum class CharState
 {
     IDLE,
     WALK
@@ -71,6 +71,7 @@ class Character : public Entity
 
         bool bAnimated = false;
 
+        CharState eState;
         MoveDir eDir;
 
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);

@@ -58,6 +58,13 @@ void UI::AddButton(std::string sName)
 
 
 
+//void UI::SetButtonCallback(std::string sName, (void)(Game::*)(std::string) *pFuncPtr)
+//{
+//    mButtons[sName].pFuncPtr = _pFuncPtr;
+//}
+
+
+
 void UI::SetDefaultFont(sf::Font &_cFont)
 {
     m_pDefaultFont = std::make_shared<sf::Font>(_cFont);

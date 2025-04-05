@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
     game/src/ui.cpp
     game/src/button.cpp
     game/src/label.cpp
+    game/src/npc.cpp
     )
 
 include_directories(".")

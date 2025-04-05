@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "game.h"
 #include "button.h"
 
 
@@ -19,6 +20,7 @@ class UI
         static void SetDefaultFont(sf::Font &_cFont);
         static void SetDefaultFontSize(uint32_t size);
         static void HandleInput(sf::RenderWindow &cWindow, const std::optional<sf::Event> event);
+//        static void SetButtonCallback(std::string sName, void(Game::*)(std::string) *pFuncPtr);
 
     public:
         static std::map<std::string, std::unique_ptr<Label>> mLabels;

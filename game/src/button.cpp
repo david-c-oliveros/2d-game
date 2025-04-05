@@ -55,6 +55,7 @@ bool Button::Check(sf::Vector2i vCursorPos)
 
 void Button::Press()
 {
+    pFuncPtr("This button");
     PerformAction();
     m_cShape.setFillColor(sf::Color::Green);
     m_bPressed = true;

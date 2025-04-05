@@ -27,12 +27,13 @@ void Player::Update()
     Character::Update();
     handleInput();
 
+    Animate();
     Move();
 }
 
 
 
-void Player::Move()
+void Player::Animate()
 {
     /*****************************************/
     /*        Set animation direction        */
@@ -65,7 +66,12 @@ void Player::Move()
             SetCurrentAnimation("walk_right");
             break;
     }
+}
 
+
+
+void Player::Move()
+{
     /*********************************/
     /*        Update position        */
     /*********************************/
@@ -81,17 +87,26 @@ void Player::Move()
 
 void Player::handleInput()
 {
-    uint8_t combo_direction = 0;
+    if (!Util::IsAnyKeyPressed())
+    {
+        eState = CharState::IDLE;
+        return;
+    }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
     {
         m_vVelocity.y -= 1.0f;
         eDir = MoveDir::FORWARD;
+        eState = CharState::WALK;
     }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
     {
         m_vVelocity.y += 1.0f;
         eDir = MoveDir::BACK;
+        eState = CharState::WALK;
     }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
     {
         m_vVelocity.x -= 1.0f;
@@ -99,6 +114,8 @@ void Player::handleInput()
         /*********************************/
         /*        Handle diagonal        */
         /*********************************/
+        eState = CharState::WALK;
+
         if (m_vVelocity.y < 0)
             eDir = MoveDir::FORWARD_LEFT;
         else if (m_vVelocity.y > 0)
@@ -113,6 +130,8 @@ void Player::handleInput()
         /*********************************/
         /*        Handle diagonal        */
         /*********************************/
+        eState = CharState::WALK;
+
         if (m_vVelocity.y < 0)
             eDir = MoveDir::FORWARD_RIGHT;
         else if (m_vVelocity.y > 0)

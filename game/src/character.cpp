@@ -13,6 +13,7 @@ Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
     : sName(_sName), Entity(_ID, _vWorldPos)
 {
     std::cout << sName << " ID: " << m_ID << "\n";
+    eState = CharState::IDLE;
 }
 
 

@@ -1,6 +1,9 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <cstddef>
+#include <random>
 
 #include <glm/glm.hpp>
 
@@ -21,6 +24,11 @@
 #include "camera.h"
 #include "ui.h"
 
+
+//typedef struct
+//{
+//    void (Game::*ButtonPressed) (std::string);
+//} MemberFuncPtr;
 
 
 class Game
@@ -49,6 +57,8 @@ class Game
 
         void LoadResources();
         void AddEntity(std::unique_ptr<Entity> _pE);
+
+//        void ButtonPressed(std::string sButtonName);
 
     private:
         void handleInputEvent(std::optional<sf::Event> event);

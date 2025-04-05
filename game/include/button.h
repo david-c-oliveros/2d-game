@@ -25,6 +25,7 @@ class Button
 
     private:
         bool isHovered(sf::Vector2i vCursorPos);
+        void(*pFuncPtr)(std::string);
 
 
     private:

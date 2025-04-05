@@ -36,6 +36,7 @@ void Game::Create()
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_position", "Cursor Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetHoveredTile())));
     UI::AddButton("My Button");
+//    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
 }
 
 
@@ -247,3 +248,10 @@ uint32_t Game::getNewID()
 {
     return m_nCurrentID++;
 }
+
+
+
+//void Game::ButtonPressed(std::string sButtonName)
+//{
+//    std::cout << sButtonName << " pressed\n";
+//}

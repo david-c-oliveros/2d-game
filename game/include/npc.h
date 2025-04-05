@@ -1,17 +1,15 @@
 #pragma once
 
-#include <glm/gtx/string_cast.hpp>
-
+#include "util.h"
 #include "character.h"
 
 
 
-class Player : public Character
+class Npc : public Character
 {
     public:
-        Player(uint32_t _ID, glm::vec2 _vWorldPos);
-        Player(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
-        ~Player();
+        Npc(uint32_t _vID, glm::vec2 _vWorldPos);
+        ~Npc();
 
         void Update();
         void Animate();
@@ -19,7 +17,7 @@ class Player : public Character
 
 
     private:
-        void handleInput();
+        void makeDecision();
 
 
     private:
