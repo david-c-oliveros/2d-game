@@ -14,7 +14,6 @@ class Player : public Character
         ~Player();
 
         void Update();
-        void Animate();
         void Move();
 
 

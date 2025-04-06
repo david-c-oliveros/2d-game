@@ -72,21 +72,6 @@ namespace Util
 
 
 
-    static void SeedRand()
-    {
-        std::srand(GetTimeSec());
-    }
-
-
-
-    template <typename T>
-    static T GenRand()
-    {
-        return std::rand();
-    }
-
-
-
     template <typename T>
     static T GenRandInRange(T range_min, T range_max)
     {

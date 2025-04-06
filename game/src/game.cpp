@@ -22,6 +22,7 @@ Game::~Game() {}
 void Game::Create()
 {
     m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0.0f));
+    TimeManager::NewTimer("main", 60);
 
     LoadResources();
     shape = sf::RectangleShape({ 1.0f, 1.0f });
@@ -43,6 +44,7 @@ void Game::Create()
 
 void Game::Start()
 {
+    TimeManager::StartTimer("main");
     while (cWindow.isOpen())
     {
         while (const std::optional event = cWindow.pollEvent())
@@ -62,6 +64,12 @@ void Game::Start()
 
 void Game::Update()
 {
+    TimeManager::UpdateAllTimers();
+    if (TimeManager::CheckTimer("main"))
+    {
+        TimeManager::TimerTimeout("main");
+    }
+
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
 
     UI::UpdateButtons(GetCursorScreenPos());
@@ -191,7 +199,8 @@ void Game::LoadResources()
     m_pPlayer->SetCurrentAnimation("walk_right");
 
 
-    std::unique_ptr<Character> _c = std::make_unique<Character>(getNewID(), "Enemy", glm::vec2(8, 8));
+    //std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
+    std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), glm::vec2(8, 8));
     _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
     _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
@@ -205,6 +214,7 @@ void Game::LoadResources()
     _c->SetAnimationFrequency("walk_forward", 8);
 
     _c->SetCurrentAnimation("walk_forward");
+    std::cout << "Npc name: " << _c->sName << '\n';
 
     AddEntity(std::move(_c));
 }

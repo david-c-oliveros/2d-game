@@ -7,16 +7,19 @@
 
 
 
+/*********************************************/
+/*        Goes in clockwise direction        */
+/*********************************************/
 enum class MoveDir
 {
     FORWARD,
-    BACK,
-    LEFT,
-    RIGHT,
-    FORWARD_LEFT,
     FORWARD_RIGHT,
+    RIGHT,
+    BACK_RIGHT,
+    BACK,
     BACK_LEFT,
-    BACK_RIGHT
+    LEFT,
+    FORWARD_LEFT,
 };
 
 
@@ -25,6 +28,18 @@ enum class CharState
 {
     IDLE,
     WALK
+};
+
+
+
+constexpr std::array<glm::vec2, 8> aMoveVels = { glm::vec2(  0.0f, -1.0f ),
+                                                 glm::vec2(  1.0f, -1.0f ),
+                                                 glm::vec2(  1.0f,  0.0f ),
+                                                 glm::vec2(  1.0f,  1.0f ),
+                                                 glm::vec2(  0.0f,  1.0f ),
+                                                 glm::vec2( -1.0f,  1.0f ),
+                                                 glm::vec2( -1.0f,  0.0f ),
+                                                 glm::vec2( -1.0f, -1.0f )
 };
 
 
@@ -56,8 +71,14 @@ class Character : public Entity
 
         sf::Vector2i GetSpriteSize();
 
+
+    protected:
+        void setAnimation();
+
+
     public:
         std::string sName;
+
 
     protected:
         std::unique_ptr<sf::Sprite> m_pSprite;

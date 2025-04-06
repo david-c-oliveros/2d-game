@@ -19,6 +19,7 @@
 #include "tile_world.h"
 #include "entity.h"
 #include "character.h"
+#include "npc.h"
 #include "player.h"
 #include "map.h"
 #include "camera.h"

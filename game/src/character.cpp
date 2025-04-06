@@ -92,3 +92,40 @@ sf::Vector2i Character::GetSpriteSize()
 {
     return m_vSpriteSize;
 }
+
+
+
+void Character::setAnimation()
+{
+    /*****************************************/
+    /*        Set animation direction        */
+    /*****************************************/
+    switch(eDir)
+    {
+        case MoveDir::FORWARD:
+            SetCurrentAnimation("walk_forward");
+            break;
+        case MoveDir::BACK:
+            SetCurrentAnimation("walk_back");
+            break;
+        case MoveDir::LEFT:
+            SetCurrentAnimation("walk_left");
+            break;
+        case MoveDir::RIGHT:
+            SetCurrentAnimation("walk_right");
+            break;
+
+        case::MoveDir::FORWARD_LEFT:
+            SetCurrentAnimation("walk_left");
+            break;
+        case::MoveDir::FORWARD_RIGHT:
+            SetCurrentAnimation("walk_right");
+            break;
+        case::MoveDir::BACK_LEFT:
+            SetCurrentAnimation("walk_left");
+            break;
+        case::MoveDir::BACK_RIGHT:
+            SetCurrentAnimation("walk_right");
+            break;
+    }
+}
