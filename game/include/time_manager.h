@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <string>
 
+#include <SFML/System.hpp>
+
 
 
 struct Timer
@@ -20,6 +22,8 @@ struct Timer
 class TimeManager
 {
     public:
+        static void Update();
+        static float GetFPS();
         static void NewTimer(std::string sName, uint32_t _nTotalTicks);
         static void StartTimer(std::string sName);
         static void ResetTimer(std::string sName);
@@ -32,4 +36,6 @@ class TimeManager
 
     private:
         static std::map<std::string, Timer> m_timers;
+        static sf::Clock m_clock;
+        static float m_fFrameTime;
 };

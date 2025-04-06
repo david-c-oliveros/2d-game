@@ -5,12 +5,13 @@
 Npc::Npc(uint32_t _vID, glm::vec2 _vWorldPos)
     : Character(_vID, _vWorldPos)
 {
+    sName = std::string("Npc_" + std::to_string(_vID));
+
     eState = CharState::WALK;
     makeDecision();
 
-    sName = std::string("Npc_" + std::to_string(_vID));
-
-    TimeManager::NewTimer(sName, 120);
+    int decision_time = Util::GenRandInRange(60, 240);
+    TimeManager::NewTimer(sName, decision_time);
     TimeManager::StartTimer(sName);
 }
 
@@ -19,12 +20,13 @@ Npc::Npc(uint32_t _vID, glm::vec2 _vWorldPos)
 Npc::Npc(uint32_t _vID, std::string _sName, glm::vec2 _vWorldPos)
     : Character(_vID, _sName, _vWorldPos)
 {
+    sName = std::string(_sName + "_" + std::to_string(_vID));
+
     eState = CharState::WALK;
     makeDecision();
 
-    sName = std::string(_sName + "_" + std::to_string(_vID));
-
-    TimeManager::NewTimer(sName, 120);
+    int decision_time = Util::GenRandInRange(60, 240);
+    TimeManager::NewTimer(sName, decision_time);
     TimeManager::StartTimer(sName);
 }
 
@@ -68,7 +70,7 @@ void Npc::Move()
 
 void Npc::makeDecision()
 {
-    std::cout << "Making decision\n";
+    //std::cout << sName << " is making a decision\n";
     int decision = Util::GenRandInRange(0, 8);
     eDir = static_cast<MoveDir>(decision);
     m_vVelocity = aMoveVels[static_cast<size_t>(eDir)];

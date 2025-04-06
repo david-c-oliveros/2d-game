@@ -3,6 +3,23 @@
 
 
 std::map<std::string, Timer> TimeManager::m_timers;
+sf::Clock TimeManager::m_clock;
+float TimeManager::m_fFrameTime;
+
+
+
+void TimeManager::Update()
+{
+    UpdateAllTimers();
+    m_fFrameTime = m_clock.restart().asSeconds();
+}
+
+
+
+float TimeManager::GetFPS()
+{
+    return 1.0f / m_fFrameTime;
+}
 
 
 

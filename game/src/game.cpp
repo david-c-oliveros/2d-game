@@ -22,9 +22,10 @@ Game::~Game() {}
 void Game::Create()
 {
     m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0.0f));
-    TimeManager::NewTimer("main", 60);
+    TimeManager::NewTimer("get_fps_interval", 6);
 
     LoadResources();
+    std::cout << "Number of npc's: " << aEntities.size() << std::endl;
     shape = sf::RectangleShape({ 1.0f, 1.0f });
     shape.setFillColor(sf::Color(250, 150, 100));
     shape.setOutlineThickness(0.0f);
@@ -36,6 +37,7 @@ void Game::Create()
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_position", "Cursor Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetHoveredTile())));
+    UI::AddText("fps", "FPS: ");
     UI::AddButton("My Button");
 //    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
 }
@@ -44,7 +46,7 @@ void Game::Create()
 
 void Game::Start()
 {
-    TimeManager::StartTimer("main");
+    TimeManager::StartTimer("get_fps_interval");
     while (cWindow.isOpen())
     {
         while (const std::optional event = cWindow.pollEvent())
@@ -64,10 +66,11 @@ void Game::Start()
 
 void Game::Update()
 {
-    TimeManager::UpdateAllTimers();
-    if (TimeManager::CheckTimer("main"))
+    TimeManager::Update();
+    if (TimeManager::CheckTimer("get_fps_interval"))
     {
-        TimeManager::TimerTimeout("main");
+        TimeManager::TimerTimeout("get_fps_interval");
+        UI::mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
     }
 
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
@@ -199,24 +202,25 @@ void Game::LoadResources()
     m_pPlayer->SetCurrentAnimation("walk_right");
 
 
-    //std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
-    std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), glm::vec2(8, 8));
-    _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
+    for (size_t i = 0; i < 10000; i++)
+    {
+        std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
+        _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
-    _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
-    _c->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
-    _c->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
-    _c->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
+        _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
+        _c->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
+        _c->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
+        _c->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
 
-    _c->SetAnimationFrequency("walk_back", 8);
-    _c->SetAnimationFrequency("walk_left", 8);
-    _c->SetAnimationFrequency("walk_right", 8);
-    _c->SetAnimationFrequency("walk_forward", 8);
+        _c->SetAnimationFrequency("walk_back", 8);
+        _c->SetAnimationFrequency("walk_left", 8);
+        _c->SetAnimationFrequency("walk_right", 8);
+        _c->SetAnimationFrequency("walk_forward", 8);
 
-    _c->SetCurrentAnimation("walk_forward");
-    std::cout << "Npc name: " << _c->sName << '\n';
+        _c->SetCurrentAnimation("walk_forward");
 
-    AddEntity(std::move(_c));
+        AddEntity(std::move(_c));
+    }
 }
 
 

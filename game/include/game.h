@@ -69,11 +69,12 @@ class Game
         sf::RenderWindow cWindow;
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
+        sf::Clock cClock;
 
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
-        std::array<std::unique_ptr<Entity>, 80> aEntities = { nullptr };
+        std::array<std::unique_ptr<Entity>, 10000> aEntities = { nullptr };
 
     private:
         bool m_bPanning = false;
@@ -83,6 +84,5 @@ class Game
         Map m_pMap;
 
         uint8_t m_nFrameCount = 1;
-
         uint32_t m_nCurrentID = 0;
 };
