@@ -74,7 +74,7 @@ class Game
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
-        std::array<std::unique_ptr<Entity>, 10000> aEntities = { nullptr };
+        std::array<std::unique_ptr<Entity>, 1000> aEntities = { nullptr };
 
     private:
         bool m_bPanning = false;

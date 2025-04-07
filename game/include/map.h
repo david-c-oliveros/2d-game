@@ -14,6 +14,16 @@
 #include "tile_world.h"
 
 
+
+struct Tile
+{
+    tson::Tileset *tileset;
+    tson::Rect cTextureRect;
+    glm::vec2 vWorldPos;
+    sf::Sprite *pSprite;
+};
+
+
 class Map
 {
     public:
@@ -21,15 +31,17 @@ class Map
         ~Map();
 
         void Draw(sf::RenderWindow &cWindow);
-
         void LoadFromFile(const std::string &_sFilepath);
 
     private:
+        void storeMap();
         sf::Sprite* storeAndLoadImage(const std::string &_image, const sf::Vector2f &_vPos);
 
     public:
         std::unique_ptr<tson::Map> pMap;
         std::unique_ptr<sf::Sprite> pSprite;
+        //std::array<std::unique_ptr<Tile>, 10000> aTiles = { nullptr };
+        std::vector<std::unique_ptr<Tile>> aTiles;
 
     private:
         std::map<std::string, std::unique_ptr<sf::Texture>> m_pTextures;

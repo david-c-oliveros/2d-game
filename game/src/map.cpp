@@ -17,38 +17,19 @@ Map::~Map()
 
 void Map::Draw(sf::RenderWindow &cWindow)
 {
-    for (auto &_layer : pMap->getLayers())
+    for (auto &tile : aTiles)
     {
-        if (_layer.getType() == tson::LayerType::TileLayer)
+        if (tile->pSprite == nullptr)
         {
-            for (auto &[pos, tileObject] : _layer.getTileObjects())
-            {
-                /**********************************/
-                /*        Get Tilemap data        */
-                /**********************************/
-                tson::Tileset *tileset = tileObject.getTile()->getTileset();
-                tson::Rect drawingRect = tileObject.getDrawingRect();
-                tson::Vector2f _vTilePos = tileObject.getPosition();
-
-                glm::vec2 _vWorldPos = glm::vec2(_vTilePos.x, _vTilePos.y) * m_vDefaultScalar;
-
-                sf::Sprite* sprite = storeAndLoadImage(tileset->getImage().u8string(), {0, 0});
-
-                /****************************/
-                /*        Draw Tiles        */
-                /****************************/
-                if (sprite != nullptr)
-                {
-                    sprite->setTextureRect(sf::Rect( sf::Vector2i(drawingRect.x, drawingRect.y),
-                                                       sf::Vector2i(drawingRect.width, drawingRect.height)) );
-
-                    sprite->setPosition({ _vTilePos.x, _vTilePos.y });
-//                    sprite->setPosition(Util::glm_to_sf_vec2(_vScreenPos));
-//                    sprite->setScale(Util::glm_to_sf_vec2(_vScalar * m_vDefaultScalar));
-                    cWindow.draw(*sprite);
-                }
-            }
+            continue;
         }
+
+        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
+                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
+
+        tile->pSprite->setPosition({ tile->vWorldPos.x, tile->vWorldPos.y });
+
+        cWindow.draw(*tile->pSprite);
     }
 }
 
@@ -66,6 +47,7 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
     {
         tson::Vector2i _vTileSize = pMap->getTileSize();
         m_vDefaultScalar /= glm::vec2(_vTileSize.x, _vTileSize.y);
+        aTiles.reserve(pMap->getSize().x * pMap->getSize().y);
         std::cout << "Map parsed successfully" << std::endl;
     }
     else
@@ -87,6 +69,37 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
             default:
                 std::cout << "Other error" << std::endl;
                 break;
+        }
+    }
+
+    storeMap();
+}
+
+
+
+void Map::storeMap()
+{
+    for (auto &_layer : pMap->getLayers())
+    {
+        if (_layer.getType() == tson::LayerType::TileLayer)
+        {
+            for (auto &[pos, tileObject] : _layer.getTileObjects())
+            {
+                /*******************************/
+                /*        Get Tile data        */
+                /*******************************/
+                std::unique_ptr<Tile> _pTile = std::make_unique<Tile>();
+
+                _pTile->tileset = tileObject.getTile()->getTileset();
+                _pTile->cTextureRect = tileObject.getDrawingRect();
+
+                tson::Vector2f _vPos = tileObject.getPosition();
+                _pTile->vWorldPos = glm::vec2(_vPos.x, _vPos.y);
+
+                _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
+
+                aTiles.emplace_back(std::move(_pTile));
+            }
         }
     }
 }

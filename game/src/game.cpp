@@ -202,7 +202,7 @@ void Game::LoadResources()
     m_pPlayer->SetCurrentAnimation("walk_right");
 
 
-    for (size_t i = 0; i < 10000; i++)
+    for (size_t i = 0; i < 1000; i++)
     {
         std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
         _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
