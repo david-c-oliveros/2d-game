@@ -27,10 +27,112 @@ void Map::Draw(sf::RenderWindow &cWindow)
         tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
                                                 sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
 
-        tile->pSprite->setPosition({ tile->vWorldPos.x, tile->vWorldPos.y });
+        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
+
+        if (tile->bSolid)
+        {
+            tile->pSprite->setColor(sf::Color(180, 0, 0));
+        }
+        else
+        {
+            tile->pSprite->setColor(sf::Color(255, 255, 255));
+        }
 
         cWindow.draw(*tile->pSprite);
     }
+}
+
+
+
+void Map::DrawCurrentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
+{
+    for (auto &tile : GetCurrentTiles(_vWorldGridPos))
+    {
+        if (tile->pSprite == nullptr)
+        {
+            continue;
+        }
+
+        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
+                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
+
+        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
+
+        tile->pSprite->setColor(sf::Color(55, 55, 100));
+
+        cWindow.draw(*tile->pSprite);
+    }
+}
+
+
+
+void Map::DrawAdjacentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
+{
+    for (auto &tile : GetAdjacentTiles(_vWorldGridPos))
+    {
+        if (tile->pSprite == nullptr)
+        {
+            continue;
+        }
+
+        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
+                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
+
+        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
+
+        tile->pSprite->setColor(sf::Color(155, 155, 200));
+
+        cWindow.draw(*tile->pSprite);
+    }
+}
+
+
+
+std::vector<std::shared_ptr<Tile>> Map::GetCurrentTiles(const glm::ivec2 &_vWorldGridPos)
+{
+    std::vector<std::shared_ptr<Tile>> aCurrentTiles;
+
+    auto isOnTile = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x == _vWorldGridPos.x &&
+                                                                       t->vWorldGridPos.y == _vWorldGridPos.y;
+    };
+
+    std::vector<std::shared_ptr<Tile>>::iterator it = std::find_if(aTiles.begin(), aTiles.end(), isOnTile);
+
+    while(it != aTiles.end())
+    {
+        aCurrentTiles.emplace_back(*it);
+        ++it;
+        it = std::find_if(++it, aTiles.end(), isOnTile);
+    }
+
+    return aCurrentTiles;
+}
+
+
+
+std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos)
+{
+    std::vector<std::shared_ptr<Tile>> aAdjacentTiles;
+
+    auto isAdjacent = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x <= _vWorldGridPos.x + 1 &&
+                                                                         t->vWorldGridPos.x >= _vWorldGridPos.x - 1 &&
+                                                                         t->vWorldGridPos.y <= _vWorldGridPos.y + 1 &&
+                                                                         t->vWorldGridPos.y >= _vWorldGridPos.y - 1;
+    };
+
+    std::vector<std::shared_ptr<Tile>>::iterator it = std::find_if(aTiles.begin(), aTiles.end(), isAdjacent);
+
+    while(it != aTiles.end())
+    {
+        aAdjacentTiles.emplace_back(*it);
+        ++it;
+        it = std::find_if(++it, aTiles.end(), isAdjacent);
+    }
+
+    return aAdjacentTiles;
 }
 
 
@@ -83,22 +185,51 @@ void Map::storeMap()
     {
         if (_layer.getType() == tson::LayerType::TileLayer)
         {
+            int current_layer_id = _layer.getId();
+            std::cout << "Current layer ID: " << current_layer_id << '\n';
+
             for (auto &[pos, tileObject] : _layer.getTileObjects())
             {
                 /*******************************/
                 /*        Get Tile data        */
                 /*******************************/
+                // TODO - If new layer tile occupies a full tile, overwrite the old tile
                 std::unique_ptr<Tile> _pTile = std::make_unique<Tile>();
 
+                //std::cout << tileObject.getTile()->getId() << ' ';
                 _pTile->tileset = tileObject.getTile()->getTileset();
                 _pTile->cTextureRect = tileObject.getDrawingRect();
 
                 tson::Vector2f _vPos = tileObject.getPosition();
-                _pTile->vWorldPos = glm::vec2(_vPos.x, _vPos.y);
+                _pTile->vWorldGridPos = glm::ivec2(_vPos.x, _vPos.y) / Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+                std::cout << glm::to_string(_pTile->vWorldGridPos) << ' ';
+
 
                 _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
 
-                aTiles.emplace_back(std::move(_pTile));
+                /********************************************/
+                /*        Set whether layer is solid        */
+                /********************************************/
+                // TODO - Make enum that contains ID's of all solid tile types
+                if (current_layer_id == 2)
+                {
+                    _pTile->bSolid = true;
+                }
+                else
+                {
+                    _pTile->bSolid = false;
+                }
+
+//                std::vector<std::shared_ptr<Tile>>::iterator it = getOccupiedTile(_pTile->vWorldPos);
+//
+//                if (it != aTiles.end())
+//                {
+//                    *it = std::move(_pTile);
+//                }
+//                else
+//                {
+                    aTiles.emplace_back(std::move(_pTile));
+//                }
             }
         }
     }
@@ -139,4 +270,15 @@ sf::Sprite* Map::storeAndLoadImage(const std::string &image, const sf::Vector2f 
     }
 
     return nullptr;
+}
+
+
+
+std::vector<std::shared_ptr<Tile>>::iterator Map::getOccupiedTile(glm::ivec2 _vWorldGridPos)
+{
+    auto vecEqual = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x == _vWorldGridPos.x &&
+                                                                   t->vWorldGridPos.y == _vWorldGridPos.y;
+    };
+
+    return std::find_if(aTiles.begin(), aTiles.end(), vecEqual);
 }

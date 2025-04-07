@@ -2,6 +2,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
+#include "globals.h"
+#include "map.h"
 #include "character.h"
 
 
@@ -13,12 +15,18 @@ class Player : public Character
         Player(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
         ~Player();
 
-        void Update();
-        void Move();
+        void Update(Map &cMap);
+        void Move(Map &cMap);
 
 
     private:
         void handleInput();
+        void updateWorldGridPosition();
+        void resolveCollisions(Map &cMap);
+
+
+    public:
+        glm::ivec2 vWorldGridPos;
 
 
     private:

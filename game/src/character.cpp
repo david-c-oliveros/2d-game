@@ -49,6 +49,7 @@ void Character::AttachAnimatedSprite(const std::string _sFilepath, glm::ivec2 _v
     m_pTexture = std::make_unique<sf::Texture>(_sFilepath);
 
     m_pSprite = std::make_unique<sf::Sprite>(*m_pTexture);
+    m_pSprite->setOrigin({ _vSpriteSize.x / 2, _vSpriteSize.y / 2 });
 
     m_vFrameRect  = Util::convert_vector<sf::Vector2i>(_vFrameRect);
     m_vSpriteSize = Util::convert_vector<sf::Vector2i>(_vSpriteSize);

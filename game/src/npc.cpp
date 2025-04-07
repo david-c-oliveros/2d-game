@@ -73,5 +73,5 @@ void Npc::makeDecision()
     //std::cout << sName << " is making a decision\n";
     int decision = Util::GenRandInRange(0, 8);
     eDir = static_cast<MoveDir>(decision);
-    m_vVelocity = aMoveVels[static_cast<size_t>(eDir)];
+    m_vVelocity = Globals::aMoveVels[static_cast<size_t>(eDir)];
 }

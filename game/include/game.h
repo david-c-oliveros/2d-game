@@ -74,14 +74,14 @@ class Game
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
-        std::array<std::unique_ptr<Entity>, 1000> aEntities = { nullptr };
+        std::array<std::unique_ptr<Entity>, Globals::TOTAL_ENEMIES> aEntities = { nullptr };
 
     private:
         bool m_bPanning = false;
         glm::ivec2 m_vHoveredTile;
 
         std::unique_ptr<Player> m_pPlayer;
-        Map m_pMap;
+        Map m_cMap;
 
         uint8_t m_nFrameCount = 1;
         uint32_t m_nCurrentID = 0;

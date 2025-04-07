@@ -76,7 +76,7 @@ void Game::Update()
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
 
     UI::UpdateButtons(GetCursorScreenPos());
-    m_pPlayer->Update();
+    m_pPlayer->Update(m_cMap);
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto &e : aEntities)
@@ -105,7 +105,9 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     cWindow.setView(Camera::cView);
-    m_pMap.Draw(cWindow);
+    m_cMap.Draw(cWindow);
+    m_cMap.DrawAdjacentTiles(cWindow, m_pPlayer->vWorldGridPos);
+    m_cMap.DrawCurrentTiles(cWindow, m_pPlayer->vWorldGridPos);
 
     /***************************************/
     /*        Draw Highlighted Tile        */
@@ -185,7 +187,7 @@ void Game::LoadResources()
     UI::SetDefaultFont(font);
     UI::SetDefaultFontSize(40);
 
-    m_pMap.LoadFromFile("sample map demo.json");
+    m_cMap.LoadFromFile("sample map demo.json");
 
     m_pPlayer->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
@@ -202,7 +204,7 @@ void Game::LoadResources()
     m_pPlayer->SetCurrentAnimation("walk_right");
 
 
-    for (size_t i = 0; i < 1000; i++)
+    for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
     {
         std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
         _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
