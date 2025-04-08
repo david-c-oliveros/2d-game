@@ -52,6 +52,17 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
         tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
 
+
+        /*****************************************************/
+        /*        DEBUG: Highlight certain tile types        */
+        /*               and adjacent tiles                  */
+        /*****************************************************/
+        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
+        {
+            cWindow.draw(*tile->pSprite);
+            continue;
+        }
+
         if (tile->bSolid)
         {
             tile->pSprite->setColor(sf::Color(180, 0, 0));
@@ -76,13 +87,11 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
 std::vector<std::shared_ptr<Tile>> Map::GetCurrentTiles(const glm::ivec2 &_vWorldGridPos)
 {
     std::vector<std::shared_ptr<Tile>> aCurrentTiles;
-
     auto isOnTile = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x == _vWorldGridPos.x &&
                                                                        t->vWorldGridPos.y == _vWorldGridPos.y;
     };
 
     std::vector<std::shared_ptr<Tile>>::iterator it = std::find_if(aTiles.begin(), aTiles.end(), isOnTile);
-
     while(it != aTiles.end())
     {
         aCurrentTiles.emplace_back(*it);
@@ -98,7 +107,6 @@ std::vector<std::shared_ptr<Tile>> Map::GetCurrentTiles(const glm::ivec2 &_vWorl
 std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos)
 {
     std::vector<std::shared_ptr<Tile>> aAdjacentTiles;
-
     auto isAdjacent = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x <= _vWorldGridPos.x + 1 &&
                                                                          t->vWorldGridPos.x >= _vWorldGridPos.x - 1 &&
                                                                          t->vWorldGridPos.y <= _vWorldGridPos.y + 1 &&
@@ -107,7 +115,6 @@ std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWor
     };
 
     std::vector<std::shared_ptr<Tile>>::iterator it = std::find_if(aTiles.begin(), aTiles.end(), isAdjacent);
-
     while(it != aTiles.end())
     {
         aAdjacentTiles.emplace_back(*it);
@@ -203,7 +210,7 @@ void Map::storeMap()
                 }
 
 
-                if (!Globals::bDEBUG)
+                if (Globals::eDEBUG_LEVEL < Globals::DebugLevel::TWO)
                 {
                   aTiles.emplace_back(std::move(_pTile));
                   continue;
@@ -211,7 +218,7 @@ void Map::storeMap()
 
 
                 /*******************************************/
-                /*        Debug: Skip stacked tiles        */
+                /*        DEBUG: Skip stacked tiles        */
                 /*******************************************/
                 std::vector<std::shared_ptr<Tile>>::iterator it = getOccupiedTile(_pTile->vWorldGridPos);
 

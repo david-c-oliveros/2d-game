@@ -4,7 +4,15 @@
 
 namespace Globals
 {
-    constexpr bool bDEBUG = false;
+    enum class DebugLevel
+    {
+        ZERO,
+        ONE,
+        TWO,
+        THREE
+    };
+
+    constexpr DebugLevel eDEBUG_LEVEL = DebugLevel::ONE;
 
     constexpr sf::Vector2f TILE_SIZE({ 32.0f, 32.0f });
 

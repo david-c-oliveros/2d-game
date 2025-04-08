@@ -46,7 +46,9 @@ class Game
         void Update();
         void Render();
         void RenderGameWorld();
+        void RenderEntities();
         void RenderUI();
+        void RenderDebug();
 
         sf::Vector2i GetCursorScreenPos();
         sf::Vector2f GetCursorWorldPos();

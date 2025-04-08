@@ -96,6 +96,11 @@ void Game::Render()
     cWindow.clear(sf::Color::Black);
 
     RenderGameWorld();
+
+    if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
+        RenderDebug();
+
+    RenderEntities();
     RenderUI();
 
     cWindow.display();
@@ -107,28 +112,17 @@ void Game::RenderGameWorld()
 {
     cWindow.setView(Camera::cView);
     m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos);
+}
 
-    /***************************************/
-    /*        Draw Highlighted Tile        */
-    /***************************************/
-    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
 
-    shape.setOutlineColor(sf::Color(150, 150, 100));
-    shape.setFillColor(sf::Color(50, 50, 100));
 
-    shape.setPosition(sf::Vector2f(_vCursorTile));
-    shape.setScale(Globals::TILE_SIZE);
-
-    cWindow.draw(shape);
-
+void Game::RenderEntities()
+{
+    cWindow.setView(Camera::cView);
 
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
-//    sf::Vector2i _pos = Util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
-//    shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
-//    shape.setFillColor(sf::Color(50, 100, 50));
-//    cWindow.draw(shape);
     m_pPlayer->Draw(cWindow);
 
     for (auto &e : aEntities)
@@ -147,6 +141,41 @@ void Game::RenderUI()
     cWindow.setView(cWindow.getDefaultView());
 
     UI::Render(cWindow);
+}
+
+
+
+void Game::RenderDebug()
+{
+    /***********************/
+    /***********************/
+    /*                     */
+    /*        DEBUG        */
+    /*                     */
+    /***********************/
+    /***********************/
+
+    /**********************************/
+    /*        Draw Cursor Tile        */
+    /**********************************/
+    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
+
+    shape.setOutlineColor(sf::Color(150, 150, 100));
+    shape.setFillColor(sf::Color(50, 50, 100));
+
+    shape.setPosition(sf::Vector2f(_vCursorTile));
+    shape.setScale(Globals::TILE_SIZE);
+
+    cWindow.draw(shape);
+
+    /******************************************/
+    /*        Draw Current Player Tile        */
+    /******************************************/
+    sf::Vector2i _pos = Util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
+    shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
+    shape.setFillColor(sf::Color(50, 100, 50));
+
+    cWindow.draw(shape);
 }
 
 
