@@ -64,7 +64,7 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
         {
             uint32_t num = 40 * mDupeCount.at(glm::to_string(tile->vWorldGridPos));
-            tile->pSprite->setColor(sf::Color(155 - num, 155 - num, 200 - num));
+            tile->pSprite->setColor(sf::Color(150 - num, 150 - num, 150 - num));
         }
 
         cWindow.draw(*tile->pSprite);
@@ -102,7 +102,8 @@ std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWor
     auto isAdjacent = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x <= _vWorldGridPos.x + 1 &&
                                                                          t->vWorldGridPos.x >= _vWorldGridPos.x - 1 &&
                                                                          t->vWorldGridPos.y <= _vWorldGridPos.y + 1 &&
-                                                                         t->vWorldGridPos.y >= _vWorldGridPos.y - 1;
+                                                                         t->vWorldGridPos.y >= _vWorldGridPos.y - 1 &&
+                                                                         t->vWorldGridPos != _vWorldGridPos;
     };
 
     std::vector<std::shared_ptr<Tile>>::iterator it = std::find_if(aTiles.begin(), aTiles.end(), isAdjacent);
@@ -110,7 +111,6 @@ std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWor
     while(it != aTiles.end())
     {
         aAdjacentTiles.emplace_back(*it);
-        ++it;
         it = std::find_if(++it, aTiles.end(), isAdjacent);
     }
 
@@ -202,16 +202,27 @@ void Map::storeMap()
                     _pTile->bSolid = false;
                 }
 
-//                std::vector<std::shared_ptr<Tile>>::iterator it = getOccupiedTile(_pTile->vWorldPos);
-//
-//                if (it != aTiles.end())
-//                {
-//                    *it = std::move(_pTile);
-//                }
-//                else
-//                {
-                    aTiles.emplace_back(std::move(_pTile));
-//                }
+
+                if (!Globals::bDEBUG)
+                {
+                  aTiles.emplace_back(std::move(_pTile));
+                  continue;
+                }
+
+
+                /*******************************************/
+                /*        Debug: Skip stacked tiles        */
+                /*******************************************/
+                std::vector<std::shared_ptr<Tile>>::iterator it = getOccupiedTile(_pTile->vWorldGridPos);
+
+                if (it != aTiles.end())
+                {
+                    *it = std::move(_pTile);
+                }
+                else
+                {
+                  aTiles.emplace_back(std::move(_pTile));
+                }
             }
         }
     }

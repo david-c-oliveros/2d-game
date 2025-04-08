@@ -33,10 +33,10 @@ void Game::Create()
 
     Camera::SetCameraView(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
     Camera::SetZoom(cWindow, 0.2f);
-    Camera::EnableFollow();
+//    Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
-    UI::AddText("cursor_position", "Cursor Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetHoveredTile())));
+    UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetCursorTile())));
     UI::AddText("fps", "FPS: ");
     UI::AddButton("My Button");
 //    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
@@ -74,6 +74,7 @@ void Game::Update()
     }
 
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
+    UI::mLabels["cursor_grid_position"]->SetText("Cursor Grid Coords: " + glm::to_string(Util::convert_vector<glm::vec2>(GetCursorTile())));
 
     UI::UpdateButtons(GetCursorScreenPos());
     m_pPlayer->Update(m_cMap);
@@ -106,21 +107,11 @@ void Game::RenderGameWorld()
 {
     cWindow.setView(Camera::cView);
     m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos);
-//    m_cMap.DrawAdjacentTiles(cWindow, m_pPlayer->vWorldGridPos);
-//    m_cMap.DrawCurrentTiles(cWindow, m_pPlayer->vWorldGridPos);
-
-    uint32_t nAdj = m_cMap.GetAdjacentTiles(m_pPlayer->vWorldGridPos).size();
-    uint32_t nCur = m_cMap.GetCurrentTiles(m_pPlayer->vWorldGridPos).size();
-
-    std::cout << "Number of adjacent tiles: " << nAdj << '\n';
-    std::cout << "Number of current tiles: " << nCur << '\n';
-
 
     /***************************************/
     /*        Draw Highlighted Tile        */
     /***************************************/
-    sf::Vector2i _vCursorTile(GetHoveredTile().x * Globals::TILE_SIZE.x, GetHoveredTile().y * Globals::TILE_SIZE.y);
-    UI::mLabels["cursor_position"]->SetText("Cursor position: " + glm::to_string(Util::convert_vector<glm::vec2>(_vCursorTile)));
+    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
 
     shape.setOutlineColor(sf::Color(150, 150, 100));
     shape.setFillColor(sf::Color(50, 50, 100));
@@ -134,6 +125,10 @@ void Game::RenderGameWorld()
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
+//    sf::Vector2i _pos = Util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
+//    shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
+//    shape.setFillColor(sf::Color(50, 100, 50));
+//    cWindow.draw(shape);
     m_pPlayer->Draw(cWindow);
 
     for (auto &e : aEntities)
@@ -173,14 +168,26 @@ sf::Vector2f Game::GetCursorWorldPos()
 
 
 
-sf::Vector2i Game::GetHoveredTile()
+sf::Vector2i Game::GetTileAtPos(glm::vec2 _vPos)
+{
+    sf::Vector2f vPos = Util::convert_vector<sf::Vector2f>(_vPos);
+    sf::Vector2i vTileAtPos({ 0, 0 });
+    vTileAtPos.x = vPos.x < 0.0f ?  (int32_t)(vPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(vPos.x) / Globals::TILE_SIZE.x;
+    vTileAtPos.y = vPos.y < 0.0f ?  (int32_t)(vPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(vPos.y) / Globals::TILE_SIZE.y;
+
+    return vTileAtPos;
+}
+
+
+
+sf::Vector2i Game::GetCursorTile()
 {
     sf::Vector2f _vCursorPos = GetCursorWorldPos();
-    sf::Vector2i vHoveredTile({ 0, 0 });
-    vHoveredTile.x = _vCursorPos.x < 0.0f ?  (int32_t)(_vCursorPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(_vCursorPos.x) / Globals::TILE_SIZE.x;
-    vHoveredTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
+    sf::Vector2i vCursorTile({ 0, 0 });
+    vCursorTile.x = _vCursorPos.x < 0.0f ?  (int32_t)(_vCursorPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(_vCursorPos.x) / Globals::TILE_SIZE.x;
+    vCursorTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
 
-    return vHoveredTile;
+    return vCursorTile;
 }
 
 

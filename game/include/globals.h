@@ -4,6 +4,8 @@
 
 namespace Globals
 {
+    constexpr bool bDEBUG = false;
+
     constexpr sf::Vector2f TILE_SIZE({ 32.0f, 32.0f });
 
     constexpr uint32_t TOTAL_ENEMIES = 10;

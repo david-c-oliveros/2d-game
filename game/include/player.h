@@ -31,6 +31,6 @@ class Player : public Character
 
     private:
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
-        float m_fSpeedScalar = 1.5f;
+        float m_fSpeedScalar = 2.0f;
         uint8_t nFrameCount = 1;
 };
