@@ -46,7 +46,7 @@ void Player::Move(Map &cMap)
 
     assert(static_cast<int>(eDir) < Globals::aMoveVels.size());
     setVelocity(Globals::aMoveVels[static_cast<int>(eDir)], m_fSpeedScalar);
-    Character::Move();
+    Character::Move(cMap);
 
     /***********************************************/
     /*        Reset velocity, as it will be        */

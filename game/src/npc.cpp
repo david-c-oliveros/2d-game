@@ -38,7 +38,7 @@ Npc::~Npc()
 
 
 
-void Npc::Update()
+void Npc::Update(Map &cMap)
 {
     if (TimeManager::CheckTimer(sName))
     {
@@ -47,17 +47,17 @@ void Npc::Update()
     }
 
     Character::Update();
-    Move();
+    Move(cMap);
 }
 
 
 
-void Npc::Move()
+void Npc::Move(Map &cMap)
 {
     /*********************************/
     /*        Update position        */
     /*********************************/
-    Character::Move();
+    Character::Move(cMap);
 
     //m_vVelocity = glm::vec2(0.0f);
 }

@@ -52,6 +52,11 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
         tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
 
+        if (tile->bCollided)
+            tile->pSprite->setColor(sf::Color(220, 0, 100));
+        else
+            tile->pSprite->setColor(sf::Color(255, 255, 255));
+
 
         /*****************************************************/
         /*        DEBUG: Highlight certain tile types        */
@@ -281,4 +286,20 @@ std::vector<std::shared_ptr<Tile>>::iterator Map::getOccupiedTile(glm::ivec2 _vW
     };
 
     return std::find_if(aTiles.begin(), aTiles.end(), vecEqual);
+}
+
+
+
+
+/**********************************/
+/**********************************/
+/*                                */
+/*        Static functions        */
+/*                                */
+/**********************************/
+/**********************************/
+sf::FloatRect Map::GetTileBoundingBox(Tile &tile)
+{
+    sf::Vector2f _vTileWorldPos = Util::convert_vector<sf::Vector2f>((glm::vec2)tile.vWorldGridPos * Globals::GLM_TILE_SIZE);
+    return sf::FloatRect(_vTileWorldPos, Globals::TILE_SIZE);
 }

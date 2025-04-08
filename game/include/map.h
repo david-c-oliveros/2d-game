@@ -24,6 +24,7 @@ struct Tile
     glm::ivec2 vWorldGridPos;
     sf::Sprite *pSprite;
     bool bSolid;
+    bool bCollided;
 };
 
 
@@ -55,4 +56,15 @@ class Map
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 
         fs::path m_basePath;
+
+
+    /**********************************/
+    /**********************************/
+    /*                                */
+    /*        Static functions        */
+    /*                                */
+    /**********************************/
+    /**********************************/
+    public:
+        static sf::FloatRect GetTileBoundingBox(Tile &tile);
 };

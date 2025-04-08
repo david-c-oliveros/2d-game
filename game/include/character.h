@@ -2,8 +2,11 @@
 
 #include <AnimationManager.hpp>
 
+#include "globals.h"
 #include "util.h"
+#include "map.h"
 #include "entity.h"
+#include "aabb.h"
 
 
 
@@ -43,7 +46,7 @@ class Character : public Entity
         std::shared_ptr<sf::Texture> GetTexture();
 
         void Update();
-        void Move();
+        void Move(Map &cMap);
         void Draw(sf::RenderWindow &cWindow);
 
 
@@ -64,6 +67,7 @@ class Character : public Entity
 
     protected:
         void setVelocity(glm::vec2 _vVel, float fScalar);
+        void updateBoundingBox();
         void setAnimation();
 
 
@@ -91,6 +95,7 @@ class Character : public Entity
         CharState eState;
         MoveDir eDir;
 
+        sf::FloatRect cBoundingBox;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 };

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "SFML/System.hpp"
+#include <SFML/System.hpp>
+
+#include <glm/glm.hpp>
 
 namespace Globals
 {
@@ -15,6 +17,7 @@ namespace Globals
     constexpr DebugLevel eDEBUG_LEVEL = DebugLevel::ZERO;
 
     constexpr sf::Vector2f TILE_SIZE({ 32.0f, 32.0f });
+    constexpr glm::vec2 GLM_TILE_SIZE(32.0f);
 
     constexpr uint32_t TOTAL_ENEMIES = 10;
 

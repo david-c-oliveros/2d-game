@@ -5,6 +5,8 @@
 Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
     : Entity(_ID, _vWorldPos)
 {
+    cBoundingBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    eState = CharState::IDLE;
 }
 
 
@@ -12,6 +14,7 @@ Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
 Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
     : sName(_sName), Entity(_ID, _vWorldPos)
 {
+    cBoundingBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
     eState = CharState::IDLE;
 }
 
@@ -35,13 +38,25 @@ void Character::Update()
 
 
 
-void Character::Move()
+void Character::Move(Map &cMap)
 {
+    for (auto &tile : cMap.aTiles)
+    {
+        if(tile->bSolid && AABB::CheckCollision(cBoundingBox, Map::GetTileBoundingBox(*tile)))
+        {
+            tile->bCollided = true;
+        }
+        else
+        {
+            tile->bCollided = false;
+        }
+    }
     if (glm::length(m_vVelocity) > 0.0f)
     {
         vWorldPos += m_vVelocity;
-        //vWorldPos += glm::normalize(m_vVelocity) * m_fSpeedScalar;
     }
+
+    updateBoundingBox();
 }
 
 
@@ -121,6 +136,13 @@ sf::Vector2i Character::GetSpriteSize()
 void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 {
     m_vVelocity = glm::normalize(_vVel) * fScalar;
+}
+
+
+
+void Character::updateBoundingBox()
+{
+    cBoundingBox.position = sf::Vector2(vWorldPos.x, vWorldPos.y);
 }
 
 

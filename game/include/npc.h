@@ -16,8 +16,8 @@ class Npc : public Character
         Npc(uint32_t _vID, std::string _sName, glm::vec2 _vWorldPos);
         ~Npc();
 
-        void Update();
-        void Move();
+        void Update(Map &cMap);
+        void Move(Map &cMap);
 
 
     private:

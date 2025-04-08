@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME}
     game/src/label.cpp
     game/src/npc.cpp
     game/src/time_manager.cpp
+    game/src/aabb.cpp
     )
 
 include_directories(".")
