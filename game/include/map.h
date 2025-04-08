@@ -1,6 +1,6 @@
 #pragma once
 
-#include<array>
+#include <array>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -33,7 +33,7 @@ class Map
         Map();
         ~Map();
 
-        void Draw(sf::RenderWindow &cWindow);
+        void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
         void DrawCurrentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
         void DrawAdjacentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
         void LoadFromFile(const std::string &_sFilepath);

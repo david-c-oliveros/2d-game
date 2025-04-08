@@ -15,8 +15,30 @@ Map::~Map()
 
 
 
-void Map::Draw(sf::RenderWindow &cWindow)
+void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
 {
+    /*********************************************************/
+    /*        Get Adjacent tiles and adjust highlight        */
+    /*        depending on how many tiles are stacked        */
+    /*********************************************************/
+    std::map<std::string, uint32_t> mDupeCount;
+    std::vector<std::shared_ptr<Tile>> aAdj = GetAdjacentTiles(_vWorldGridPos);
+
+    for (auto &tile : aAdj)
+    {
+        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
+        {
+            mDupeCount.at(glm::to_string(tile->vWorldGridPos))++;
+        }
+        else
+        {
+            mDupeCount[glm::to_string(tile->vWorldGridPos)] = 0;
+        }
+    }
+
+    /****************************/
+    /*        Draw tiles        */
+    /****************************/
     for (auto &tile : aTiles)
     {
         if (tile->pSprite == nullptr)
@@ -39,51 +61,11 @@ void Map::Draw(sf::RenderWindow &cWindow)
             tile->pSprite->setColor(sf::Color(255, 255, 255));
         }
 
-        cWindow.draw(*tile->pSprite);
-    }
-}
-
-
-
-void Map::DrawCurrentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
-{
-    for (auto &tile : GetCurrentTiles(_vWorldGridPos))
-    {
-        if (tile->pSprite == nullptr)
+        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
         {
-            continue;
+            uint32_t num = 40 * mDupeCount.at(glm::to_string(tile->vWorldGridPos));
+            tile->pSprite->setColor(sf::Color(155 - num, 155 - num, 200 - num));
         }
-
-        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
-                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
-
-        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
-        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
-
-        tile->pSprite->setColor(sf::Color(55, 55, 100));
-
-        cWindow.draw(*tile->pSprite);
-    }
-}
-
-
-
-void Map::DrawAdjacentTiles(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
-{
-    for (auto &tile : GetAdjacentTiles(_vWorldGridPos))
-    {
-        if (tile->pSprite == nullptr)
-        {
-            continue;
-        }
-
-        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
-                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
-
-        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
-        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
-
-        tile->pSprite->setColor(sf::Color(155, 155, 200));
 
         cWindow.draw(*tile->pSprite);
     }

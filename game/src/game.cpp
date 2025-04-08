@@ -105,9 +105,16 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     cWindow.setView(Camera::cView);
-    m_cMap.Draw(cWindow);
-    m_cMap.DrawAdjacentTiles(cWindow, m_pPlayer->vWorldGridPos);
-    m_cMap.DrawCurrentTiles(cWindow, m_pPlayer->vWorldGridPos);
+    m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos);
+//    m_cMap.DrawAdjacentTiles(cWindow, m_pPlayer->vWorldGridPos);
+//    m_cMap.DrawCurrentTiles(cWindow, m_pPlayer->vWorldGridPos);
+
+    uint32_t nAdj = m_cMap.GetAdjacentTiles(m_pPlayer->vWorldGridPos).size();
+    uint32_t nCur = m_cMap.GetCurrentTiles(m_pPlayer->vWorldGridPos).size();
+
+    std::cout << "Number of adjacent tiles: " << nAdj << '\n';
+    std::cout << "Number of current tiles: " << nCur << '\n';
+
 
     /***************************************/
     /*        Draw Highlighted Tile        */
