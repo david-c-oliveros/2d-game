@@ -18,7 +18,7 @@ Map::~Map()
 void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
 {
     /*********************************************************/
-    /*        Get Adjacent tiles and adjust highlight        */
+    /*        Get Adjacent tiles to adjust highlight         */
     /*        depending on how many tiles are stacked        */
     /*********************************************************/
     std::map<std::string, uint32_t> mDupeCount;

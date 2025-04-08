@@ -118,7 +118,7 @@ public:
   static void printTextures();
   static void forceUpdate(string animation, Sprite &sprite);
 
-  static void update(string animation, Sprite& sprite);
+  static bool update(string animation, Sprite& sprite);
 
   /*
   This method may not be used, as it would require the game to organize all of

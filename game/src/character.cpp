@@ -29,6 +29,19 @@ void Character::Update()
     {
         AnimationManager::update(m_sCurrentAnimation, *m_pSprite);
     }
+
+    setAnimation();
+}
+
+
+
+void Character::Move()
+{
+    if (glm::length(m_vVelocity) > 0.0f)
+    {
+        vWorldPos += m_vVelocity;
+        //vWorldPos += glm::normalize(m_vVelocity) * m_fSpeedScalar;
+    }
 }
 
 
@@ -59,26 +72,29 @@ void Character::AttachAnimatedSprite(const std::string _sFilepath, glm::ivec2 _v
 
 void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::ivec2 _vEndIndex)
 {
-    AnimationManager::addAnimation(_sName, m_pSprite->getTexture(), m_vFrameRect, m_vSpriteSize);
-    AnimationManager::setAnimationStartingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
-    AnimationManager::setAnimationEndingIndex(_sName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
+    std::string sAnimName(sName + "_" + _sName);
+    AnimationManager::addAnimation(sAnimName, m_pSprite->getTexture(), m_vFrameRect, m_vSpriteSize);
+    AnimationManager::setAnimationStartingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
+    AnimationManager::setAnimationEndingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
 }
 
 
 
 void Character::SetAnimationFrequency(std::string _sName, int32_t _nFreq)
 {
-    AnimationManager::setAnimationFrequency(_sName, _nFreq);
+    std::string sAnimName(sName + "_" + _sName);
+    AnimationManager::setAnimationFrequency(sAnimName, _nFreq);
 }
 
 
 
 void Character::SetCurrentAnimation(std::string _sName)
 {
+    std::string sAnimName(sName + "_" + _sName);
     m_sPreviousAnimation = m_sCurrentAnimation;
-    m_sCurrentAnimation = _sName;
+    m_sCurrentAnimation = sAnimName;
 
-    if (_sName !=  m_sPreviousAnimation)
+    if (sAnimName !=  m_sPreviousAnimation)
     {
         AnimationManager::setAnimationIndex(m_sCurrentAnimation,
                                             AnimationManager::getAnimationStartingIndex(m_sCurrentAnimation));
@@ -88,9 +104,23 @@ void Character::SetCurrentAnimation(std::string _sName)
 
 
 
+std::string Character::GetCurrentAnimation()
+{
+    return m_sCurrentAnimation;
+}
+
+
+
 sf::Vector2i Character::GetSpriteSize()
 {
     return m_vSpriteSize;
+}
+
+
+
+void Character::setVelocity(glm::vec2 _vVel, float fScalar)
+{
+    m_vVelocity = glm::normalize(_vVel) * fScalar;
 }
 
 

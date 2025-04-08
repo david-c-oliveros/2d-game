@@ -28,11 +28,11 @@ void AnimationManager::forceUpdate(string animation, Sprite &sprite)
 }
 
 
-void AnimationManager::update(string animation, Sprite &sprite) {
+bool AnimationManager::update(string animation, Sprite &sprite) {
   if (m_timesBetweenUpdate[animation] < m_frequencies[animation])
   {
       m_timesBetweenUpdate[animation]++;
-      return;
+      return false;
   }
   // First, we want to locate our animation in the map
   // We look at the sheet size because that is the easiest indicator to tell if
@@ -88,6 +88,8 @@ void AnimationManager::update(string animation, Sprite &sprite) {
     // If we didn't find an entry
     cout << "No animation entry found for \"" << animation << "\"!" << endl;
   }
+
+  return true;
 }
 
 /*

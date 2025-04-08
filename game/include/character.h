@@ -43,6 +43,7 @@ class Character : public Entity
         std::shared_ptr<sf::Texture> GetTexture();
 
         void Update();
+        void Move();
         void Draw(sf::RenderWindow &cWindow);
 
 
@@ -57,15 +58,22 @@ class Character : public Entity
         void SetAnimationFrequency(std::string _sName, int32_t _nFreq);
         void SetCurrentAnimation(std::string _sName);
 
+        std::string GetCurrentAnimation();
         sf::Vector2i GetSpriteSize();
 
 
     protected:
+        void setVelocity(glm::vec2 _vVel, float fScalar);
         void setAnimation();
 
 
     public:
         std::string sName;
+
+        sf::Clock clock;
+        int nDebugCount;
+        int nDebugTotal;
+        float fAnimInterval;
 
 
     protected:
@@ -83,5 +91,6 @@ class Character : public Entity
         CharState eState;
         MoveDir eDir;
 
+        glm::vec2 m_vVelocity = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 };

@@ -40,15 +40,14 @@ Npc::~Npc()
 
 void Npc::Update()
 {
-    Character::Update();
-    setAnimation();
-    Move();
-
     if (TimeManager::CheckTimer(sName))
     {
         TimeManager::TimerTimeout(sName);
         makeDecision();
     }
+
+    Character::Update();
+    Move();
 }
 
 
@@ -58,10 +57,7 @@ void Npc::Move()
     /*********************************/
     /*        Update position        */
     /*********************************/
-    if (glm::length(m_vVelocity) > 0.0f)
-    {
-        vWorldPos += glm::normalize(m_vVelocity) * m_fSpeedScalar;
-    }
+    Character::Move();
 
     //m_vVelocity = glm::vec2(0.0f);
 }
@@ -73,5 +69,5 @@ void Npc::makeDecision()
     //std::cout << sName << " is making a decision\n";
     int decision = Util::GenRandInRange(0, 8);
     eDir = static_cast<MoveDir>(decision);
-    m_vVelocity = Globals::aMoveVels[static_cast<size_t>(eDir)];
+    setVelocity(Globals::aMoveVels[static_cast<size_t>(eDir)], m_fSpeedScalar);
 }

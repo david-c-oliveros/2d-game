@@ -12,7 +12,7 @@ namespace Globals
         THREE
     };
 
-    constexpr DebugLevel eDEBUG_LEVEL = DebugLevel::ONE;
+    constexpr DebugLevel eDEBUG_LEVEL = DebugLevel::ZERO;
 
     constexpr sf::Vector2f TILE_SIZE({ 32.0f, 32.0f });
 

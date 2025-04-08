@@ -26,10 +26,9 @@ Player::~Player()
 
 void Player::Update(Map &cMap)
 {
-    Character::Update();
     handleInput();
+    Character::Update();
 
-    setAnimation();
     Move(cMap);
 }
 
@@ -46,13 +45,8 @@ void Player::Move(Map &cMap)
     }
 
     assert(static_cast<int>(eDir) < Globals::aMoveVels.size());
-    m_vVelocity = Globals::aMoveVels[static_cast<int>(eDir)];
-    if (glm::length(m_vVelocity) > 0.0f)
-    {
-        vWorldPos += glm::normalize(m_vVelocity) * m_fSpeedScalar;
-        cMap.GetCurrentTiles(vWorldGridPos);
-        cMap.GetAdjacentTiles(vWorldGridPos);
-    }
+    setVelocity(Globals::aMoveVels[static_cast<int>(eDir)], m_fSpeedScalar);
+    Character::Move();
 
     /***********************************************/
     /*        Reset velocity, as it will be        */

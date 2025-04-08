@@ -25,7 +25,6 @@ class Npc : public Character
 
 
     private:
-        std::string m_sName;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
         float m_fSpeedScalar = 1.0f;
         uint8_t nFrameCount = 1;

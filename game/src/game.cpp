@@ -33,10 +33,11 @@ void Game::Create()
 
     Camera::SetCameraView(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
     Camera::SetZoom(cWindow, 0.2f);
-//    Camera::EnableFollow();
+    Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetCursorTile())));
+    UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_pPlayer->fAnimInterval));
     UI::AddText("fps", "FPS: ");
     UI::AddButton("My Button");
 //    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
@@ -75,6 +76,7 @@ void Game::Update()
 
     UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
     UI::mLabels["cursor_grid_position"]->SetText("Cursor Grid Coords: " + glm::to_string(Util::convert_vector<glm::vec2>(GetCursorTile())));
+    UI::mLabels["player_anim_interval"]->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
 
     UI::UpdateButtons(GetCursorScreenPos());
     m_pPlayer->Update(m_cMap);
@@ -245,6 +247,8 @@ void Game::LoadResources()
     m_pPlayer->SetAnimationFrequency("walk_forward", 8);
 
     m_pPlayer->SetCurrentAnimation("walk_right");
+
+    std::cout << "Current player animation: " << m_pPlayer->GetCurrentAnimation() << '\n';
 
 
     for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
