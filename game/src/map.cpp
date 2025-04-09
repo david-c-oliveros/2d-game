@@ -52,38 +52,33 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
         tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
 
-        if (tile->bCollided)
-            tile->pSprite->setColor(sf::Color(220, 0, 100));
-        else
-            tile->pSprite->setColor(sf::Color(255, 255, 255));
-
-
         cWindow.draw(*tile->pSprite);
-        if (tile->bSolid)
-        {
-            sf::FloatRect rect = GetTileBox(*tile);
-            sf::RectangleShape shape(rect.size);
-            shape.setPosition(rect.position);
-            shape.setFillColor(sf::Color(80, 0, 0));
-            cWindow.draw(shape);
-        }
-
-        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
-            continue;
 
 
         /*****************************************************/
         /*        DEBUG: Highlight certain tile types        */
         /*               and adjacent tiles                  */
         /*****************************************************/
+        /*********************************/
+        /*        DEBUG Level One        */
+        /*********************************/
+        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
+            continue;
+
         if (tile->bSolid)
         {
-            tile->pSprite->setColor(sf::Color(180, 0, 0));
+            sf::FloatRect rect = GetTileBox(*tile);
+            sf::RectangleShape shape(rect.size);
+            shape.setPosition(rect.position);
+            shape.setFillColor(sf::Color(100, 50, 0, 180));
+            cWindow.draw(shape);
         }
-        else
-        {
-            tile->pSprite->setColor(sf::Color(255, 255, 255));
-        }
+
+        /*********************************/
+        /*        DEBUG Level Two        */
+        /*********************************/
+        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ONE)
+            continue;
 
         if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
         {
@@ -94,6 +89,12 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         cWindow.draw(*tile->pSprite);
     }
 }
+
+
+
+//void Map::DrawNavTiles()
+//{
+//}
 
 
 
@@ -139,60 +140,24 @@ std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWor
 
 
 
-glm::ivec2 Map::GetSize()
-{
-//    std::map<std::string, uint32_t> mDupeCount;
-//
-//    int count = 0;
-//    for (auto tile : aTiles)
-//    {
-//        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
-//        {
-//            mDupeCount.at(glm::to_string(tile->vWorldGridPos))++;
-//        }
-//        else
-//        {
-//            count++;
-//            mDupeCount[glm::to_string(tile->vWorldGridPos)] = 0;
-//        }
-//    }
-
-    glm::ivec2 vSize(0);
-    for (auto tile : aTiles)
-    {
-        if (tile->vWorldGridPos.x > vSize.x)
-            vSize.x = tile->vWorldGridPos.x;
-
-        if (tile->vWorldGridPos.y > vSize.y)
-            vSize.y = tile->vWorldGridPos.y;
-    }
-
-    vSize.x++;
-    vSize.y++;
-
-    return vSize;
-}
-
-
-
 void Map::LoadFromFile(const std::string &_sFilepathStr)
 {
     /* Tileson uses an alias 'fs' for 'std::filesystem' */
     tson::Tileson t;
     fs::path fp(m_basePath / _sFilepathStr);
 
-    pMap = t.parse(fp);
+    pTsonMap = t.parse(fp);
 
-    if (pMap->getStatus() == tson::ParseStatus::OK)
+    if (pTsonMap->getStatus() == tson::ParseStatus::OK)
     {
-        tson::Vector2i _vTileSize = pMap->getTileSize();
+        tson::Vector2i _vTileSize = pTsonMap->getTileSize();
         m_vDefaultScalar /= glm::vec2(_vTileSize.x, _vTileSize.y);
-        aTiles.reserve(pMap->getSize().x * pMap->getSize().y);
+        aTiles.reserve(pTsonMap->getSize().x * pTsonMap->getSize().y);
         std::cout << "Map parsed successfully" << std::endl;
     }
     else
     {
-        switch(pMap->getStatus())
+        switch(pTsonMap->getStatus())
         {
             case tson::ParseStatus::FileNotFound:
                 std::cout << "File not found" << std::endl;
@@ -219,12 +184,26 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
 
 void Map::storeMap()
 {
-    for (auto &_layer : pMap->getLayers())
+    uint32_t nLayer = 0;
+    for (auto &_layer : pTsonMap->getLayers())
     {
         if (_layer.getType() == tson::LayerType::TileLayer)
         {
             int current_layer_id = _layer.getId();
             std::cout << "Current layer ID: " << current_layer_id << '\n';
+            std::cout << "Layer size: " << glm::to_string(Util::convert_vector<glm::ivec2>(_layer.getSize())) << '\n';
+
+            /*******************************************************/
+            /*         Initialize size of Nav Tiles array          */
+            /*        But only do this once (on first layer)       */
+            /*******************************************************/
+            if (nLayer == 0)
+            {
+                vMapSize = glm::ivec2(_layer.getSize().x, _layer.getSize().y);
+                aNavTiles.resize((size_t)(vMapSize.x * vMapSize.y), NavTile{ glm::ivec2(0.0f), false });
+            }
+            nLayer++;
+
 
             for (auto &[pos, tileObject] : _layer.getTileObjects())
             {
@@ -232,15 +211,13 @@ void Map::storeMap()
                 /*        Get Tile data        */
                 /*******************************/
                 // TODO - If new layer tile occupies a full tile, overwrite the old tile
-                std::unique_ptr<Tile> _pTile = std::make_unique<Tile>();
+                std::shared_ptr<Tile> _pTile = std::make_shared<Tile>();
 
-                //std::cout << tileObject.getTile()->getId() << ' ';
                 _pTile->tileset = tileObject.getTile()->getTileset();
                 _pTile->cTextureRect = tileObject.getDrawingRect();
 
                 tson::Vector2f _vPos = tileObject.getPosition();
                 _pTile->vWorldGridPos = glm::ivec2(_vPos.x, _vPos.y) / Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
-                std::cout << glm::to_string(_pTile->vWorldGridPos) << ' ';
 
 
                 _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
@@ -258,10 +235,11 @@ void Map::storeMap()
                     _pTile->bSolid = false;
                 }
 
+                storeNavTile(_pTile);
 
                 if (Globals::eDEBUG_LEVEL < Globals::DebugLevel::TWO)
                 {
-                  aTiles.emplace_back(std::move(_pTile));
+                  aTiles.emplace_back(_pTile);
                   continue;
                 }
 
@@ -273,14 +251,44 @@ void Map::storeMap()
 
                 if (it != aTiles.end())
                 {
-                    *it = std::move(_pTile);
+                    *it = _pTile;
                 }
                 else
                 {
-                  aTiles.emplace_back(std::move(_pTile));
+                  aTiles.emplace_back(_pTile);
                 }
             }
         }
+    }
+}
+
+
+
+void Map::storeNavTile(std::shared_ptr<Tile> tile)
+{
+    /************************************************************/
+    /************************************************************/
+    /*         Create new NavTile from tile if the              */
+    /*         NavTile at the current index is a nullptr        */
+    /*                                                          */
+    /*         Otherwise overwrite only if the current          */
+    /*                    tile is solid                         */
+    /************************************************************/
+    /************************************************************/
+    int nIndex = tile->vWorldGridPos.y * vMapSize.x + tile->vWorldGridPos.x;;
+
+    if (!aNavTiles.at(nIndex).bOccupied)
+    {
+        aNavTiles.at(nIndex).vWorldGridPos = tile->vWorldGridPos;
+        aNavTiles.at(nIndex).bSolid = tile->bSolid;
+        aNavTiles.at(nIndex).bOccupied = true;
+        return;
+    }
+
+    if (tile->bSolid)
+    {
+        aNavTiles.at(nIndex).vWorldGridPos = tile->vWorldGridPos;
+        aNavTiles.at(nIndex).bSolid = tile->bSolid;
     }
 }
 

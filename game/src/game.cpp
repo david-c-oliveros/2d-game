@@ -21,7 +21,7 @@ Game::~Game() {}
 
 void Game::Create()
 {
-    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0.0f));
+    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(4.0f));
     TimeManager::NewTimer("get_fps_interval", 6);
 
     LoadResources();
@@ -103,6 +103,13 @@ void Game::Render()
         RenderDebug();
 
     RenderEntities();
+
+    if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
+    {
+        //m_pPlayer->DrawBoundingBox(cWindow);
+        m_pPlayer->DrawCollider(cWindow);
+    }
+
     RenderUI();
 
     cWindow.display();
@@ -178,6 +185,7 @@ void Game::RenderDebug()
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
     cWindow.draw(shape);
+
 }
 
 

@@ -48,6 +48,8 @@ class Character : public Entity
         void Update();
         void Move(Map &cMap);
         void Draw(sf::RenderWindow &cWindow);
+        void DrawBoundingBox(sf::RenderWindow &cWindow);
+        void DrawCollider(sf::RenderWindow &cWindow);
 
 
         void AttachAnimatedSprite(const std::string _sFilepath,
@@ -79,6 +81,10 @@ class Character : public Entity
         int nDebugTotal;
         float fAnimInterval;
 
+        bool bAnimated = false;
+
+        Circle cCollider{vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
+
 
     protected:
         std::unique_ptr<sf::Sprite> m_pSprite;
@@ -90,12 +96,9 @@ class Character : public Entity
         sf::Vector2i m_vSpriteSize;
         sf::Vector2i m_vFrameRect;
 
-        bool bAnimated = false;
-
         CharState eState;
         MoveDir eDir;
 
-        Circle cCollider;
         sf::FloatRect cBox;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);

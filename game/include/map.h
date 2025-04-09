@@ -28,6 +28,15 @@ struct Tile
 };
 
 
+
+struct NavTile
+{
+    glm::ivec2 vWorldGridPos;
+    bool bSolid;
+    bool bOccupied = false;
+};
+
+
 class Map
 {
     public:
@@ -37,18 +46,20 @@ class Map
         void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
-        glm::ivec2 GetSize();
         void LoadFromFile(const std::string &_sFilepath);
 
     private:
         void storeMap();
+        void storeNavTile(std::shared_ptr<Tile> tile);
         sf::Sprite* storeAndLoadImage(const std::string &_image, const sf::Vector2f &_vPos);
         std::vector<std::shared_ptr<Tile>>::iterator getOccupiedTile(glm::ivec2 _vWorldPos);
 
     public:
-        std::unique_ptr<tson::Map> pMap;
+        std::unique_ptr<tson::Map> pTsonMap;
         std::unique_ptr<sf::Sprite> pSprite;
         std::vector<std::shared_ptr<Tile>> aTiles;
+        std::vector<NavTile> aNavTiles;
+        glm::ivec2 vMapSize;
 
     private:
         std::map<std::string, std::unique_ptr<sf::Texture>> m_pTextures;

@@ -150,7 +150,7 @@ glm::vec2 Collision::sweepResponseSlide(Hit sweepResult, glm::vec2 vEntityVel)
 
 
 
-glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vVel, std::vector<std::shared_ptr<Tile>> &aTiles, glm::ivec2 vWorldSize)
+glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vVel, const std::vector<NavTile> &aNavTiles, glm::ivec2 vWorldSize)
 {
     glm::vec2 vPotentialPos = c.vPos + vVel;
 
@@ -169,7 +169,7 @@ glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vVel, std::vector<std::sha
 
             int nCurIndex = vCell.y * vWorldSize.x + vCell.x;
 
-            if (aTiles[nCurIndex]->bSolid)
+            if (aNavTiles.at(nCurIndex).bSolid)
             {
                 glm::vec2 vNearestPoint;
 

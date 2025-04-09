@@ -40,37 +40,9 @@ void Character::Update()
 
 void Character::Move(Map &cMap)
 {
-    Circle cCollider{vWorldPos / Globals::GLM_TILE_SIZE, Globals::GLM_TILE_SIZE.x };
-    vWorldPos = Collision::CircleSquare(cCollider, m_vVelocity / Globals::GLM_TILE_SIZE, cMap.aTiles, cMap.GetSize());
+    vWorldPos = Collision::CircleSquare(cCollider, m_vVelocity / Globals::GLM_TILE_SIZE, cMap.aNavTiles, cMap.vMapSize);
     vWorldPos *= Globals::GLM_TILE_SIZE;
-    for (auto &tile : cMap.aTiles)
-    {
-        /********************************************/
-        /*        Simple collision detection        */
-        /********************************************/
-//        if(tile->bSolid && Collision::AABB(cBox, Map::GetTileBox(*tile)))
-//        {
-//            tile->bCollided = true;
-//        }
-//        else
-//        {
-//            tile->bCollided = false;
-//        }
-
-        /**************************************************/
-        /*        Collision detection and response        */
-        /**************************************************/
-        if (tile->bSolid)
-        {
-            Hit sweepResult = Collision::SweptAABB(cBox, cMap.GetTileBox(*tile), m_vVelocity, glm::vec2(0.0f));
-            m_vVelocity = Collision::SweepResponse(sweepResult, m_vVelocity);
-        }
-    }
-
-    if (glm::length(m_vVelocity) > 0.0f)
-    {
-        //vWorldPos += m_vVelocity;
-    }
+    cCollider.vPos = vWorldPos / Globals::GLM_TILE_SIZE;
 
     updateBoundingBox();
 }
@@ -82,6 +54,34 @@ void Character::Draw(sf::RenderWindow &cWindow)
     m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
 
     cWindow.draw(*m_pSprite);
+}
+
+
+
+void Character::DrawBoundingBox(sf::RenderWindow &cWindow)
+{
+    sf::RectangleShape bb(cBox.size);
+    bb.setPosition(cBox.position);
+    bb.setFillColor(sf::Color(0, 100, 0, 255));
+    bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
+
+    cWindow.draw(bb);
+}
+
+
+
+void Character::DrawCollider(sf::RenderWindow &cWindow)
+{
+    std::cout << "\nPlayer pos:   " << glm::to_string(vWorldPos) << '\n';
+    std::cout << "Collider pos: " << glm::to_string(cCollider.vPos * Globals::GLM_TILE_SIZE) << '\n';
+    std::cout << "Box pos:      " << glm::to_string(Util::convert_vector<glm::vec2>(cBox.position)) << '\n';
+    sf::CircleShape cColShape(cCollider.fRadius * Globals::TILE_SIZE.x);
+
+    cColShape.setOrigin({ cCollider.fRadius * Globals::TILE_SIZE.x, cCollider.fRadius * Globals::TILE_SIZE.y });
+    cColShape.setPosition(Util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
+    cColShape.setFillColor(sf::Color(0, 0, 100, 255));
+
+    cWindow.draw(cColShape);
 }
 
 
