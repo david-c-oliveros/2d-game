@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "tile_world.h"
+#include "map.h"
 
 
 
@@ -15,7 +16,7 @@ class Entity
         ~Entity();
 
         void Create();
-        virtual void Update() = 0;
+        virtual void Update(Map &cMap) = 0;
         virtual void Draw(sf::RenderWindow &cWindow) = 0;
 
 

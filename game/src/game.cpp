@@ -87,7 +87,7 @@ void Game::Update()
         if (e == nullptr)
             continue;
 
-        e->Update();
+        e->Update(m_cMap);
     }
 }
 
@@ -175,7 +175,7 @@ void Game::RenderDebug()
     /******************************************/
     sf::Vector2i _pos = Util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
-    shape.setFillColor(sf::Color(50, 100, 50));
+    shape.setFillColor(sf::Color(50, 100, 50, 100));
 
     cWindow.draw(shape);
 }

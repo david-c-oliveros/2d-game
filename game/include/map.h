@@ -35,9 +35,10 @@ class Map
         ~Map();
 
         void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
-        void LoadFromFile(const std::string &_sFilepath);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
+        glm::ivec2 GetSize();
+        void LoadFromFile(const std::string &_sFilepath);
 
     private:
         void storeMap();
@@ -66,5 +67,5 @@ class Map
     /**********************************/
     /**********************************/
     public:
-        static sf::FloatRect GetTileBoundingBox(Tile &tile);
+        static sf::FloatRect GetTileBox(Tile &tile);
 };

@@ -5,7 +5,7 @@
 Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
     : Entity(_ID, _vWorldPos)
 {
-    cBoundingBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
     eState = CharState::IDLE;
 }
 
@@ -14,7 +14,7 @@ Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
 Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
     : sName(_sName), Entity(_ID, _vWorldPos)
 {
-    cBoundingBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
     eState = CharState::IDLE;
 }
 
@@ -40,20 +40,36 @@ void Character::Update()
 
 void Character::Move(Map &cMap)
 {
+    Circle cCollider{vWorldPos / Globals::GLM_TILE_SIZE, Globals::GLM_TILE_SIZE.x };
+    vWorldPos = Collision::CircleSquare(cCollider, m_vVelocity / Globals::GLM_TILE_SIZE, cMap.aTiles, cMap.GetSize());
+    vWorldPos *= Globals::GLM_TILE_SIZE;
     for (auto &tile : cMap.aTiles)
     {
-        if(tile->bSolid && AABB::CheckCollision(cBoundingBox, Map::GetTileBoundingBox(*tile)))
+        /********************************************/
+        /*        Simple collision detection        */
+        /********************************************/
+//        if(tile->bSolid && Collision::AABB(cBox, Map::GetTileBox(*tile)))
+//        {
+//            tile->bCollided = true;
+//        }
+//        else
+//        {
+//            tile->bCollided = false;
+//        }
+
+        /**************************************************/
+        /*        Collision detection and response        */
+        /**************************************************/
+        if (tile->bSolid)
         {
-            tile->bCollided = true;
-        }
-        else
-        {
-            tile->bCollided = false;
+            Hit sweepResult = Collision::SweptAABB(cBox, cMap.GetTileBox(*tile), m_vVelocity, glm::vec2(0.0f));
+            m_vVelocity = Collision::SweepResponse(sweepResult, m_vVelocity);
         }
     }
+
     if (glm::length(m_vVelocity) > 0.0f)
     {
-        vWorldPos += m_vVelocity;
+        //vWorldPos += m_vVelocity;
     }
 
     updateBoundingBox();
@@ -142,7 +158,7 @@ void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 
 void Character::updateBoundingBox()
 {
-    cBoundingBox.position = sf::Vector2(vWorldPos.x, vWorldPos.y);
+    cBox.position = sf::Vector2(vWorldPos.x, vWorldPos.y);
 }
 
 

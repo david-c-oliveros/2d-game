@@ -6,7 +6,7 @@
 #include "util.h"
 #include "map.h"
 #include "entity.h"
-#include "aabb.h"
+#include "collision.h"
 
 
 
@@ -95,7 +95,8 @@ class Character : public Entity
         CharState eState;
         MoveDir eDir;
 
-        sf::FloatRect cBoundingBox;
+        Circle cCollider;
+        sf::FloatRect cBox;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 };

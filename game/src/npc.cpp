@@ -66,7 +66,6 @@ void Npc::Move(Map &cMap)
 
 void Npc::makeDecision()
 {
-    //std::cout << sName << " is making a decision\n";
     int decision = Util::GenRandInRange(0, 8);
     eDir = static_cast<MoveDir>(decision);
     setVelocity(Globals::aMoveVels[static_cast<size_t>(eDir)], m_fSpeedScalar);

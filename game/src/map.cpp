@@ -58,16 +58,24 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
             tile->pSprite->setColor(sf::Color(255, 255, 255));
 
 
+        cWindow.draw(*tile->pSprite);
+        if (tile->bSolid)
+        {
+            sf::FloatRect rect = GetTileBox(*tile);
+            sf::RectangleShape shape(rect.size);
+            shape.setPosition(rect.position);
+            shape.setFillColor(sf::Color(80, 0, 0));
+            cWindow.draw(shape);
+        }
+
+        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
+            continue;
+
+
         /*****************************************************/
         /*        DEBUG: Highlight certain tile types        */
         /*               and adjacent tiles                  */
         /*****************************************************/
-        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
-        {
-            cWindow.draw(*tile->pSprite);
-            continue;
-        }
-
         if (tile->bSolid)
         {
             tile->pSprite->setColor(sf::Color(180, 0, 0));
@@ -127,6 +135,42 @@ std::vector<std::shared_ptr<Tile>> Map::GetAdjacentTiles(const glm::ivec2 &_vWor
     }
 
     return aAdjacentTiles;
+}
+
+
+
+glm::ivec2 Map::GetSize()
+{
+//    std::map<std::string, uint32_t> mDupeCount;
+//
+//    int count = 0;
+//    for (auto tile : aTiles)
+//    {
+//        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
+//        {
+//            mDupeCount.at(glm::to_string(tile->vWorldGridPos))++;
+//        }
+//        else
+//        {
+//            count++;
+//            mDupeCount[glm::to_string(tile->vWorldGridPos)] = 0;
+//        }
+//    }
+
+    glm::ivec2 vSize(0);
+    for (auto tile : aTiles)
+    {
+        if (tile->vWorldGridPos.x > vSize.x)
+            vSize.x = tile->vWorldGridPos.x;
+
+        if (tile->vWorldGridPos.y > vSize.y)
+            vSize.y = tile->vWorldGridPos.y;
+    }
+
+    vSize.x++;
+    vSize.y++;
+
+    return vSize;
 }
 
 
@@ -298,7 +342,7 @@ std::vector<std::shared_ptr<Tile>>::iterator Map::getOccupiedTile(glm::ivec2 _vW
 /*                                */
 /**********************************/
 /**********************************/
-sf::FloatRect Map::GetTileBoundingBox(Tile &tile)
+sf::FloatRect Map::GetTileBox(Tile &tile)
 {
     sf::Vector2f _vTileWorldPos = Util::convert_vector<sf::Vector2f>((glm::vec2)tile.vWorldGridPos * Globals::GLM_TILE_SIZE);
     return sf::FloatRect(_vTileWorldPos, Globals::TILE_SIZE);
