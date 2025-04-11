@@ -49,10 +49,9 @@ void Game::Start()
 {
     TimeManager::StartTimer("get_fps_interval");
 
-    bool bRunning = true;
-    while (bRunning)
+    while (m_bRunning)
     {
-        while (const std::optional event = cWindow.pollEvent())
+        while (const std::optional event = Renderer::GetWindow().pollEvent())
         {
             handleInputEvent(event);
             Renderer::SetView(Camera::GetView());
@@ -127,7 +126,7 @@ void Game::RenderGameWorld()
     sf::Transform tView = Camera::GetView().getTransform();
     //cWindow.setView(Camera::GetView());
     Renderer::SetView(Camera::GetView());
-    m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos, tView, m_shader);
+    m_cMap.Draw(m_pPlayer->vWorldGridPos, tView, m_shader);
 }
 
 
@@ -158,7 +157,7 @@ void Game::RenderUI()
     Renderer::SetDefaultView();
     //cWindow.setView(cWindow.getDefaultView());
 
-    UI::Render(cWindow);
+    UI::Render();
 }
 
 
@@ -184,7 +183,8 @@ void Game::RenderDebug()
     shape.setPosition(sf::Vector2f(_vCursorTile));
     shape.setScale(Globals::TILE_SIZE);
 
-    cWindow.draw(shape);
+    Renderer::Draw(shape);
+    //cWindow.draw(shape);
 
     /******************************************/
     /*        Draw Current Player Tile        */
@@ -341,13 +341,15 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
 
     if (event->is<sf::Event::Closed>())
     {
-        cWindow.close();
+        m_bRunning = false;
+        //cWindow.close();
     }
     else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
-            cWindow.close();
+            m_bRunning = false;
+            //cWindow.close();
         }
 //        else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
 //        {

@@ -15,7 +15,7 @@ Map::~Map()
 
 
 
-void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader)
+void Map::Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader)
 {
     /*********************************************************/
     /*        Get Adjacent tiles to adjust highlight         */
@@ -62,12 +62,13 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::
 
         const sf::Transform model = tile->pSprite->getTransform();
 
-        shader.setUniform("model", model.getMatrix());
+//        shader.setUniform("model", model.getMatrix());
 //        shader.setUniform("view", tView.getMatrix());
-        shader.setUniform("sTexture", sf::Shader::CurrentTexture);
-        shader.setUniform("light_position", vWorldAbsPos.x);
-
-        cWindow.draw(*tile->pSprite, &shader);
+//        shader.setUniform("sTexture", sf::Shader::CurrentTexture);
+//        shader.setUniform("light_position", vWorldAbsPos.x);
+//
+//        cWindow.draw(*tile->pSprite, &shader);
+        Renderer::Draw(*tile->pSprite);
 
 
         /*****************************************************/
@@ -86,7 +87,7 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::
             sf::RectangleShape shape(rect.size);
             shape.setPosition(rect.position);
             shape.setFillColor(sf::Color(100, 50, 0, 180));
-            cWindow.draw(shape);
+            Renderer::Draw(shape);
         }
 
         /*********************************/
@@ -101,7 +102,7 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::
             tile->pSprite->setColor(sf::Color(150 - num, 150 - num, 150 - num));
         }
 
-        cWindow.draw(*tile->pSprite);
+        Renderer::Draw(*tile->pSprite);
     }
 }
 
@@ -232,7 +233,9 @@ void Map::storeMap()
                 _pTile->vWorldGridPos = glm::ivec2(_vPos.x, _vPos.y) / Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
 
 
-                _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
+                _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage(), {0, 0});
+                // TODO - Look into why this doesn't work in C++20
+//                _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
 
                 /********************************************/
                 /*        Set whether layer is solid        */

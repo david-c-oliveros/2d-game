@@ -71,7 +71,7 @@ class Game
         uint32_t getNewID();
 
     public:
-        sf::RenderWindow cWindow;
+//        sf::RenderWindow cWindow;
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
         sf::Clock cClock;

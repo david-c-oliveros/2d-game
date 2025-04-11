@@ -1,5 +1,6 @@
 #include "renderer.h"
-
+#include "glad/glad.h"
+#include "gl_error_manager.h"
 
 
 std::shared_ptr<sf::RenderWindow> Renderer::m_pWindow;
@@ -15,17 +16,24 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
     settings.majorVersion = 4;
     settings.minorVersion = 6;
 
-    m_pWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(vDim), sName, sf::Style::Default, state, settings);
+    m_pWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(vDim), sName, sf::Style::Default, state);
     m_pWindow->setVerticalSyncEnabled(true);
     m_pWindow->setPosition((sf::Vector2i)vDim - (sf::Vector2i)vDim / 2);
 
     if (!m_pWindow->setActive(true))
     {
-        std::cout << "Failed to set window to active\n";
+        std::cout << "- ERROR::SFML::Failed to set window to active\n";
         return -1;
     }
 
-    //glViewport(0, 0, static_cast<GLsizei>(m_pWindow->getSize().x), static_cast<GLsizei>(m_pWindow->getSize().y));
+    gladLoadGL();
+    std::cout << "- Activated render window\n";
+
+    GLCall(glViewport(0, 0, static_cast<GLsizei>(m_pWindow->getSize().x), static_cast<GLsizei>(m_pWindow->getSize().y)));
+
+    std::cout << "- Set OpenGL viewport\n";
+
+    return 0;
 }
 
 

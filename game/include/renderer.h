@@ -2,9 +2,8 @@
 
 #include <iostream>
 
-#include <glad/glad.h>
 #include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
+//#include <SFML/OpenGL.hpp>
 
 
 

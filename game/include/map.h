@@ -1,7 +1,5 @@
 #pragma once
 
-#include <array>
-
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -13,7 +11,7 @@
 
 #include "globals.h"
 #include "util.h"
-#include "tile_world.h"
+#include "renderer.h"
 
 
 
@@ -43,7 +41,7 @@ class Map
         Map();
         ~Map();
 
-        void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader);
+        void Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
         void LoadFromFile(const std::string &_sFilepath);

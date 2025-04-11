@@ -26,7 +26,7 @@ void UI::UpdateButtons(sf::Vector2i vCursorPos)
 
 
 
-void UI::Render(sf::RenderWindow &cWindow)
+void UI::Render()
 {
     for (auto &label : mLabels)
     {
