@@ -16,7 +16,7 @@
 
 #include "globals.h"
 #include "util.h"
-#include "tile_world.h"
+#include "renderer.h"
 #include "entity.h"
 #include "character.h"
 #include "npc.h"
@@ -60,6 +60,8 @@ class Game
         void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
 
         void LoadResources();
+        int LoadShaders(const std::filesystem::path &fsVertPath,
+                        const std::filesystem::path &fsFragPath);
         void AddEntity(std::unique_ptr<Entity> _pE);
 
 //        void ButtonPressed(std::string sButtonName);
@@ -80,11 +82,12 @@ class Game
         std::array<std::unique_ptr<Entity>, Globals::TOTAL_ENEMIES> aEntities = { nullptr };
 
     private:
-        bool m_bPanning = false;
-        glm::ivec2 m_vHoveredTile;
+        bool m_bRunning = true;
 
         std::unique_ptr<Player> m_pPlayer;
         Map m_cMap;
+
+        sf::Shader m_shader;
 
         uint8_t m_nFrameCount = 1;
         uint32_t m_nCurrentID = 0;

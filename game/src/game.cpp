@@ -8,9 +8,7 @@ Game::Game(int32_t _nCanvasWidth, int32_t _nCanvasHeight)
     /*        Create Window        */
     /*******************************/
     sf::Vector2u vDim = { _nCanvasWidth, _nCanvasHeight };
-    cWindow = sf::RenderWindow(sf::VideoMode(vDim), "SFML window", sf::Style::Default, sf::State::Windowed);
-    cWindow.setVerticalSyncEnabled(true);
-    cWindow.setPosition((sf::Vector2<int>)vDim - (sf::Vector2<int>)vDim / 2);
+    Renderer::CreateWindow("Cozy Cryptids", vDim, sf::State::Windowed);
 }
 
 
@@ -21,18 +19,20 @@ Game::~Game() {}
 
 void Game::Create()
 {
-    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(4.0f));
+    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(8, 4));
     TimeManager::NewTimer("get_fps_interval", 6);
 
     LoadResources();
-    std::cout << "Number of npc's: " << aEntities.size() << std::endl;
+    LoadShaders("../../res/shaders/simple.vert",
+                "../../res/shaders/simple.frag");
+    std::cout << "- Number of npc's: " << aEntities.size() << std::endl;
     shape = sf::RectangleShape({ 1.0f, 1.0f });
     shape.setFillColor(sf::Color(250, 150, 100));
     shape.setOutlineThickness(0.0f);
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
     Camera::SetCameraView(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
-    Camera::SetZoom(cWindow, 0.2f);
+    Camera::SetZoom(Renderer::GetWindow(), 0.5f);
     Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
@@ -48,14 +48,17 @@ void Game::Create()
 void Game::Start()
 {
     TimeManager::StartTimer("get_fps_interval");
-    while (cWindow.isOpen())
+
+    bool bRunning = true;
+    while (bRunning)
     {
         while (const std::optional event = cWindow.pollEvent())
         {
             handleInputEvent(event);
-            cWindow.setView(Camera::cView);
-            Camera::HandleMouseInput(cWindow, event);
-            UI::HandleInput(cWindow, event);
+            Renderer::SetView(Camera::GetView());
+            //cWindow.setView(Camera::GetView());
+            Camera::HandleMouseInput(Renderer::GetWindow(), event);
+            UI::HandleInput(Renderer::GetWindow(), event);
         }
 
         Update();
@@ -78,7 +81,7 @@ void Game::Update()
     UI::mLabels["cursor_grid_position"]->SetText("Cursor Grid Coords: " + glm::to_string(Util::convert_vector<glm::vec2>(GetCursorTile())));
     UI::mLabels["player_anim_interval"]->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
 
-    UI::UpdateButtons(GetCursorScreenPos());
+    UI::UpdateButtons(Renderer::GetCursorScreenPos());
     m_pPlayer->Update(m_cMap);
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
@@ -95,7 +98,8 @@ void Game::Update()
 
 void Game::Render()
 {
-    cWindow.clear(sf::Color::Black);
+    Renderer::Clear(sf::Color::Black);
+    //cWindow.clear(sf::Color::Black);
 
     RenderGameWorld();
 
@@ -107,39 +111,43 @@ void Game::Render()
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
     {
         //m_pPlayer->DrawBoundingBox(cWindow);
-        m_pPlayer->DrawCollider(cWindow);
+        m_pPlayer->DrawCollider();
     }
 
     RenderUI();
 
-    cWindow.display();
+    Renderer::Display();
+    //cWindow.display();
 }
 
 
 
 void Game::RenderGameWorld()
 {
-    cWindow.setView(Camera::cView);
-    m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos);
+    sf::Transform tView = Camera::GetView().getTransform();
+    //cWindow.setView(Camera::GetView());
+    Renderer::SetView(Camera::GetView());
+    m_cMap.Draw(cWindow, m_pPlayer->vWorldGridPos, tView, m_shader);
 }
 
 
 
 void Game::RenderEntities()
 {
-    cWindow.setView(Camera::cView);
+    Renderer::SetView(Camera::GetView());
+    //cWindow.setView(Camera::GetView());
 
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
-    m_pPlayer->Draw(cWindow);
+    m_pPlayer->Draw();
 
     for (auto &e : aEntities)
     {
         if (e == nullptr)
             continue;
 
-        e->Draw(cWindow);
+        e->Draw();
     }
 }
 
@@ -147,7 +155,8 @@ void Game::RenderEntities()
 
 void Game::RenderUI()
 {
-    cWindow.setView(cWindow.getDefaultView());
+    Renderer::SetDefaultView();
+    //cWindow.setView(cWindow.getDefaultView());
 
     UI::Render(cWindow);
 }
@@ -184,7 +193,8 @@ void Game::RenderDebug()
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
-    cWindow.draw(shape);
+    Renderer::Draw(shape);
+//    cWindow.draw(shape);
 
 }
 
@@ -192,7 +202,7 @@ void Game::RenderDebug()
 
 sf::Vector2i Game::GetCursorScreenPos()
 {
-    sf::Vector2i _vCursorScreen = sf::Mouse::getPosition(cWindow);
+    sf::Vector2i _vCursorScreen = sf::Mouse::getPosition(Renderer::GetWindow());
     return _vCursorScreen;
 }
 
@@ -200,9 +210,9 @@ sf::Vector2i Game::GetCursorScreenPos()
 
 sf::Vector2f Game::GetCursorWorldPos()
 {
-    cWindow.setView(Camera::cView);
-    sf::Vector2f _vCursorWorld  = cWindow.mapPixelToCoords(sf::Mouse::getPosition(cWindow));
-    return _vCursorWorld;
+//    cWindow.setView(Camera::GetView());
+//    sf::Vector2f _vCursorWorld = cWindow.mapPixelToCoords(sf::Mouse::getPosition(cWindow));
+//    return _vCursorWorld;
 }
 
 
@@ -221,7 +231,7 @@ sf::Vector2i Game::GetTileAtPos(glm::vec2 _vPos)
 
 sf::Vector2i Game::GetCursorTile()
 {
-    sf::Vector2f _vCursorPos = GetCursorWorldPos();
+    sf::Vector2f _vCursorPos = Renderer::GetCursorWorldPos(Camera::GetView());
     sf::Vector2i vCursorTile({ 0, 0 });
     vCursorTile.x = _vCursorPos.x < 0.0f ?  (int32_t)(_vCursorPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(_vCursorPos.x) / Globals::TILE_SIZE.x;
     vCursorTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
@@ -256,12 +266,12 @@ void Game::LoadResources()
 
     m_pPlayer->SetCurrentAnimation("walk_right");
 
-    std::cout << "Current player animation: " << m_pPlayer->GetCurrentAnimation() << '\n';
+    std::cout << "- Current player animation: " << m_pPlayer->GetCurrentAnimation() << '\n';
 
 
     for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
     {
-        std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(8, 8));
+        std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(4, 2));
         _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
         _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
@@ -282,6 +292,35 @@ void Game::LoadResources()
 
 
 
+int Game::LoadShaders(const std::filesystem::path &fsVertPath,
+                      const std::filesystem::path &fsFragPath)
+{
+    if (!sf::Shader::isAvailable())
+    {
+        std::cout << "ERROR::Shaders not available\n";
+        return -1;
+    }
+    std::cout << "- Shaders available\n";
+
+    if (!m_shader.loadFromFile(fsVertPath, sf::Shader::Type::Vertex))
+    {
+        std::cout << "ERROR::Could not load vertex shader\n";
+        return -1;
+    }
+    std::cout << "- Vertex shader loaded succesfully\n";
+
+    if (!m_shader.loadFromFile(fsFragPath, sf::Shader::Type::Fragment))
+    {
+        std::cout << "ERROR::Could not load fragment shader\n";
+        return -1;
+    }
+    std::cout << "- Fragment shader loaded succesfully\n";
+
+    return 0;
+}
+
+
+
 void Game::AddEntity(std::unique_ptr<Entity> _pE)
 {
     for (auto &entity : aEntities)
@@ -298,7 +337,7 @@ void Game::AddEntity(std::unique_ptr<Entity> _pE)
 
 void Game::handleInputEvent(std::optional<sf::Event> event)
 {
-    sf::Vector2i vCursorPos = GetCursorScreenPos();
+    sf::Vector2i vCursorPos = Renderer::GetCursorScreenPos();
 
     if (event->is<sf::Event::Closed>())
     {
@@ -310,6 +349,10 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
         {
             cWindow.close();
         }
+//        else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
+//        {
+//            Update();
+//        }
     }
 }
 

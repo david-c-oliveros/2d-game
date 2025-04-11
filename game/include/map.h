@@ -43,7 +43,7 @@ class Map
         Map();
         ~Map();
 
-        void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos);
+        void Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
         void LoadFromFile(const std::string &_sFilepath);
@@ -56,7 +56,6 @@ class Map
 
     public:
         std::unique_ptr<tson::Map> pTsonMap;
-        std::unique_ptr<sf::Sprite> pSprite;
         std::vector<std::shared_ptr<Tile>> aTiles;
         std::vector<NavTile> aNavTiles;
         glm::ivec2 vMapSize;

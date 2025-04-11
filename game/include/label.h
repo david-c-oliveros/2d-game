@@ -4,6 +4,8 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
+#include "renderer.h"
+
 
 
 class Label
@@ -12,7 +14,7 @@ class Label
         Label(std::string _sText, sf::Font &_cFont);
         ~Label();
 
-        void Draw(sf::RenderWindow &cWindow);
+        void Draw();
         void SetText(std::string _cText);
         void SetFont(sf::Font &_cFont);
         void SetFontSize(uint32_t size);

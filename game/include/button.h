@@ -5,6 +5,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "util.h"
+#include "renderer.h"
 #include "label.h"
 
 
@@ -15,7 +16,7 @@ class Button
         Button(std::string sLabelText, sf::Font &_cFont, uint32_t _nFontSize);
         ~Button();
 
-        void Draw(sf::RenderWindow &cWindow);
+        void Draw();
         void SetFontSize(uint32_t size);
         bool Check(sf::Vector2i vCursorPos);
         void Press();

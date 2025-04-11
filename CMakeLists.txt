@@ -10,7 +10,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(${PROJECT_NAME}
     external/SFMLAnimation/src/AnimationManager.cpp
+    external/glad/src/glad.c
     game/src/main.cpp
+    game/src/renderer.cpp
     game/src/game.cpp
     game/src/map.cpp
     game/src/entity.cpp
@@ -31,6 +33,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC /usr/include/SFML
     PUBLIC external
     PUBLIC game/include
+    PUBLIC external/glad/include
     PUBLIC external/glm
     PUBLIC external/SFMLAnimation/src
     PUBLIC external/SSBMTonberry/tileson

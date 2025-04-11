@@ -30,12 +30,12 @@ void UI::Render(sf::RenderWindow &cWindow)
 {
     for (auto &label : mLabels)
     {
-        label.second->Draw(cWindow);
+        label.second->Draw();
     }
 
     for (auto &button : mButtons)
     {
-        button.second->Draw(cWindow);
+        button.second->Draw();
     }
 }
 

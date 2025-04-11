@@ -150,8 +150,11 @@ glm::vec2 Collision::sweepResponseSlide(Hit sweepResult, glm::vec2 vEntityVel)
 
 
 
-glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vVel, const std::vector<NavTile> &aNavTiles, glm::ivec2 vWorldSize)
+glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vCircleVel, glm::vec2 &vGravVel, const std::vector<NavTile> &aNavTiles, glm::ivec2 vWorldSize)
 {
+    bool bHit = false;
+
+    glm::vec2 vVel = vCircleVel / Globals::GLM_TILE_SIZE + vGravVel / Globals::GLM_TILE_SIZE;
     glm::vec2 vPotentialPos = c.vPos + vVel;
 
     glm::ivec2 vCurCell = glm::floor(c.vPos);
@@ -198,10 +201,17 @@ glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vVel, const std::vector<Na
                     }
 
                     vPotentialPos = vPotentialPos - vNorm * fOverlap;
+                    bHit = true;
                 }
             }
         }
     }
+
+    /****************************************************************/
+    /*        If there is a hit, reset velocity from gravity        */
+    /****************************************************************/
+    if (bHit)
+        vGravVel = glm::vec2(0.0f);
 
     return vPotentialPos;
 }

@@ -21,7 +21,8 @@ namespace Globals
 
     constexpr uint32_t TOTAL_ENEMIES = 1;
 
-    constexpr std::array<glm::vec2, 8> aMoveVels = { glm::vec2(  0.0f, -1.0f ),
+    constexpr std::array<glm::vec2, 9> aMoveVels = { glm::vec2(  0.0f,  0.0f ),
+                                                     glm::vec2(  0.0f, -1.0f ),
                                                      glm::vec2(  1.0f, -1.0f ),
                                                      glm::vec2(  1.0f,  0.0f ),
                                                      glm::vec2(  1.0f,  1.0f ),
@@ -30,4 +31,12 @@ namespace Globals
                                                      glm::vec2( -1.0f,  0.0f ),
                                                      glm::vec2( -1.0f, -1.0f )
     };
+
+
+    /***********************************/
+    /*        Physics Constants        */
+    /***********************************/
+    constexpr bool bTOP_DOWN = true;
+    constexpr float METER = 16.0f * 8.0f;
+    constexpr float GRAVITY = bTOP_DOWN ? 0.0f : 9.80665f / METER;
 }

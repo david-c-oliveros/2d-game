@@ -40,7 +40,8 @@ void Character::Update()
 
 void Character::Move(Map &cMap)
 {
-    vWorldPos = Collision::CircleSquare(cCollider, m_vVelocity / Globals::GLM_TILE_SIZE, cMap.aNavTiles, cMap.vMapSize);
+    m_vGravVel.y += Globals::GRAVITY;
+    vWorldPos = Collision::CircleSquare(cCollider, m_vVelocity, m_vGravVel, cMap.aNavTiles, cMap.vMapSize);
     vWorldPos *= Globals::GLM_TILE_SIZE;
     cCollider.vPos = vWorldPos / Globals::GLM_TILE_SIZE;
 
@@ -49,39 +50,39 @@ void Character::Move(Map &cMap)
 
 
 
-void Character::Draw(sf::RenderWindow &cWindow)
+void Character::Draw()
 {
     m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
 
-    cWindow.draw(*m_pSprite);
+    Renderer::Draw(*m_pSprite);
+    //cWindow.draw(*m_pSprite);
 }
 
 
 
-void Character::DrawBoundingBox(sf::RenderWindow &cWindow)
+void Character::DrawBoundingBox()
 {
     sf::RectangleShape bb(cBox.size);
     bb.setPosition(cBox.position);
     bb.setFillColor(sf::Color(0, 100, 0, 255));
     bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
 
-    cWindow.draw(bb);
+    Renderer::Draw(bb);
+    //cWindow.draw(bb);
 }
 
 
 
-void Character::DrawCollider(sf::RenderWindow &cWindow)
+void Character::DrawCollider()
 {
-    std::cout << "\nPlayer pos:   " << glm::to_string(vWorldPos) << '\n';
-    std::cout << "Collider pos: " << glm::to_string(cCollider.vPos * Globals::GLM_TILE_SIZE) << '\n';
-    std::cout << "Box pos:      " << glm::to_string(Util::convert_vector<glm::vec2>(cBox.position)) << '\n';
     sf::CircleShape cColShape(cCollider.fRadius * Globals::TILE_SIZE.x);
 
     cColShape.setOrigin({ cCollider.fRadius * Globals::TILE_SIZE.x, cCollider.fRadius * Globals::TILE_SIZE.y });
     cColShape.setPosition(Util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
     cColShape.setFillColor(sf::Color(0, 0, 100, 255));
 
-    cWindow.draw(cColShape);
+    Renderer::Draw(cColShape);
+//    cWindow.draw(cColShape);
 }
 
 
@@ -151,6 +152,12 @@ sf::Vector2i Character::GetSpriteSize()
 
 void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 {
+    if (_vVel == glm::vec2(0.0f))
+    {
+        m_vVelocity = glm::vec2(0.0f);
+        return;
+    }
+
     m_vVelocity = glm::normalize(_vVel) * fScalar;
 }
 

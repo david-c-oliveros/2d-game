@@ -20,10 +20,11 @@ Button::~Button()
 }
 
 
-void Button::Draw(sf::RenderWindow &cWindow)
+void Button::Draw()
 {
-    cWindow.draw(m_cShape);
-    m_pLabel->Draw(cWindow);
+    Renderer::Draw(m_cShape);
+    //cWindow.draw(m_cShape);
+    m_pLabel->Draw();
 }
 
 

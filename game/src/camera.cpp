@@ -4,8 +4,8 @@
 
 void Camera::SetCameraView(sf::Vector2f _vSize, sf::Vector2f _vCenter)
 {
-    cView.setSize(_vSize);
-    cView.setCenter(_vCenter);
+    m_cView.setSize(_vSize);
+    m_cView.setCenter(_vCenter);
 }
 
 
@@ -37,8 +37,8 @@ void Camera::HandleMouseInput(sf::RenderWindow &cWindow, std::optional<sf::Event
         const sf::Vector2f vNewPos = cWindow.mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y));
         const sf::Vector2f vDeltaPos = vOldPos - vNewPos;
 
-        cView.setCenter(cView.getCenter() + vDeltaPos);
-        cWindow.setView(cView);
+        m_cView.setCenter(m_cView.getCenter() + vDeltaPos);
+        cWindow.setView(m_cView);
 
         vOldPos = cWindow.mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y));
     }
@@ -62,32 +62,32 @@ void Camera::ZoomViewAt(sf::RenderWindow &cWindow, sf::Vector2i vPixel, float fZ
 {
     const sf::Vector2f vBeforeCoord{ cWindow.mapPixelToCoords(vPixel) };
 
-    cView.zoom(fZoom);
-    cWindow.setView(cView);
+    m_cView.zoom(fZoom);
+    cWindow.setView(m_cView);
 
     const sf::Vector2f vAfterCoord{ cWindow.mapPixelToCoords(vPixel) };
     const sf::Vector2f vOffsetCoords{ vBeforeCoord - vAfterCoord };
 
-    cView.move(vOffsetCoords);
-    cWindow.setView(cView);
+    m_cView.move(vOffsetCoords);
+    cWindow.setView(m_cView);
 }
 
 
 
 void Camera::SetSize(sf::RenderWindow &cWindow, sf::Vector2f _vSize)
 {
-    cView.setSize(_vSize);
-    cView.setCenter(sf::Vector2f(_vSize.x / 2.0f, _vSize.y / 2.0f));
-    cWindow.setView(cView);
+    m_cView.setSize(_vSize);
+    m_cView.setCenter(sf::Vector2f(_vSize.x / 2.0f, _vSize.y / 2.0f));
+    cWindow.setView(m_cView);
 }
 
 
 
 void Camera::SetZoom(sf::RenderWindow &cWindow, float _fZoom)
 {
-    cView.zoom(_fZoom);
-    cView.setCenter(sf::Vector2f(cView.getSize().x / 2.0f, cView.getSize().y / 2.0f));
-    cWindow.setView(cView);
+    m_cView.zoom(_fZoom);
+    m_cView.setCenter(sf::Vector2f(m_cView.getSize().x / 2.0f, m_cView.getSize().y / 2.0f));
+    cWindow.setView(m_cView);
 }
 
 
@@ -111,6 +111,13 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow)
         return;
 
-    sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
-    cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
+    sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(m_cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
+    m_cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
+}
+
+
+
+sf::View Camera::GetView()
+{
+    return m_cView;
 }

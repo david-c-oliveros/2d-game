@@ -17,7 +17,7 @@ class Entity
 
         void Create();
         virtual void Update(Map &cMap) = 0;
-        virtual void Draw(sf::RenderWindow &cWindow) = 0;
+        virtual void Draw() = 0;
 
 
     public:

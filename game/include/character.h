@@ -4,6 +4,7 @@
 
 #include "globals.h"
 #include "util.h"
+#include "renderer.h"
 #include "map.h"
 #include "entity.h"
 #include "collision.h"
@@ -15,6 +16,7 @@
 /*********************************************/
 enum class MoveDir
 {
+    IDLE,
     FORWARD,
     FORWARD_RIGHT,
     RIGHT,
@@ -47,9 +49,9 @@ class Character : public Entity
 
         void Update();
         void Move(Map &cMap);
-        void Draw(sf::RenderWindow &cWindow);
-        void DrawBoundingBox(sf::RenderWindow &cWindow);
-        void DrawCollider(sf::RenderWindow &cWindow);
+        void Draw();
+        void DrawBoundingBox();
+        void DrawCollider();
 
 
         void AttachAnimatedSprite(const std::string _sFilepath,
@@ -101,5 +103,6 @@ class Character : public Entity
 
         sf::FloatRect cBox;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
+        glm::vec2 m_vGravVel = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 };

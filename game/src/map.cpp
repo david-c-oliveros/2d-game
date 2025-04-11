@@ -15,7 +15,7 @@ Map::~Map()
 
 
 
-void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
+void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader)
 {
     /*********************************************************/
     /*        Get Adjacent tiles to adjust highlight         */
@@ -49,10 +49,25 @@ void Map::Draw(sf::RenderWindow &cWindow, const glm::ivec2 &_vWorldGridPos)
         tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
                                                 sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
 
-        glm::ivec2 _vSpritePos = tile->vWorldGridPos * Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+        glm::vec2 _vSpritePos = (glm::vec2)tile->vWorldGridPos * Globals::GLM_TILE_SIZE;
         tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
 
-        cWindow.draw(*tile->pSprite);
+        /***********************************************/
+        /***********************************************/
+        /*        Calculate position of light          */
+        /*        sources to pass to the shader        */
+        /***********************************************/
+        /***********************************************/
+        const sf::Vector2f vWorldAbsPos = Util::convert_vector<sf::Vector2f>((glm::vec2)_vWorldGridPos * Globals::GLM_TILE_SIZE);
+
+        const sf::Transform model = tile->pSprite->getTransform();
+
+        shader.setUniform("model", model.getMatrix());
+//        shader.setUniform("view", tView.getMatrix());
+        shader.setUniform("sTexture", sf::Shader::CurrentTexture);
+        shader.setUniform("light_position", vWorldAbsPos.x);
+
+        cWindow.draw(*tile->pSprite, &shader);
 
 
         /*****************************************************/
@@ -153,7 +168,6 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
         tson::Vector2i _vTileSize = pTsonMap->getTileSize();
         m_vDefaultScalar /= glm::vec2(_vTileSize.x, _vTileSize.y);
         aTiles.reserve(pTsonMap->getSize().x * pTsonMap->getSize().y);
-        std::cout << "Map parsed successfully" << std::endl;
     }
     else
     {
@@ -190,8 +204,6 @@ void Map::storeMap()
         if (_layer.getType() == tson::LayerType::TileLayer)
         {
             int current_layer_id = _layer.getId();
-            std::cout << "Current layer ID: " << current_layer_id << '\n';
-            std::cout << "Layer size: " << glm::to_string(Util::convert_vector<glm::ivec2>(_layer.getSize())) << '\n';
 
             /*******************************************************/
             /*         Initialize size of Nav Tiles array          */

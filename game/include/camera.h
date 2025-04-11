@@ -21,10 +21,15 @@ class Camera
         static void UpdateFollow();
         static void UpdateFollow(sf::Vector2f _vTarget);
 
+        static sf::View GetView();
+
 
     public:
-        inline static sf::View cView;
         inline static sf::Vector2f vOldPos = sf::Vector2f(0.0f, 0.0f);
         inline static bool bPanning = false;
         inline static bool bFollow = false;
+
+
+    private:
+        inline static sf::View m_cView;
 };

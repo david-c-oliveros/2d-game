@@ -13,9 +13,10 @@ Label::~Label()
 }
 
 
-void Label::Draw(sf::RenderWindow &cWindow)
+void Label::Draw()
 {
-    cWindow.draw(*m_pText);
+    Renderer::Draw(*m_pText);
+    //cWindow.draw(*m_pText);
 }
 
 
