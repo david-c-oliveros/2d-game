@@ -11,11 +11,11 @@
 class Camera
 {
     public:
-        static void SetCameraView(sf::Vector2f _vSize, sf::Vector2f _vCenter);
-        static void HandleMouseInput(sf::RenderWindow &cWindow, std::optional<sf::Event> cEvent);
-        static void ZoomViewAt(sf::RenderWindow &cWindow, sf::Vector2i vPixel, float fZoom);
-        static void SetSize(sf::RenderWindow &cWindow, sf::Vector2f _vZoom);
-        static void SetZoom(sf::RenderWindow &cWindow, float _fZoom);
+        static void SetViewParams(sf::Vector2f _vSize, sf::Vector2f _vCenter);
+        static void HandleMouseInput(std::optional<sf::Event> cEvent);
+        static void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
+        static void SetSize(sf::Vector2f _vZoom);
+        static void SetZoom(float fZoom);
         static void EnableFollow();
         static void DisableFollow();
         static void UpdateFollow();

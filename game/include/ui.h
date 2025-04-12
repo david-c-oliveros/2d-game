@@ -19,7 +19,7 @@ class UI
         static void AddButton(std::string sName);
         static void SetDefaultFont(sf::Font &_cFont);
         static void SetDefaultFontSize(uint32_t size);
-        static void HandleInput(sf::RenderWindow &cWindow, const std::optional<sf::Event> event);
+        static void HandleInput(const std::optional<sf::Event> event);
 //        static void SetButtonCallback(std::string sName, void(Game::*)(std::string) *pFuncPtr);
 
     public:

@@ -25,20 +25,21 @@ void Game::Create()
     LoadResources();
     LoadShaders("../../res/shaders/simple.vert",
                 "../../res/shaders/simple.frag");
-    std::cout << "- Number of npc's: " << aEntities.size() << std::endl;
+
     shape = sf::RectangleShape({ 1.0f, 1.0f });
     shape.setFillColor(sf::Color(250, 150, 100));
     shape.setOutlineThickness(0.0f);
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
-    Camera::SetCameraView(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
-    Camera::SetZoom(Renderer::GetWindow(), 0.5f);
+    Camera::SetViewParams(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
+    Camera::SetZoom(0.5f);
     Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetCursorTile())));
     UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_pPlayer->fAnimInterval));
     UI::AddText("fps", "FPS: ");
+
     UI::AddButton("My Button");
 //    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
 }
@@ -55,9 +56,8 @@ void Game::Start()
         {
             handleInputEvent(event);
             Renderer::SetView(Camera::GetView());
-            //cWindow.setView(Camera::GetView());
-            Camera::HandleMouseInput(Renderer::GetWindow(), event);
-            UI::HandleInput(Renderer::GetWindow(), event);
+            Camera::HandleMouseInput(event);
+            UI::HandleInput(event);
         }
 
         Update();
@@ -98,7 +98,6 @@ void Game::Update()
 void Game::Render()
 {
     Renderer::Clear(sf::Color::Black);
-    //cWindow.clear(sf::Color::Black);
 
     RenderGameWorld();
 
@@ -109,14 +108,13 @@ void Game::Render()
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
     {
-        //m_pPlayer->DrawBoundingBox(cWindow);
+        //m_pPlayer->DrawBoundingBox();
         m_pPlayer->DrawCollider();
     }
 
     RenderUI();
 
     Renderer::Display();
-    //cWindow.display();
 }
 
 
@@ -124,7 +122,6 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     sf::Transform tView = Camera::GetView().getTransform();
-    //cWindow.setView(Camera::GetView());
     Renderer::SetView(Camera::GetView());
     m_cMap.Draw(m_pPlayer->vWorldGridPos, tView, m_shader);
 }
@@ -134,7 +131,6 @@ void Game::RenderGameWorld()
 void Game::RenderEntities()
 {
     Renderer::SetView(Camera::GetView());
-    //cWindow.setView(Camera::GetView());
 
     /*******************************/
     /*        Draw Entities        */
@@ -155,7 +151,6 @@ void Game::RenderEntities()
 void Game::RenderUI()
 {
     Renderer::SetDefaultView();
-    //cWindow.setView(cWindow.getDefaultView());
 
     UI::Render();
 }
@@ -184,7 +179,6 @@ void Game::RenderDebug()
     shape.setScale(Globals::TILE_SIZE);
 
     Renderer::Draw(shape);
-    //cWindow.draw(shape);
 
     /******************************************/
     /*        Draw Current Player Tile        */
@@ -194,25 +188,7 @@ void Game::RenderDebug()
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
     Renderer::Draw(shape);
-//    cWindow.draw(shape);
 
-}
-
-
-
-sf::Vector2i Game::GetCursorScreenPos()
-{
-    sf::Vector2i _vCursorScreen = sf::Mouse::getPosition(Renderer::GetWindow());
-    return _vCursorScreen;
-}
-
-
-
-sf::Vector2f Game::GetCursorWorldPos()
-{
-//    cWindow.setView(Camera::GetView());
-//    sf::Vector2f _vCursorWorld = cWindow.mapPixelToCoords(sf::Mouse::getPosition(cWindow));
-//    return _vCursorWorld;
 }
 
 
@@ -337,24 +313,20 @@ void Game::AddEntity(std::unique_ptr<Entity> _pE)
 
 void Game::handleInputEvent(std::optional<sf::Event> event)
 {
-    sf::Vector2i vCursorPos = Renderer::GetCursorScreenPos();
-
     if (event->is<sf::Event::Closed>())
     {
         m_bRunning = false;
-        //cWindow.close();
     }
     else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
     {
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
             m_bRunning = false;
-            //cWindow.close();
         }
-//        else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
-//        {
-//            Update();
-//        }
+    }
+    else if (const auto resized = event->getIf<sf::Event::Resized>())
+    {
+        Renderer::OnWindowResize(resized->size);
     }
 }
 

@@ -79,7 +79,7 @@ void UI::SetDefaultFontSize(uint32_t size)
 
 
 
-void UI::HandleInput(sf::RenderWindow &cWindow, const std::optional<sf::Event> event)
+void UI::HandleInput(const std::optional<sf::Event> event)
 {
     if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
     {

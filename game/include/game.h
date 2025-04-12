@@ -50,8 +50,6 @@ class Game
         void RenderUI();
         void RenderDebug();
 
-        sf::Vector2i GetCursorScreenPos();
-        sf::Vector2f GetCursorWorldPos();
         sf::Vector2i GetTileAtPos(glm::vec2 _vPos);
         sf::Vector2i GetCursorTile();
 

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
-add_compile_options(-Wfatal-errors -w -O2 -fPIC -g)
+add_compile_options(-Wfatal-errors -w -O2 -fPIC -g -D_DEBUG)
 
 project(game)
 
@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     game/src/gl_error_manager.cpp
     game/src/main.cpp
     game/src/renderer.cpp
+    game/src/sprite_renderer.cpp
     game/src/game.cpp
     game/src/map.cpp
     game/src/entity.cpp

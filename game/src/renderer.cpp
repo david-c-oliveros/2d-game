@@ -1,5 +1,4 @@
 #include "renderer.h"
-#include "glad/glad.h"
 #include "gl_error_manager.h"
 
 
@@ -12,11 +11,11 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    settings.antiAliasingLevel = 4;
+    settings.antiAliasingLevel = 0;
     settings.majorVersion = 4;
     settings.minorVersion = 6;
 
-    m_pWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(vDim), sName, sf::Style::Default, state);
+    m_pWindow = std::make_unique<sf::RenderWindow>(sf::VideoMode(vDim), sName, sf::Style::Default, state, settings);
     m_pWindow->setVerticalSyncEnabled(true);
     m_pWindow->setPosition((sf::Vector2i)vDim - (sf::Vector2i)vDim / 2);
 
@@ -29,7 +28,7 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
     gladLoadGL();
     std::cout << "- Activated render window\n";
 
-    GLCall(glViewport(0, 0, static_cast<GLsizei>(m_pWindow->getSize().x), static_cast<GLsizei>(m_pWindow->getSize().y)));
+    GLCall(glViewport(0, 0, static_cast<GLsizei>(vDim.x), static_cast<GLsizei>(vDim.y)));
 
     std::cout << "- Set OpenGL viewport\n";
 
@@ -40,9 +39,21 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
 
 void Renderer::Clear(sf::Color color)
 {
-//    glClearColor(color.r, color.g, color.b, color.a);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_pWindow->clear(color);
+    glClearColor(color.r, color.g, color.b, color.a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+
+
+void Renderer::DrawGL(GLuint &vao, const sf::Shader &shader, GLuint nNumVert)
+{
+    sf::Shader::bind(&shader);
+
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, nNumVert);
+    glBindVertexArray(0);
+
+    sf::Shader::bind(nullptr);
 }
 
 
@@ -87,4 +98,12 @@ void Renderer::SetView(sf::View cView)
 void Renderer::SetDefaultView()
 {
     m_pWindow->setView(m_pWindow->getDefaultView());
+}
+
+
+
+void Renderer::OnWindowResize(sf::Vector2u vNewSize)
+{
+    //Camera::SetViewParams((sf::Vector2f)vNewSize, (sf::Vector2f)vNewSize / 2.0f);
+    GLCall(glViewport(0, 0, static_cast<GLsizei>(vNewSize.x), static_cast<GLsizei>(vNewSize.y)));
 }

@@ -10,7 +10,6 @@ void GLClearError()
 
 bool GLLogCall(const char* function, const char* file, int line)
 {
-    std::cout << "Sanity check - GLLogCall\n";
     while (GLenum error = glGetError())
     {
         std::cout << "- ERROR::GL::(" << error << "):" << function
