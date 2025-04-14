@@ -19,12 +19,18 @@ Game::~Game() {}
 
 void Game::Create()
 {
+//    SpriteRenderer::InitRenderer();
+
     m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(8, 4));
     TimeManager::NewTimer("get_fps_interval", 6);
 
+    RM::LoadShader("../../res/shaders/s.vert",
+                   "../../res/shaders/s.frag",
+                   "", "map_shader");
+
     LoadResources();
-    LoadShaders("../../res/shaders/simple.vert",
-                "../../res/shaders/simple.frag");
+//    LoadShaders("../../res/shaders/simple.vert",
+//                  "../../res/shaders/simple.frag");
 
     shape = sf::RectangleShape({ 1.0f, 1.0f });
     shape.setFillColor(sf::Color(250, 150, 100));
@@ -32,8 +38,8 @@ void Game::Create()
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
     Camera::SetViewParams(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
-    Camera::SetZoom(0.5f);
-    Camera::EnableFollow();
+//    Camera::SetZoom(0.5f);
+//    Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
     UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetCursorTile())));
@@ -55,7 +61,7 @@ void Game::Start()
         while (const std::optional event = Renderer::GetWindow().pollEvent())
         {
             handleInputEvent(event);
-            Renderer::SetView(Camera::GetView());
+            //Renderer::SetView(Camera::GetView());
             Camera::HandleMouseInput(event);
             UI::HandleInput(event);
         }
@@ -97,13 +103,25 @@ void Game::Update()
 
 void Game::Render()
 {
-    Renderer::Clear(sf::Color::Black);
+    Renderer::Clear(sf::Color::Blue);
 
     RenderGameWorld();
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
         RenderDebug();
 
+    Renderer::SetView(Camera::GetView());
+    glm::mat4 glm_view = Renderer::SetViewMatrix(RM::GetShader("map_shader"));
+    glm::mat4 glm_view = LookAtFromSFView();
+    glm::mat4 cam_view = glm::make_mat4(Camera::GetView().getTransform().getMatrix());
+
+    glm::vec2 camera_position = Util::convert_vector<glm::vec2>(Camera::GetView().getCenter());
+    glm::vec2 camera_size = Util::convert_vector<glm::vec2>(Camera::GetView().getSize());
+    std::cout << "Camera center: " << glm::to_string(camera_position) << '\n';
+    std::cout << "Camera size: " << glm::to_string(camera_size) << '\n';
+
+    std::cout << "GLM view matrix: " << glm::to_string(glm_view) << '\n';
+    std::cout << "SFML view matrix: " << glm::to_string(cam_view) << '\n';
     RenderEntities();
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
@@ -122,27 +140,24 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     sf::Transform tView = Camera::GetView().getTransform();
-    Renderer::SetView(Camera::GetView());
-    m_cMap.Draw(m_pPlayer->vWorldGridPos, tView, m_shader);
+    m_cMap.Draw(m_pPlayer->vWorldGridPos, RM::GetShader("map_shader"));
 }
 
 
 
 void Game::RenderEntities()
 {
-    Renderer::SetView(Camera::GetView());
-
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
-    m_pPlayer->Draw();
+    m_pPlayer->Draw(RM::GetShader("map_shader"));
 
     for (auto &e : aEntities)
     {
         if (e == nullptr)
             continue;
 
-        e->Draw();
+        e->Draw(RM::GetShader("map_shader"));
     }
 }
 
@@ -178,7 +193,7 @@ void Game::RenderDebug()
     shape.setPosition(sf::Vector2f(_vCursorTile));
     shape.setScale(Globals::TILE_SIZE);
 
-    Renderer::Draw(shape);
+//    Renderer::Draw(shape);
 
     /******************************************/
     /*        Draw Current Player Tile        */
@@ -187,7 +202,7 @@ void Game::RenderDebug()
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
-    Renderer::Draw(shape);
+//    Renderer::Draw(shape);
 
 }
 
@@ -213,6 +228,25 @@ sf::Vector2i Game::GetCursorTile()
     vCursorTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
 
     return vCursorTile;
+}
+
+
+
+void Game::LookAtFromSFView()
+{
+    glm::vec3 vViewPos(0.0f, 0.0f, 1.0f);
+    sf::Vector2f vViewCenter = Camera::GetView().getCenter();
+
+    glm::vec3 vEye(vViewCenter.x, vViewCenter.y, 1.0f);
+
+    float rRotation = Camera::GetView().getRotation();
+    float fRadians = glm::radians(fRotation);
+
+    glm::vec2 vForward(std::cos(fRadians), std::sin(fRadians));
+    glm::vec2 vTarget = vEye + glm::vec3(vForward.x, vForward.y, -1.0f);
+    glm::vec3 vUp(0.0f, -1.0f, 0.0f);
+
+    return glm::lookAt(vEye, vTarget, vUp);
 }
 
 

@@ -114,6 +114,7 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow || bPanning)
         return;
 
+    std::cout << "updating follow\n";
     sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(m_cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
     m_cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
 }

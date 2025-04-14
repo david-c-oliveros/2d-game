@@ -6,12 +6,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include <nlohmann/json.hpp>
 #include <tileson.hpp>
 
 #include "globals.h"
 #include "util.h"
+#include "shader.h"
 #include "renderer.h"
+#include "sprite_renderer.h"
 
 
 
@@ -41,7 +42,7 @@ class Map
         Map();
         ~Map();
 
-        void Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader);
+        void Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
         void LoadFromFile(const std::string &_sFilepath);

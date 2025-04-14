@@ -16,7 +16,10 @@
 
 #include "globals.h"
 #include "util.h"
+#include "shader.h"
 #include "renderer.h"
+#include "sprite_renderer.h"
+#include "resource_manager.h"
 #include "entity.h"
 #include "character.h"
 #include "npc.h"
@@ -56,6 +59,8 @@ class Game
         void EnableFollowCamera();
         void LerpCamera(glm::vec2 _vTarget);
         void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
+
+        void LookAtFromSFView();
 
         void LoadResources();
         int LoadShaders(const std::filesystem::path &fsVertPath,

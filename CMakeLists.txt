@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
-add_compile_options(-Wfatal-errors -w -O2 -fPIC -g -D_DEBUG)
+add_compile_options(-Werror -w -O2 -fPIC -g -D_DEBUG)
 
 project(game)
 
@@ -14,11 +14,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(${PROJECT_NAME}
     external/SFMLAnimation/src/AnimationManager.cpp
     external/glad/src/glad.c
+    game/src/game.cpp
     game/src/gl_error_manager.cpp
     game/src/main.cpp
+    game/src/resource_manager.cpp
+    game/src/shader.cpp
     game/src/renderer.cpp
     game/src/sprite_renderer.cpp
-    game/src/game.cpp
     game/src/map.cpp
     game/src/entity.cpp
     game/src/character.cpp

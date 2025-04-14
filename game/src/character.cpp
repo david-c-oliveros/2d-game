@@ -50,12 +50,11 @@ void Character::Move(Map &cMap)
 
 
 
-void Character::Draw()
+void Character::Draw(const GLShader &cShader)
 {
     m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
 
-    Renderer::Draw(*m_pSprite);
-    //cWindow.draw(*m_pSprite);
+    SpriteRenderer::Draw(*m_pSprite, vWorldPos, cShader);
 }
 
 
@@ -67,7 +66,7 @@ void Character::DrawBoundingBox()
     bb.setFillColor(sf::Color(0, 100, 0, 255));
     bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
 
-    Renderer::Draw(bb);
+//    Renderer::Draw(bb);
     //cWindow.draw(bb);
 }
 
@@ -81,7 +80,7 @@ void Character::DrawCollider()
     cColShape.setPosition(Util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
     cColShape.setFillColor(sf::Color(0, 0, 100, 255));
 
-    Renderer::Draw(cColShape);
+//    Renderer::Draw(cColShape);
 //    cWindow.draw(cColShape);
 }
 

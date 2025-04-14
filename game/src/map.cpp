@@ -15,7 +15,7 @@ Map::~Map()
 
 
 
-void Map::Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader &shader)
+void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
 {
     /*********************************************************/
     /*        Get Adjacent tiles to adjust highlight         */
@@ -60,15 +60,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader
         /***********************************************/
         const sf::Vector2f vWorldAbsPos = Util::convert_vector<sf::Vector2f>((glm::vec2)_vWorldGridPos * Globals::GLM_TILE_SIZE);
 
-        const sf::Transform model = tile->pSprite->getTransform();
-
-//        shader.setUniform("model", model.getMatrix());
-//        shader.setUniform("view", tView.getMatrix());
-//        shader.setUniform("sTexture", sf::Shader::CurrentTexture);
-//        shader.setUniform("light_position", vWorldAbsPos.x);
-//
-//        cWindow.draw(*tile->pSprite, &shader);
-        Renderer::Draw(*tile->pSprite);
+        SpriteRenderer::Draw(*tile->pSprite, _vSpritePos, cShader);
 
 
         /*****************************************************/
@@ -87,7 +79,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader
             sf::RectangleShape shape(rect.size);
             shape.setPosition(rect.position);
             shape.setFillColor(sf::Color(100, 50, 0, 180));
-            Renderer::Draw(shape);
+//            Renderer::Draw(shape);
         }
 
         /*********************************/
@@ -102,7 +94,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, sf::Transform tView, sf::Shader
             tile->pSprite->setColor(sf::Color(150 - num, 150 - num, 150 - num));
         }
 
-        Renderer::Draw(*tile->pSprite);
+//        Renderer::Draw(*tile->pSprite);
     }
 }
 

@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 
-#include "tile_world.h"
+#include "shader.h"
 #include "map.h"
 
 
@@ -17,7 +17,7 @@ class Entity
 
         void Create();
         virtual void Update(Map &cMap) = 0;
-        virtual void Draw() = 0;
+        virtual void Draw(const GLShader &cShader) = 0;
 
 
     public:

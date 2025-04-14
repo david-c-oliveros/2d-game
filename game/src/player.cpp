@@ -29,7 +29,7 @@ void Player::Update(Map &cMap)
     handleInput();
 
     Character::Update();
-    Move(cMap);
+//    Move(cMap);
 }
 
 
@@ -39,9 +39,9 @@ void Player::Move(Map &cMap)
     /*********************************/
     /*        Update position        */
     /*********************************/
-    assert(static_cast<int>(eDir) < Globals::aMoveVels.size());
-    setVelocity(Globals::aMoveVels[static_cast<int>(eDir)], m_fSpeedScalar);
-    Character::Move(cMap);
+//    assert(static_cast<int>(eDir) < Globals::aMoveVels.size());
+//    setVelocity(Globals::aMoveVels[static_cast<int>(eDir)], m_fSpeedScalar);
+//    Character::Move(cMap);
 
     /***********************************************/
     /*        Reset velocity, as it will be        */
@@ -51,7 +51,7 @@ void Player::Move(Map &cMap)
     /********************************************/
     /*        Update world grid position        */
     /********************************************/
-    updateWorldGridPosition();
+//    updateWorldGridPosition();
 }
 
 
