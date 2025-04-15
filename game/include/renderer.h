@@ -26,16 +26,20 @@ class Renderer
 
         static void SetView(sf::View cView);
         static void SetDefaultView();
-        static glm::mat4 SetViewMatrix(const GLShader &cShader);
+
+        static void SetViewMatrix(const std::string sShader);
+        static void SetZoom(float fZoom, const std::string sShader);
         static void SetProjectionMatrix(const std::string sShader);
 
         static void OnWindowResize(sf::Vector2u vNewSize);
 
+        static glm::mat4 LookAtFromSFView();
+
         template <typename T>
-        static void Draw(T &drawable, sf::Shader &cShader)
+        static void Draw(T &drawable)
         {
             m_pWindow->pushGLStates();
-            m_pWindow->draw(drawable, &cShader);
+            m_pWindow->draw(drawable);
             m_pWindow->popGLStates();
         }
 

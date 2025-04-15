@@ -19,25 +19,23 @@ Game::~Game() {}
 
 void Game::Create()
 {
-//    SpriteRenderer::InitRenderer();
+    SpriteRenderer::InitRenderer();
 
     m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(8, 4));
     TimeManager::NewTimer("get_fps_interval", 6);
 
-    RM::LoadShader("../../res/shaders/s.vert",
-                   "../../res/shaders/s.frag",
+    RM::LoadShader("../../res/shaders/simple.vert",
+                   "../../res/shaders/simple.frag",
                    "", "map_shader");
 
     LoadResources();
-//    LoadShaders("../../res/shaders/simple.vert",
-//                  "../../res/shaders/simple.frag");
 
     shape = sf::RectangleShape({ 1.0f, 1.0f });
     shape.setFillColor(sf::Color(250, 150, 100));
     shape.setOutlineThickness(0.0f);
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
-    Camera::SetViewParams(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(960.0f, 540.0f));
+    Camera::SetViewParams(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(0.0f, 0.0f));
 //    Camera::SetZoom(0.5f);
 //    Camera::EnableFollow();
 
@@ -48,6 +46,8 @@ void Game::Create()
 
     UI::AddButton("My Button");
 //    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
+
+    Renderer::SetProjectionMatrix("map_shader");
 }
 
 
@@ -61,8 +61,8 @@ void Game::Start()
         while (const std::optional event = Renderer::GetWindow().pollEvent())
         {
             handleInputEvent(event);
-            //Renderer::SetView(Camera::GetView());
             Camera::HandleMouseInput(event);
+
             UI::HandleInput(event);
         }
 
@@ -87,7 +87,9 @@ void Game::Update()
     UI::mLabels["player_anim_interval"]->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
 
     UI::UpdateButtons(Renderer::GetCursorScreenPos());
+
     m_pPlayer->Update(m_cMap);
+
     Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto &e : aEntities)
@@ -103,30 +105,21 @@ void Game::Update()
 
 void Game::Render()
 {
-    Renderer::Clear(sf::Color::Blue);
+    Renderer::Clear(sf::Color(0, 0, 0, 255));
+
+    Renderer::SetView(Camera::GetView());
+    Renderer::SetViewMatrix("map_shader");
 
     RenderGameWorld();
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
         RenderDebug();
 
-    Renderer::SetView(Camera::GetView());
-    glm::mat4 glm_view = Renderer::SetViewMatrix(RM::GetShader("map_shader"));
-    glm::mat4 glm_view = LookAtFromSFView();
-    glm::mat4 cam_view = glm::make_mat4(Camera::GetView().getTransform().getMatrix());
-
-    glm::vec2 camera_position = Util::convert_vector<glm::vec2>(Camera::GetView().getCenter());
-    glm::vec2 camera_size = Util::convert_vector<glm::vec2>(Camera::GetView().getSize());
-    std::cout << "Camera center: " << glm::to_string(camera_position) << '\n';
-    std::cout << "Camera size: " << glm::to_string(camera_size) << '\n';
-
-    std::cout << "GLM view matrix: " << glm::to_string(glm_view) << '\n';
-    std::cout << "SFML view matrix: " << glm::to_string(cam_view) << '\n';
-    RenderEntities();
+    //RenderEntities();
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
     {
-        //m_pPlayer->DrawBoundingBox();
+        m_pPlayer->DrawBoundingBox();
         m_pPlayer->DrawCollider();
     }
 
@@ -139,7 +132,15 @@ void Game::Render()
 
 void Game::RenderGameWorld()
 {
-    sf::Transform tView = Camera::GetView().getTransform();
+    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
+
+    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
+    SpriteRenderer::Draw({ 0.0f, 0.0f }, "map_shader");
+
+    glm::vec2 vCursorTile = Util::convert_vector<glm::vec2>(_vCursorTile);
+
+    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec3(0.0f, 1.0f, 0.0f));
+    SpriteRenderer::Draw(vCursorTile, "map_shader");
     m_cMap.Draw(m_pPlayer->vWorldGridPos, RM::GetShader("map_shader"));
 }
 
@@ -150,14 +151,14 @@ void Game::RenderEntities()
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
-    m_pPlayer->Draw(RM::GetShader("map_shader"));
+    m_pPlayer->Draw("map_shader");
 
     for (auto &e : aEntities)
     {
         if (e == nullptr)
             continue;
 
-        e->Draw(RM::GetShader("map_shader"));
+        e->Draw("map_shader");
     }
 }
 
@@ -193,7 +194,11 @@ void Game::RenderDebug()
     shape.setPosition(sf::Vector2f(_vCursorTile));
     shape.setScale(Globals::TILE_SIZE);
 
-//    Renderer::Draw(shape);
+    Renderer::Draw(shape);
+
+    shape.setPosition({ 0.0f, 0.0f });
+    shape.setScale({ 1920.0f, 1080.0f });
+    //Renderer::Draw(shape);
 
     /******************************************/
     /*        Draw Current Player Tile        */
@@ -228,25 +233,6 @@ sf::Vector2i Game::GetCursorTile()
     vCursorTile.y = _vCursorPos.y < 0.0f ?  (int32_t)(_vCursorPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(_vCursorPos.y) / Globals::TILE_SIZE.y;
 
     return vCursorTile;
-}
-
-
-
-void Game::LookAtFromSFView()
-{
-    glm::vec3 vViewPos(0.0f, 0.0f, 1.0f);
-    sf::Vector2f vViewCenter = Camera::GetView().getCenter();
-
-    glm::vec3 vEye(vViewCenter.x, vViewCenter.y, 1.0f);
-
-    float rRotation = Camera::GetView().getRotation();
-    float fRadians = glm::radians(fRotation);
-
-    glm::vec2 vForward(std::cos(fRadians), std::sin(fRadians));
-    glm::vec2 vTarget = vEye + glm::vec3(vForward.x, vForward.y, -1.0f);
-    glm::vec3 vUp(0.0f, -1.0f, 0.0f);
-
-    return glm::lookAt(vEye, vTarget, vUp);
 }
 
 
@@ -356,6 +342,11 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
         if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
         {
             m_bRunning = false;
+        }
+        else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
+        {
+            m_bDebug = !m_bDebug;
+            //Update();
         }
     }
     else if (const auto resized = event->getIf<sf::Event::Resized>())

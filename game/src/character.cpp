@@ -50,11 +50,11 @@ void Character::Move(Map &cMap)
 
 
 
-void Character::Draw(const GLShader &cShader)
+void Character::Draw(const std::string sShader)
 {
     m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
 
-    SpriteRenderer::Draw(*m_pSprite, vWorldPos, cShader);
+    SpriteRenderer::Draw(*m_pSprite, vWorldPos, sShader);
 }
 
 

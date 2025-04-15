@@ -32,6 +32,18 @@ namespace Globals
                                                      glm::vec2( -1.0f, -1.0f )
     };
 
+    constexpr float QUAD_VERTICES[] =
+        {   
+            0.0f,            GLM_TILE_SIZE.x, 0.0f, 1.0f,
+            GLM_TILE_SIZE.x, 0.0f,            1.0f, 0.0f,
+            0.0f,            0.0f,            0.0f, 0.0f,
+
+            0.0f,            GLM_TILE_SIZE.y, 0.0f, 1.0f,
+            GLM_TILE_SIZE.x, GLM_TILE_SIZE.y, 1.0f, 1.0f,
+            GLM_TILE_SIZE.x, 0.0f,            1.0f, 0.0f,
+        };
+
+
 
     /***********************************/
     /*        Physics Constants        */

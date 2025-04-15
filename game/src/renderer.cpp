@@ -92,8 +92,12 @@ sf::Vector2i Renderer::GetCursorScreenPos()
 
 sf::Vector2f Renderer::GetCursorWorldPos(sf::View cameraView)
 {
+    auto oldView = m_pWindow->getView();
     m_pWindow->setView(cameraView);
-    return m_pWindow->mapPixelToCoords(sf::Mouse::getPosition(*m_pWindow));
+    auto vWorldPos = m_pWindow->mapPixelToCoords(sf::Mouse::getPosition(*m_pWindow));
+    m_pWindow->setView(oldView);
+
+    return vWorldPos;
 }
 
 
@@ -112,26 +116,44 @@ void Renderer::SetDefaultView()
 
 
 
-glm::mat4 Renderer::SetViewMatrix(const GLShader &cShader)
+void Renderer::SetZoom(float fZoom, const std::string sShader)
 {
-    cShader.Bind();
-//    const float* matArr = cView.getTransform().getMatrix();
-//    glm::mat4 view = glm::make_mat4(matArr);
+    m_mViewMatrix = glm::scale(m_mViewMatrix, glm::vec3(1.0f / fZoom, 1.0f / fZoom, 1.0f));
+    RM::GetShader(sShader).Bind();
+    RM::GetShader(sShader).SetUniform("u_View", m_mViewMatrix);
+    std::cout << "Zooming\n";
+}
 
-    glm::vec3 vViewPos(0.0f, 0.0f, 1.0f);
-    glm::vec3 vOrigin(0.0f);
-    glm::mat4 view = glm::lookAt(vViewPos, vOrigin, glm::vec3(0, 1, 0));
-    cShader.SetUniform("u_View", view);
 
-    return view;
+
+void Renderer::SetViewMatrix(const std::string sShader)
+{
+    glm::mat4 view = LookAtFromSFView();
+
+    RM::GetShader(sShader).Bind();
+    RM::GetShader(sShader).SetUniform("u_View", view);
+
+    m_mViewMatrix = view;
 }
 
 
 
 void Renderer::SetProjectionMatrix(const std::string sShader)
 {
-    glm::vec2 vCanvasSize(GetCanvasSize());
-    glm::mat4 projection = glm::ortho<float>(0.0f, vCanvasSize.x, vCanvasSize.y, 0.0f, -1000.0f, 1000.0f);
+    sf::Vector2f vCenter = Camera::GetView().getCenter();
+    sf::Vector2f vSize   = Camera::GetView().getSize();
+
+    float fLeft   = -vSize.x / 2;
+    float fRight  = vSize.x / 2;
+    float fTop    = -vSize.y / 2;
+    float fBottom = vSize.y / 2;
+
+    std::cout << "Left:   " << fLeft << '\n'
+              << "Right:  " << fRight << '\n'
+              << "Top:    " << fTop << '\n'
+              << "Bottom: " << fBottom << '\n';
+
+    glm::mat4 projection = glm::ortho<float>(fLeft, fRight, fBottom, fTop, -1000.0f, 1000.0f);
 
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Projection", projection);
@@ -143,4 +165,21 @@ void Renderer::OnWindowResize(sf::Vector2u vNewSize)
 {
     //Camera::SetViewParams((sf::Vector2f)vNewSize, (sf::Vector2f)vNewSize / 2.0f);
     GLCall(glViewport(0, 0, static_cast<GLsizei>(vNewSize.x), static_cast<GLsizei>(vNewSize.y)));
+}
+
+
+
+glm::mat4 Renderer::LookAtFromSFView()
+{
+    sf::Vector2f vViewCenter = Camera::GetView().getCenter();
+
+    float fRotRad = -Camera::GetView().getRotation().asRadians();
+
+    glm::vec3 vEye(vViewCenter.x, vViewCenter.y, 1.0f);
+    glm::vec3 vTarget(vViewCenter.x, vViewCenter.y, 0.0f);
+    glm::vec3 vUp(std::sin(fRotRad), std::cos(fRotRad), 0.0f);
+
+    glm::mat4 vLookAt = glm::lookAt(vEye, vTarget, vUp);
+
+    return vLookAt;
 }

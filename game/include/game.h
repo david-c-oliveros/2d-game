@@ -14,6 +14,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <AnimationManager.hpp>
 
+#include "gl_error_manager.h"
 #include "globals.h"
 #include "util.h"
 #include "shader.h"
@@ -60,7 +61,7 @@ class Game
         void LerpCamera(glm::vec2 _vTarget);
         void ZoomViewAt(sf::Vector2i vPixel, float fZoom);
 
-        void LookAtFromSFView();
+        glm::mat4 LookAtFromSFView();
 
         void LoadResources();
         int LoadShaders(const std::filesystem::path &fsVertPath,
@@ -94,4 +95,7 @@ class Game
 
         uint8_t m_nFrameCount = 1;
         uint32_t m_nCurrentID = 0;
+
+        uint32_t nQuadVAO;
+        bool m_bDebug = false;;
 };

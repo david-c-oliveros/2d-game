@@ -49,7 +49,7 @@ class Character : public Entity
 
         void Update();
         void Move(Map &cMap);
-        void Draw(const GLShader &cShader);
+        void Draw(const std::string sShader);
         void DrawBoundingBox();
         void DrawCollider();
 

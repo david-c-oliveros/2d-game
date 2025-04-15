@@ -17,7 +17,7 @@ class Entity
 
         void Create();
         virtual void Update(Map &cMap) = 0;
-        virtual void Draw(const GLShader &cShader) = 0;
+        virtual void Draw(const std::string sShader) = 0;
 
 
     public:

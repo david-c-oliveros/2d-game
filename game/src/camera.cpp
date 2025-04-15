@@ -5,8 +5,20 @@
 
 
 
+sf::Vector2f Camera::vOldPos = sf::Vector2f(0.0f, 0.0f);
+bool Camera::bPanning = false;
+bool Camera::bFollow = false;
+uint32_t Camera::nCount = 0;
+
+sf::View Camera::m_cView;
+sf::Vector2f Camera::m_vBaseSize;
+float Camera::m_fZoom = 1.0f;
+
+
+
 void Camera::SetViewParams(sf::Vector2f _vSize, sf::Vector2f _vCenter)
 {
+    m_vBaseSize = _vSize;
     m_cView.setSize(_vSize);
     m_cView.setCenter(_vCenter);
 }
@@ -44,6 +56,8 @@ void Camera::HandleMouseInput(std::optional<sf::Event> cEvent)
         Renderer::SetView(m_cView);
 
         vOldPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y));
+
+//        Renderer::SetProjectionMatrix("map_shader");
     }
 
     else if (const auto* mouseWheelScrolled = cEvent->getIf<sf::Event::MouseWheelScrolled>())
@@ -61,18 +75,24 @@ void Camera::HandleMouseInput(std::optional<sf::Event> cEvent)
 }
 
 
-void Camera::ZoomViewAt(sf::Vector2i vPixel, float fZoom)
+void Camera::ZoomViewAt(sf::Vector2i vPixel, float fZoomFactor)
 {
-    const sf::Vector2f vBeforeCoord{ Renderer::GetWindow().mapPixelToCoords(vPixel) };
+    sf::Vector2f vPixelF = static_cast<sf::Vector2f>(vPixel);
 
-    m_cView.zoom(fZoom);
+    m_fZoom *= fZoomFactor;
+    const sf::Vector2f vBeforeCoord{ Renderer::GetWindow().mapPixelToCoords(vPixel, m_cView) };
+
+    //m_cView.zoom(fZoom);
+    m_cView.setSize(m_vBaseSize * m_fZoom);
     Renderer::SetView(m_cView);
 
-    const sf::Vector2f vAfterCoord{ Renderer::GetWindow().mapPixelToCoords(vPixel) };
+    const sf::Vector2f vAfterCoord{ Renderer::GetWindow().mapPixelToCoords(vPixel, m_cView) };
     const sf::Vector2f vOffsetCoords{ vBeforeCoord - vAfterCoord };
 
     m_cView.move(vOffsetCoords);
     Renderer::SetView(m_cView);
+
+    Renderer::SetProjectionMatrix("map_shader");
 }
 
 
@@ -88,9 +108,11 @@ void Camera::SetSize(sf::Vector2f _vSize)
 
 void Camera::SetZoom(float fZoom)
 {
+    // TODO - Please fix
+    m_fZoom = fZoom;
     ZoomViewAt((sf::Vector2i)m_cView.getCenter(), fZoom);
-    m_cView.setCenter((sf::Vector2f)m_cView.getSize() / 2.0f);
-    Renderer::SetView(m_cView);
+    //m_cView.setCenter((sf::Vector2f)m_cView.getSize() / 2.0f);
+    //Renderer::SetView(m_cView);
 }
 
 
@@ -114,7 +136,6 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow || bPanning)
         return;
 
-    std::cout << "updating follow\n";
     sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(m_cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
     m_cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
 }

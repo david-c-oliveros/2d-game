@@ -7,6 +7,10 @@
 
 #include "util.h"
 
+// DEBUG
+#include "sprite_renderer.h"
+//
+
 
 class Camera
 {
@@ -18,18 +22,20 @@ class Camera
         static void SetZoom(float fZoom);
         static void EnableFollow();
         static void DisableFollow();
-        static void UpdateFollow();
         static void UpdateFollow(sf::Vector2f _vTarget);
 
         static sf::View GetView();
 
 
     public:
-        inline static sf::Vector2f vOldPos = sf::Vector2f(0.0f, 0.0f);
-        inline static bool bPanning = false;
-        inline static bool bFollow = false;
+        static sf::Vector2f vOldPos;
+        static bool bPanning;
+        static bool bFollow;
 
 
     private:
-        inline static sf::View m_cView;
+        static uint32_t nCount;
+        static sf::View m_cView;
+        static sf::Vector2f m_vBaseSize;
+        static float m_fZoom;
 };

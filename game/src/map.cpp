@@ -60,7 +60,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
         /***********************************************/
         const sf::Vector2f vWorldAbsPos = Util::convert_vector<sf::Vector2f>((glm::vec2)_vWorldGridPos * Globals::GLM_TILE_SIZE);
 
-        SpriteRenderer::Draw(*tile->pSprite, _vSpritePos, cShader);
+        SpriteRenderer::Draw(*tile->pSprite, _vSpritePos, "map_shader");
 
 
         /*****************************************************/
@@ -310,6 +310,10 @@ sf::Sprite* Map::storeAndLoadImage(const std::string &image, const sf::Vector2f 
         if (fs::exists(path) && fs::is_regular_file(path))
         {
             std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
+            //std::unique_ptr<GLTexture> tex = std::make_unique<GLTexture>();
+
+            // TODO - Properly pass in bAlpha
+            //RM::LoadTexture(path.generic_string(), true, image);
             bool bImageFound = tex->loadFromFile(path.generic_string());
             tex->setSmooth(false);
 

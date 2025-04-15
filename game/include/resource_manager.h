@@ -14,17 +14,22 @@ class RM
     public:
         static std::map<std::string, GLShader> mShaders;
 
-        static GLShader LoadShader(std::string vShaderFile,
-                                   std::string fShaderFile,
-                                   std::string gShaderFile,
-                                   std::string sName);
+        static GLShader LoadShader(const std::string vShaderFile,
+                                   const std::string fShaderFile,
+                                   const std::string gShaderFile,
+                                   const std::string sName);
 
-        static GLShader GetShader(std::string sName);
+//        GLTexture RM::LoadTexture(const std::string sFile, bool bAlpha, const std::string sName)
+
+        static GLShader GetShader(const std::string sName);
+//        GLTexture GetTexture(const std::string sName);
         static void Clear();
 
 
     private:
-        static GLShader loadShaderFromFile(std::string vShaderFile,
-                                           std::string fShaderFile,
-                                           std::string gShaderFile = "");
+        static GLShader loadShaderFromFile(const std::string vShaderFile,
+                                           const std::string fShaderFile,
+                                           const std::string gShaderFile = "");
+
+//        GLTexture loadTextureFromFile(const std::string sFile, bool bAlpha);
 };
