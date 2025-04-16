@@ -123,15 +123,12 @@ glm::vec2 Collision::SweepResponse(Hit sweepResult, glm::vec2 vEntityVel)
 {
     if (sweepResult.fTime < 1.0f)
     {
-        std::cout << "time: " << std::to_string(sweepResult.fTime) << '\n';
         glm::vec2 vCorrectVel = glm::vec2(vEntityVel.x * sweepResult.fTime,
                                 vEntityVel.y * sweepResult.fTime);
 
         glm::vec2 vResponseVel = sweepResponseSlide(sweepResult, vEntityVel);
 
         glm::vec2 vNewVel(vCorrectVel + vResponseVel);
-
-//        std::cout << "New velocity: " << glm::to_string(vNewVel) << '\n';
 
         return vNewVel;
     }

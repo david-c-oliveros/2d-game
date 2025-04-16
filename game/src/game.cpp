@@ -21,12 +21,16 @@ void Game::Create()
 {
     SpriteRenderer::InitRenderer();
 
-    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(8, 4));
+    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0, 0));
     TimeManager::NewTimer("get_fps_interval", 6);
 
     RM::LoadShader("../../res/shaders/simple.vert",
                    "../../res/shaders/simple.frag",
                    "", "map_shader");
+
+    RM::LoadShader("../../res/shaders/s.vert",
+                   "../../res/shaders/s.frag",
+                   "", "color_shader");
 
     LoadResources();
 
@@ -36,11 +40,12 @@ void Game::Create()
     shape.setOutlineColor(sf::Color(250, 150, 100));
 
     Camera::SetViewParams(sf::Vector2f(1920.0f, 1080.0f), sf::Vector2(0.0f, 0.0f));
-//    Camera::SetZoom(0.5f);
-//    Camera::EnableFollow();
+    Camera::SetZoom(0.5f);
+    Camera::EnableFollow();
 
     UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
-    UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(Util::convert_vector<glm::ivec2>(GetCursorTile())));
+    UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(GetCursorTile())));
+    UI::AddText("cursor_world_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
     UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_pPlayer->fAnimInterval));
     UI::AddText("fps", "FPS: ");
 
@@ -81,15 +86,16 @@ void Game::Update()
         UI::mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
     }
 
-    UI::mLabels["player_position"]->SetText("Player position: " + glm::to_string(Util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
-    UI::mLabels["cursor_grid_position"]->SetText("Cursor Grid Coords: " + glm::to_string(Util::convert_vector<glm::vec2>(GetCursorTile())));
-    UI::mLabels["player_anim_interval"]->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
+    UI::mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
+    UI::mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
+    UI::mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
+    UI::mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
 
     UI::UpdateButtons(Renderer::GetCursorScreenPos());
 
     m_pPlayer->Update(m_cMap);
 
-    Camera::UpdateFollow(Util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + Util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
+    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
 
     for (auto &e : aEntities)
     {
@@ -104,7 +110,7 @@ void Game::Update()
 
 void Game::Render()
 {
-    Renderer::Clear(sf::Color(0, 0, 0, 255));
+    Renderer::Clear(sf::Color(34, 34, 54, 0xff));
 
     Renderer::SetView(Camera::GetView());
     Renderer::SetViewMatrix("map_shader");
@@ -131,33 +137,10 @@ void Game::Render()
 
 void Game::RenderGameWorld()
 {
-    //DEBUG//////////////////////////
-//    glm::mat4 view = Renderer::GetViewMatrix();
-//    glm::mat4 model(1.0f);
-//
-//    model = glm::translate(model, glm::vec3(4 * 32, 4 * 32, 0));
-//    model = glm::scale(model, glm::vec3(Globals::GLM_TILE_SIZE, 1.0f));
-//    glm::vec2 vPos(0.0f, 1.0f);
-//
-//    glm::vec3 vFragPos = glm::vec3(view * model * glm::vec4(vPos, 0.0f, 1.0f));
-//
-//    std::cout << "Shader debug: " << glm::to_string(vFragPos) << '\n';
-    //////////////////////////
-
     RM::GetShader("map_shader").Bind();
     RM::GetShader("map_shader").SetUniform("u_LightPosition", m_pPlayer->vWorldPos);
 
-    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
-
-    glm::vec2 vCursorTile = Util::convert_vector<glm::vec2>(_vCursorTile);
-
-    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-    SpriteRenderer::Draw(vCursorTile, "map_shader");
     m_cMap.Draw(m_pPlayer->vWorldGridPos, RM::GetShader("map_shader"));
-
-    RM::GetShader("map_shader").Bind();
-    cDebugSprite.SetPosition(vCursorTile);
-    SpriteRenderer::Draw(cDebugSprite, "map_shader");
 }
 
 
@@ -174,7 +157,7 @@ void Game::RenderEntities()
         if (e == nullptr)
             continue;
 
-//        e->Draw("map_shader");
+        e->Draw("map_shader");
     }
 }
 
@@ -198,32 +181,21 @@ void Game::RenderDebug()
     /*                     */
     /***********************/
     /***********************/
-
-    /**********************************/
-    /*        Draw Cursor Tile        */
-    /**********************************/
     sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
+    glm::vec2 vCursorTile = util::convert_vector<glm::vec2>(_vCursorTile);
 
-    shape.setOutlineColor(sf::Color(150, 150, 100));
-    shape.setFillColor(sf::Color(50, 50, 100));
-
-    shape.setPosition(sf::Vector2f(_vCursorTile));
-    shape.setScale(Globals::TILE_SIZE);
-
-    Renderer::Draw(shape);
-
-    shape.setPosition({ 0.0f, 0.0f });
-    shape.setScale({ 1920.0f, 1080.0f });
-    //Renderer::Draw(shape);
+    RM::GetShader("color_shader").Bind();
+    RM::GetShader("color_shader").SetUniform("u_Color", glm::vec4(0.4f, 0.7f, 0.2f, 1.0f));
+    SpriteRenderer::Draw(vCursorTile, "color_shader");
 
     /******************************************/
     /*        Draw Current Player Tile        */
     /******************************************/
-    sf::Vector2i _pos = Util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
+    sf::Vector2i _pos = util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
-//    Renderer::Draw(shape);
+    Renderer::Draw(shape);
 
 }
 
@@ -231,7 +203,7 @@ void Game::RenderDebug()
 
 sf::Vector2i Game::GetTileAtPos(glm::vec2 _vPos)
 {
-    sf::Vector2f vPos = Util::convert_vector<sf::Vector2f>(_vPos);
+    sf::Vector2f vPos = util::convert_vector<sf::Vector2f>(_vPos);
     sf::Vector2i vTileAtPos({ 0, 0 });
     vTileAtPos.x = vPos.x < 0.0f ?  (int32_t)(vPos.x / Globals::TILE_SIZE.x - 1) : (int32_t)(vPos.x) / Globals::TILE_SIZE.x;
     vTileAtPos.y = vPos.y < 0.0f ?  (int32_t)(vPos.y / Globals::TILE_SIZE.y - 1) : (int32_t)(vPos.y) / Globals::TILE_SIZE.y;
@@ -257,7 +229,7 @@ void Game::LoadResources()
 {
     sf::Font font;
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
-        std::cout << "ERROR loading font" << std::endl;
+        util::Log("ERROR loading font");
 
     UI::SetDefaultFont(font);
     UI::SetDefaultFontSize(40);
@@ -285,7 +257,8 @@ void Game::LoadResources()
 
     m_pPlayer->SetCurrentAnimation("walk_right");
 
-    std::cout << "- Current player animation: " << m_pPlayer->GetCurrentAnimation() << '\n';
+    util::Log("Current player animation: ", false);
+    util::Log(m_pPlayer->GetCurrentAnimation());
 
 
     for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
@@ -307,35 +280,6 @@ void Game::LoadResources()
 
         AddEntity(std::move(_c));
     }
-}
-
-
-
-int Game::LoadShaders(const std::filesystem::path &fsVertPath,
-                      const std::filesystem::path &fsFragPath)
-{
-    if (!sf::Shader::isAvailable())
-    {
-        std::cout << "ERROR::Shaders not available\n";
-        return -1;
-    }
-    std::cout << "- Shaders available\n";
-
-    if (!m_shader.loadFromFile(fsVertPath, sf::Shader::Type::Vertex))
-    {
-        std::cout << "ERROR::Could not load vertex shader\n";
-        return -1;
-    }
-    std::cout << "- Vertex shader loaded succesfully\n";
-
-    if (!m_shader.loadFromFile(fsFragPath, sf::Shader::Type::Fragment))
-    {
-        std::cout << "ERROR::Could not load fragment shader\n";
-        return -1;
-    }
-    std::cout << "- Fragment shader loaded succesfully\n";
-
-    return 0;
 }
 
 

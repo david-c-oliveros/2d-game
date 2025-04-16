@@ -52,49 +52,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
         glm::vec2 vSpritePos = (glm::vec2)tile->vWorldGridPos * Globals::GLM_TILE_SIZE;
         tile->pSprite->SetPosition(vSpritePos);
 
-        /***********************************************/
-        /***********************************************/
-        /*        Calculate position of light          */
-        /*        sources to pass to the shader        */
-        /***********************************************/
-        /***********************************************/
-        const sf::Vector2f vWorldAbsPos = Util::convert_vector<sf::Vector2f>((glm::vec2)_vWorldGridPos * Globals::GLM_TILE_SIZE);
-
         SpriteRenderer::Draw(*tile->pSprite, "map_shader");
-
-
-        /*****************************************************/
-        /*        DEBUG: Highlight certain tile types        */
-        /*               and adjacent tiles                  */
-        /*****************************************************/
-        /*********************************/
-        /*        DEBUG Level One        */
-        /*********************************/
-        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ZERO)
-            continue;
-
-        if (tile->bSolid)
-        {
-            sf::FloatRect rect = GetTileBox(*tile);
-            sf::RectangleShape shape(rect.size);
-            shape.setPosition(rect.position);
-            shape.setFillColor(sf::Color(100, 50, 0, 180));
-//            Renderer::Draw(shape);
-        }
-
-        /*********************************/
-        /*        DEBUG Level Two        */
-        /*********************************/
-        if (Globals::eDEBUG_LEVEL == Globals::DebugLevel::ONE)
-            continue;
-
-        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
-        {
-            uint32_t num = 40 * mDupeCount.at(glm::to_string(tile->vWorldGridPos));
-            tile->pSprite->SetColor(glm::vec4(150 - num, 150 - num, 150 - num, 1.0f));
-        }
-
-//        Renderer::Draw(*tile->pSprite);
     }
 }
 
@@ -167,19 +125,19 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
         switch(pTsonMap->getStatus())
         {
             case tson::ParseStatus::FileNotFound:
-                std::cout << "File not found" << std::endl;
+                util::Log("ERROR::TILESON::File not found");
                 break;
             case tson::ParseStatus::ParseError:
-                std::cout << "Parse error" << std::endl;
+                util::Log("ERROR::TILESON::Parse error");
                 break;
             case tson::ParseStatus::MissingData:
-                std::cout << "Missing data" << std::endl;
+                util::Log("ERROR::TILESON::Missing data");
                 break;
             case tson::ParseStatus::DecompressionError:
-                std::cout << "DecompressionError" << std::endl;
+                util::Log("ERROR::TILESON::Decompression error");
                 break;
             default:
-                std::cout << "Other error" << std::endl;
+                util::Log("ERROR::TILESON::Other error");
                 break;
         }
     }
@@ -222,7 +180,7 @@ void Map::storeMap()
                 _pTile->cTextureRect = tileObject.getDrawingRect();
 
                 tson::Vector2f _vPos = tileObject.getPosition();
-                _pTile->vWorldGridPos = glm::ivec2(_vPos.x, _vPos.y) / Util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
+                _pTile->vWorldGridPos = glm::ivec2(_vPos.x, _vPos.y) / util::convert_vector<glm::ivec2>(Globals::TILE_SIZE);
 
 
                 _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage(), {0, 0});
@@ -309,25 +267,17 @@ std::shared_ptr<GLSprite> Map::storeAndLoadImage(const std::string &sImageName, 
 
         if (fs::exists(path) && fs::is_regular_file(path))
         {
-            //std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
-            //std::unique_ptr<GLTexture> tex = std::make_unique<GLTexture>();
-
             // TODO - Properly pass in bAlpha
             RM::LoadTexture(path.generic_string(), true, sImageName);
-            //bool bImageFound = tex->loadFromFile(path.generic_string());
-//            tex->setSmooth(false);
-
-            // TODO - May need refactoring as code scales
             std::shared_ptr<GLSprite> spr = std::make_shared<GLSprite>(sImageName);
-            //std::unique_ptr<sf::Sprite> spr = std::make_unique<sf::Sprite>(*tex);
             spr->SetPosition(_vPos);
             spr->SetColor(glm::vec4(1.0f));
-            //m_pTextures[sImageName] = std::move(tex);
             m_pSprites[sImageName] = std::move(spr);
         }
         else
         {
-            std::cout << "Could not find: " << path.generic_string() << std::endl;
+            util::Log("ERROR::MAP::Could not find image: ", false);
+            util::Log(path.generic_string());
         }
     }
 
@@ -338,48 +288,6 @@ std::shared_ptr<GLSprite> Map::storeAndLoadImage(const std::string &sImageName, 
 
     return m_pSprites[sImageName];
 }
-
-
-
-//sf::Sprite* Map::storeAndLoadImage(const std::string &sImageName, const sf::Vector2f &_vPos)
-//{
-//    if (m_pTextures.count(sImageName) == 0)
-//    {
-//        fs::path path = m_basePath / sImageName;
-//
-//        if (fs::exists(path) && fs::is_regular_file(path))
-//        {
-//            //std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
-//            std::unique_ptr<GLTexture> tex = std::make_unique<GLTexture>();
-//
-//            // TODO - Properly pass in bAlpha
-//            RM::LoadTexture(path.generic_string(), true, sImageName);
-//            //bool bImageFound = tex->loadFromFile(path.generic_string());
-//            tex->setSmooth(false);
-//
-//            // TODO - May need refactoring as code scales
-//            if (bImageFound)
-//            {
-//                std::unique_ptr<GLSprite> spr = std::make_unique<GLSprite>(sImageName);
-//                //std::unique_ptr<sf::Sprite> spr = std::make_unique<sf::Sprite>(*tex);
-//                spr->SetPosition(_vPos);
-//                m_pTextures[sImageName] = std::move(tex);
-//                m_pSprites[sImageName] = std::move(spr);
-//            }
-//        }
-//        else
-//        {
-//            std::cout << "Could not find: " << path.generic_string() << std::endl;
-//        }
-//    }
-//
-//    if (m_pSprites.count(sImageName) > 0)
-//    {
-//        return m_pSprites[sImageName].get();
-//    }
-//
-//    return nullptr;
-//}
 
 
 
@@ -404,6 +312,6 @@ std::vector<std::shared_ptr<Tile>>::iterator Map::getOccupiedTile(glm::ivec2 _vW
 /**********************************/
 sf::FloatRect Map::GetTileBox(Tile &tile)
 {
-    sf::Vector2f _vTileWorldPos = Util::convert_vector<sf::Vector2f>((glm::vec2)tile.vWorldGridPos * Globals::GLM_TILE_SIZE);
+    sf::Vector2f _vTileWorldPos = util::convert_vector<sf::Vector2f>((glm::vec2)tile.vWorldGridPos * Globals::GLM_TILE_SIZE);
     return sf::FloatRect(_vTileWorldPos, Globals::TILE_SIZE);
 }

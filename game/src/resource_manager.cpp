@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include "util.h"
+
 
 std::map<std::string, GLTexture> RM::mTextures;
 std::map<std::string, GLShader> RM::mShaders;
@@ -13,7 +15,8 @@ const GLShader& RM::LoadShader(const std::string vShaderFile,
                                const std::string sName)
 {
     mShaders[sName] = loadShaderFromFile(vShaderFile, fShaderFile, gShaderFile);
-    return mShaders[sName];
+
+    return mShaders.at(sName);
 }
 
 
@@ -25,13 +28,19 @@ const GLTexture& RM::LoadTexture(const std::string sFile, bool bAlpha, const std
 
 const GLShader& RM::GetShader(const std::string sName)
 {
-    return mShaders[sName];
+    if (mShaders.count(sName) == 0)
+        util::Log("ERROR::Shader not found");
+
+    return mShaders.at(sName);
 }
 
 
 GLTexture RM::GetTexture(const std::string sName)
 {
-    return mTextures[sName];
+    if (mTextures.count(sName) == 0)
+        util::Log("ERROR::Texture not found");
+
+    return mTextures.at(sName);
 }
 
 
@@ -66,7 +75,9 @@ GLTexture RM::loadTextureFromFile(const std::string sFile, bool bAlpha)
 
     if (NULL == pData)
     {
-        std::cout << "- WARNING::File " << sFile << " not found" << std::endl;
+        util::Log("WARNING::File ", false);
+        util::Log(sFile, false);
+        util::Log(" not found");
     }
 
     cTexture.Generate(pData, nWidth, nHeight);
@@ -113,7 +124,7 @@ GLShader RM::loadShaderFromFile(const std::string vShaderFile,
     }
     catch(std::ifstream::failure e)
     {
-        std::cout << "- ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+        util::Log("ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ");
     }
 
     const char* vShaderCode = sVertexCode.c_str();

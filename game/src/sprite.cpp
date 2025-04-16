@@ -37,7 +37,7 @@ void GLSprite::SetTextureRect(sf::Rect<int> _TextureRect)
 {
     if (m_sTexName == "")
     {
-        std::cout << "- ERROR::Sprite texture must be set before the texture rectangle\n";
+        util::Log("ERROR::Sprite texture must be set before the texture rectangle");
         return;
     }
 
@@ -53,7 +53,7 @@ void GLSprite::SetPosition(glm::vec2 vPos)
 
 const sf::Rect<float> GLSprite::GetTexRectNorm() const
 {
-    sf::Vector2f vTexSize = Util::convert_vector<sf::Vector2f>(RM::GetTexture(m_sTexName).GetSize());
+    sf::Vector2f vTexSize = util::convert_vector<sf::Vector2f>(RM::GetTexture(m_sTexName).GetSize());
 
     sf::FloatRect TextureRectNorm((sf::Vector2f)m_TextureRect.position, (sf::Vector2f)m_TextureRect.size);
 

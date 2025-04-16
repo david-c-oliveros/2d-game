@@ -26,18 +26,18 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
 
     if (!m_pWindow->setActive(true))
     {
-        std::cout << "- ERROR::SFML::Failed to set window to active\n";
+        util::Log("ERROR::SFML::Failed to set window to active");
         return -1;
     }
 
     gladLoadGL();
-    std::cout << "- Activated render window\n";
+    util::Log("Activated render window");
 
     GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     GLCall(glViewport(0, 0, static_cast<GLsizei>(vDim.x), static_cast<GLsizei>(vDim.y)));
 
-    std::cout << "- Set OpenGL viewport\n";
+    util::Log("Set OpenGL viewport");
 
     return 0;
 }
@@ -46,7 +46,10 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
 
 void Renderer::Clear(sf::Color color)
 {
-    GLCall(glClearColor(color.r, color.g, color.b, color.a));
+    glm::vec4 c = glm::vec4(color.r, color.g, color.b, color.a);
+    c = util::remap(c, glm::vec4(0.0f), glm::vec4(255.0f), glm::vec4(0.0f), glm::vec4(1.0f));
+
+    GLCall(glClearColor(c.r, c.g, c.b, c.a));
     GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
@@ -79,7 +82,7 @@ sf::RenderWindow& Renderer::GetWindow()
 
 glm::vec2 Renderer::GetCanvasSize()
 {
-    return Util::convert_vector<glm::vec2>(m_pWindow->getSize());
+    return util::convert_vector<glm::vec2>(m_pWindow->getSize());
 }
 
 
@@ -122,7 +125,6 @@ void Renderer::SetZoom(float fZoom, const std::string sShader)
     m_mViewMatrix = glm::scale(m_mViewMatrix, glm::vec3(1.0f / fZoom, 1.0f / fZoom, 1.0f));
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_View", m_mViewMatrix);
-    std::cout << "Zooming\n";
 }
 
 
@@ -148,11 +150,6 @@ void Renderer::SetProjectionMatrix(const std::string sShader)
     float fRight  = vSize.x / 2;
     float fTop    = -vSize.y / 2;
     float fBottom = vSize.y / 2;
-
-    std::cout << "Left:   " << fLeft << '\n'
-              << "Right:  " << fRight << '\n'
-              << "Top:    " << fTop << '\n'
-              << "Bottom: " << fBottom << '\n';
 
     glm::mat4 projection = glm::ortho<float>(fLeft, fRight, fBottom, fTop, -1000.0f, 1000.0f);
 

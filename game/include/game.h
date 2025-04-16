@@ -35,6 +35,8 @@
 //    void (Game::*ButtonPressed) (std::string);
 //} MemberFuncPtr;
 
+void Log(const std::string sStr);
+
 
 class Game
 {

@@ -18,16 +18,12 @@ void SpriteRenderer::InitRenderer()
 
 void SpriteRenderer::Draw(glm::vec2 vPos, const std::string sShader)
 {
-    // TMP
-    glm::vec2 vSize(32.0f);
-
     glm::mat4 model = glm::mat4(1.0f);
     float fRotation = 0.0f;
 
     model = glm::translate(model, glm::vec3(vPos, 0.0f));
-//    model = glm::translate(model, glm::vec3(-Globals::GLM_TILE_SIZE.x, -Globals::GLM_TILE_SIZE.y, 0.0f));
     model = glm::rotate(model, glm::radians(fRotation), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, glm::vec3(vSize, 1.0f));
+    model = glm::scale(model, glm::vec3(Globals::GLM_TILE_SIZE, 1.0f));
 
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Model", model);
@@ -38,20 +34,15 @@ void SpriteRenderer::Draw(glm::vec2 vPos, const std::string sShader)
 
 void SpriteRenderer::Draw(GLSprite &cSprite, const std::string sShader)
 {
-    // TMP
-
-    glm::vec2 vSize(32.0f);
     glm::mat4 model = glm::mat4(1.0f);
     float fRotation = 0.0f;
 
-    // TODO - Figure out where sizing of the sprite should be done
     model = glm::translate(model, glm::vec3(cSprite.GetPosition(), 0.0f));
-//    model = glm::translate(model, glm::vec3(0.5f * vSize.x, 0.5f * vSize.y, 0.0f));
     model = glm::rotate(model, glm::radians(fRotation), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, glm::vec3(vSize, 1.0f));
+    model = glm::scale(model, glm::vec3(Globals::GLM_TILE_SIZE, 1.0f));
 
-    glm::vec2 vRectPos(Util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().position));
-    glm::vec2 vRectSize(Util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().size));
+    glm::vec2 vRectPos(util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().position));
+    glm::vec2 vRectSize(util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().size));
 
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Model", model);

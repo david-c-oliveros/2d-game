@@ -2,6 +2,7 @@
 
 #include "shader.h"
 #include "gl_error_manager.h"
+#include "util.h"
 
 
 GLShader::GLShader()
@@ -67,9 +68,9 @@ void GLShader::Compile(const char* sVertexSource, const char* sFragmentSource, c
     GLCall(glLinkProgram(nID));
     GLCall(glValidateProgram(nID));
 
-    std::cout << "- Linking shaders\n";
+    util::Log("Linking shaders");
     checkCompileErrors(nID, "PROGRAM");
-    std::cout << "- Deleting shaders\n";
+    util::Log("Deleting shaders");
 
     GLCall(glDeleteShader(sVertex));
     GLCall(glDeleteShader(sFragment));
@@ -199,17 +200,21 @@ void GLShader::ValidateShaderProgram() const
     GLint current_program = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
     if (0 == current_program)
-        std::cout << "- ERROR::No current program is set\n";
+        util::Log("ERROR::No current program is set");
     else if(current_program != nID)
-        std::cout << "ERROR::Current program ("
-            << current_program
-            << ") doesn't match active program ("
-            << nID << ")\n";
+    {
+        util::Log("ERROR::Current program (", false);
+        util::Log(current_program, false);
+        util::Log(") doesn't match active program (", false);
+        util::Log(nID + ")");
+    }
     else
-        std::cout << "ERROR::Current program ("
-            << current_program
-            << ") matches active program ("
-            << nID << ")\n";
+    {
+        util::Log("ERROR::Current program (", false);
+        util::Log(current_program, false);
+        util::Log(") matches active program (", false);
+        util::Log(nID + ")");
+    }
 }
 
 
@@ -242,10 +247,11 @@ void GLShader::PrintProgramParam(GLenum eParam) const
     char cInfoLog[1024];
     GLCall(glGetProgramiv(nID, eParam, &iSuccess));
     GLCall(glGetProgramInfoLog(nID, 1024, NULL, cInfoLog));
-    std::cout << "- SHADER PROGRAM::PARAMETER: " << glEnumStrings[eParam]
-        << cInfoLog << "\n-- --------------------------------------------------- -- "
-        << "\nValue: " << iSuccess << "\n-- --------------------------------------------------- -- "
-        << std::endl;
+    util::Log("SHADER PROGRAM::PARAMETER: " + glEnumStrings[eParam], false);
+    util::Log(cInfoLog);
+    util::Log("\n-- --------------------------------------------------- --");
+    util::Log("Value" + iSuccess);
+    util::Log("\n-- --------------------------------------------------- --");
 }
 
 
@@ -260,13 +266,13 @@ void GLShader::checkCompileErrors(GLuint nObject, std::string sType)
         if (!iSuccess)
         {
             GLCall(glGetShaderInfoLog(nObject, 1024, NULL, cInfoLog));
-            std::cout << "- ERROR::SHADER: Compile-time error: Type: " << sType << "\n"
-                << cInfoLog << "\n-- --------------------------------------------------- -- "
-                << std::endl;
+            util::Log("ERROR::SHADER: Compile-time error: Type: " + sType);
+            util::Log(cInfoLog);
+            util::Log("-- --------------------------------------------------- --");
         }
         else
         {
-            std::cout << "- Shader compilation successful\n";
+            util::Log("Shader compilation successful");
         }
     }
     else
@@ -275,13 +281,13 @@ void GLShader::checkCompileErrors(GLuint nObject, std::string sType)
         if (!iSuccess)
         {
             GLCall(glGetProgramInfoLog(nObject, 1024, NULL, cInfoLog));
-            std::cout << "| ERROR::SHADER: Link-time error: Type: " << sType << "\n"
-                << cInfoLog << "\n-- --------------------------------------------------- -- "
-                << std::endl;
+            util::Log("ERROR::SHADER: Link-time error: Type: " + sType);
+            util::Log(cInfoLog);
+            util::Log("-- --------------------------------------------------- --");
         }
         else
         {
-            std::cout << "- Shader linking successful\n";
+            util::Log("Shader linking successful");
         }
     }
 }

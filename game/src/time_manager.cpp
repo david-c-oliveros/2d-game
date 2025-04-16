@@ -1,4 +1,5 @@
 #include "time_manager.h"
+#include "util.h"
 
 
 
@@ -27,7 +28,7 @@ void TimeManager::NewTimer(std::string sName, uint32_t _nTotalTicks)
 {
     if (m_timers.count(sName) > 0)
     {
-        std::cout << "ERROR::Timer already exists\n";
+        util::Log("ERROR::Timer already exists");
         return;
     }
 

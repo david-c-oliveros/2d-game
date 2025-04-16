@@ -62,9 +62,6 @@ class Map
         glm::ivec2 vMapSize;
 
     private:
-//        std::map<std::string, std::unique_ptr<sf::Texture>> m_pTextures;
-//        std::vector<std::string> m_aTextures;
-//        std::map<std::string, std::unique_ptr<sf::Sprite>> m_pSprites;
         std::map<std::string, std::shared_ptr<GLSprite>> m_pSprites;
 
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);

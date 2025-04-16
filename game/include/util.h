@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 
-namespace Util
+namespace util
 {
     /***************************************/
     /*        Function Declarations        */
@@ -28,6 +28,9 @@ namespace Util
     static T GenRandInRange(T range_min, T range_max);
 
     static uint32_t GetTimeSec();
+
+    template <typename T>
+    static void Log(const T &data, bool bNewline = true);
 
 
 
@@ -90,5 +93,18 @@ namespace Util
         std::chrono::duration dur = now.time_since_epoch();
         std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(dur);
         return static_cast<uint32_t>(sec.count());
+    }
+
+
+
+    template <typename T>
+    static void Log(const T &data, bool bNewline)
+    {
+        std::ostringstream ss;
+        ss << data;
+        if (bNewline)
+            std::cout << "- " << ss.str() << '\n';
+        else
+            std::cout << "- " << ss.str();
     }
 }

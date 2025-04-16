@@ -46,6 +46,7 @@ void Character::Move(Map &cMap)
     vWorldPos *= Globals::GLM_TILE_SIZE;
     cCollider.vPos = vWorldPos / Globals::GLM_TILE_SIZE;
 
+
     updateBoundingBox();
 }
 
@@ -65,7 +66,7 @@ void Character::DrawBoundingBox()
     bb.setFillColor(sf::Color(0, 100, 0, 255));
     bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
 
-//    Renderer::Draw(bb);
+    Renderer::Draw(bb);
 }
 
 
@@ -75,10 +76,10 @@ void Character::DrawCollider()
     sf::CircleShape cColShape(cCollider.fRadius * Globals::TILE_SIZE.x);
 
     cColShape.setOrigin({ cCollider.fRadius * Globals::TILE_SIZE.x, cCollider.fRadius * Globals::TILE_SIZE.y });
-    cColShape.setPosition(Util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
+    cColShape.setPosition(util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
     cColShape.setFillColor(sf::Color(0, 0, 100, 255));
 
-//    Renderer::Draw(cColShape);
+    Renderer::Draw(cColShape);
 }
 
 
@@ -98,8 +99,8 @@ void Character::AttachAnimatedSprite(const std::string _sSpriteName, const std::
 
 //    m_pSprite->setOrigin({ _vSpriteSize.x / 2, _vSpriteSize.y / 2 });
 
-    m_vSheetSize  = Util::convert_vector<sf::Vector2i>(_vSheetSize);
-    m_vSpriteSize = Util::convert_vector<sf::Vector2i>(_vSpriteSize);
+    m_vSheetSize  = util::convert_vector<sf::Vector2i>(_vSheetSize);
+    m_vSpriteSize = util::convert_vector<sf::Vector2i>(_vSpriteSize);
 }
 
 
@@ -108,8 +109,8 @@ void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::i
 {
     std::string sAnimName(sName + "_" + _sName);
     AnimationManager::addAnimation(sAnimName, m_pSprite->GetTexture(), m_vSheetSize, m_vSpriteSize);
-    AnimationManager::setAnimationStartingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
-    AnimationManager::setAnimationEndingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
+    AnimationManager::setAnimationStartingIndex(sAnimName, util::convert_vector<sf::Vector2i>(_vStartIndex));
+    AnimationManager::setAnimationEndingIndex(sAnimName, util::convert_vector<sf::Vector2i>(_vEndIndex));
 }
 
 
@@ -167,14 +168,15 @@ void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 
 void Character::updateSprite()
 {
-    m_pSprite->SetPosition(vWorldPos);
+    m_pSprite->SetPosition(vWorldPos - Globals::GLM_TILE_SIZE * 0.5f);
 }
 
 
 
 void Character::updateBoundingBox()
 {
-    cBox.position = sf::Vector2(vWorldPos.x, vWorldPos.y);
+    cBox.position = sf::Vector2(vWorldPos.x - Globals::TILE_SIZE.y / 2,
+                                vWorldPos.y - Globals::TILE_SIZE.y / 2);
 }
 
 

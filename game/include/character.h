@@ -87,7 +87,7 @@ class Character : public Entity
 
         bool bAnimated = false;
 
-        Circle cCollider{vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
+        Circle cCollider{ vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
 
 
     protected:

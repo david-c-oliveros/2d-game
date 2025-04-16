@@ -58,7 +58,7 @@ void Player::Move(Map &cMap)
 
 void Player::handleInput()
 {
-    if (!Util::IsAnyKeyPressed())
+    if (!util::IsAnyKeyPressed())
     {
         eState = CharState::IDLE;
         eDir = MoveDir::IDLE;

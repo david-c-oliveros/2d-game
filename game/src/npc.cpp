@@ -10,7 +10,7 @@ Npc::Npc(uint32_t _vID, glm::vec2 _vWorldPos)
     eState = CharState::WALK;
     makeDecision();
 
-    int decision_time = Util::GenRandInRange(60, 240);
+    int decision_time = util::GenRandInRange(60, 240);
     TimeManager::NewTimer(sName, decision_time);
     TimeManager::StartTimer(sName);
 }
@@ -25,7 +25,7 @@ Npc::Npc(uint32_t _vID, std::string _sName, glm::vec2 _vWorldPos)
     eState = CharState::WALK;
     makeDecision();
 
-    int decision_time = Util::GenRandInRange(60, 240);
+    int decision_time = util::GenRandInRange(60, 240);
     TimeManager::NewTimer(sName, decision_time);
     TimeManager::StartTimer(sName);
 }
@@ -66,7 +66,7 @@ void Npc::Move(Map &cMap)
 
 void Npc::makeDecision()
 {
-    int decision = Util::GenRandInRange(0, 8);
+    int decision = util::GenRandInRange(0, 8);
     eDir = static_cast<MoveDir>(decision);
     setVelocity(Globals::aMoveVels[static_cast<size_t>(eDir)], m_fSpeedScalar);
 }
