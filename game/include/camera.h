@@ -1,15 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <optional>
 
 #include <glm/glm.hpp>
-#include <SFML/Graphics.hpp>
-
-#include "util.h"
-
-// DEBUG
-#include "sprite_renderer.h"
-//
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/View.hpp>
 
 
 class Camera

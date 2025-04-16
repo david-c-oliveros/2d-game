@@ -1,8 +1,7 @@
-#include <glm/gtx/string_cast.hpp>
-
 #include "renderer.h"
 #include "resource_manager.h"
 #include "gl_error_manager.h"
+#include "util.h"
 
 
 std::shared_ptr<sf::RenderWindow> Renderer::m_pWindow;

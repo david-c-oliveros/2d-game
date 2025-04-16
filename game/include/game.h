@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 
 #include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 
 #include <glm/gtx/string_cast.hpp>

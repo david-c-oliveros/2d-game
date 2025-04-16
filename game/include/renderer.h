@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/View.hpp>
+#include <SFML/System/Vector2.hpp>
 #include "glad/glad.h"
 
 #include "shader.h"

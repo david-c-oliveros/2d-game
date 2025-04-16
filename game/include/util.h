@@ -32,6 +32,9 @@ namespace util
     template <typename T>
     static void Log(const T &data, bool bNewline = true);
 
+    template <typename T>
+    static void LogError(const T &data, bool bNewline = true);
+
 
 
 
@@ -102,9 +105,32 @@ namespace util
     {
         std::ostringstream ss;
         ss << data;
+
+        std::string sGreen("\033[32m");
+        std::string sBoldGreen("\033[1;32m");
+        std::string sReset("\033[0m");
+
         if (bNewline)
-            std::cout << "- " << ss.str() << '\n';
+            std::cout << sGreen << "- " << sReset << ss.str() << '\n';
         else
-            std::cout << "- " << ss.str();
+            std::cout << sGreen << "- " << sReset << ss.str();
+    }
+
+
+
+    template <typename T>
+    static void LogError(const T &data, bool bNewline)
+    {
+        std::ostringstream ss;
+        ss << data;
+
+        std::string sRed("\033[31m");
+        std::string sBoldRed("\033[1;31m");
+        std::string sReset("\033[0m");
+
+        if (bNewline)
+            std::cerr << "- " << sBoldRed << "ERROR" << sReset << "::" << ss.str() << '\n';
+        else
+            std::cerr << "- " << sRed << "ERROR" << sReset << "::" << ss.str();
     }
 }

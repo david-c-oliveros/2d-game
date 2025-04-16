@@ -1,10 +1,12 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/System/Vector2.hpp>
 
-#include "util.h"
+#include <glm/glm.hpp>
+
 #include "renderer.h"
 #include "label.h"
 

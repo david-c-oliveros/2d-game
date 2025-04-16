@@ -2,7 +2,10 @@
 
 #include <iostream>
 #include <string>
-#include <SFML/Graphics.hpp>
+
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include "renderer.h"
 

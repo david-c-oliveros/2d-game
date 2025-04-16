@@ -1,4 +1,8 @@
 #include "map.h"
+#include "util.h"
+
+#include <SFML/System/Vector2.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 
 

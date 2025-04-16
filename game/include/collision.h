@@ -4,8 +4,7 @@
 #include <limits>
 
 #include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Rect.hpp>
 
 #include "map.h"
 

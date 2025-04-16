@@ -1,9 +1,6 @@
 #pragma once
 
-#include <glm/gtx/string_cast.hpp>
-
 #include "globals.h"
-#include "util.h"
 #include "time_manager.h"
 #include "character.h"
 

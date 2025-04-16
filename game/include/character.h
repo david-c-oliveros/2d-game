@@ -3,7 +3,6 @@
 #include <AnimationManager.hpp>
 
 #include "globals.h"
-#include "util.h"
 #include "renderer.h"
 #include "map.h"
 #include "entity.h"

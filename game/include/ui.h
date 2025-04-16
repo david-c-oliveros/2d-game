@@ -2,7 +2,8 @@
 
 #include <map>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/System/Vector2.hpp>
 
 #include "game.h"
 #include "button.h"

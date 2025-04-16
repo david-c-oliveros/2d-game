@@ -1,6 +1,4 @@
 #include "sprite.h"
-
-#include <glm/gtx/string_cast.hpp>
 #include "util.h"
 
 

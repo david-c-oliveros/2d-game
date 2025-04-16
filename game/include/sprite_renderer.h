@@ -1,11 +1,9 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
 #include "globals.h"
-#include "util.h"
 #include "shader.h"
 #include "resource_manager.h"
 #include "renderer.h"

@@ -1,4 +1,5 @@
 #include "sprite_renderer.h"
+#include "util.h"
 
 #include <glad/glad.h>
 

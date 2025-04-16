@@ -1,15 +1,12 @@
 #pragma once
 
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include <algorithm>
 
+#include <SFML/Graphics/Rect.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
-
 #include <tileson.hpp>
 
 #include "globals.h"
-#include "util.h"
 #include "shader.h"
 #include "texture.h"
 #include "sprite.h"

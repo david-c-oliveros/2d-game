@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/gtx/string_cast.hpp>
-
 #include "globals.h"
 #include "map.h"
 #include "character.h"

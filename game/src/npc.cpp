@@ -1,4 +1,5 @@
 #include "npc.h"
+#include "util.h"
 
 
 
