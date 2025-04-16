@@ -89,6 +89,8 @@ class Game
         bool m_bRunning = true;
 
         std::unique_ptr<Player> m_pPlayer;
+
+        GLSprite cDebugSprite;
         Map m_cMap;
 
         sf::Shader m_shader;

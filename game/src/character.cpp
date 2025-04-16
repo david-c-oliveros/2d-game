@@ -30,9 +30,10 @@ void Character::Update()
 {
     if (bAnimated)
     {
-        AnimationManager::update(m_sCurrentAnimation, *m_pSprite);
+        AnimationManager::update(m_sCurrentAnimation, m_pSprite);
     }
 
+    updateSprite();
     setAnimation();
 }
 
@@ -52,9 +53,7 @@ void Character::Move(Map &cMap)
 
 void Character::Draw(const std::string sShader)
 {
-    m_pSprite->setPosition(Util::convert_vector<sf::Vector2f>(vWorldPos));
-
-    SpriteRenderer::Draw(*m_pSprite, vWorldPos, sShader);
+    SpriteRenderer::Draw(*m_pSprite, sShader);
 }
 
 
@@ -67,7 +66,6 @@ void Character::DrawBoundingBox()
     bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
 
 //    Renderer::Draw(bb);
-    //cWindow.draw(bb);
 }
 
 
@@ -81,21 +79,26 @@ void Character::DrawCollider()
     cColShape.setFillColor(sf::Color(0, 0, 100, 255));
 
 //    Renderer::Draw(cColShape);
-//    cWindow.draw(cColShape);
 }
 
 
 
-void Character::AttachAnimatedSprite(const std::string _sFilepath, glm::ivec2 _vSpriteSize, glm::ivec2 _vFrameRect)
+void Character::AttachAnimatedSprite(const std::string _sSpriteName, const std::string sFilepath,
+                                     glm::ivec2 _vSpriteSize, glm::ivec2 _vSheetSize)
 {
     m_vDefaultScalar /= _vSpriteSize;
     bAnimated = true;
-    m_pTexture = std::make_unique<sf::Texture>(_sFilepath);
+    std::string sSpriteName(sName + "_" + std::to_string(m_ID) + "_" + _sSpriteName);
+    RM::LoadTexture(sFilepath, true, sSpriteName);
+    m_pSprite = std::make_unique<GLSprite>();
+    
+    m_pSprite->SetColor(glm::vec4(1.0f));
+    m_pSprite->SetTexture(sSpriteName);
+    m_pSprite->SetTextureRect(sf::Rect<int>(sf::Vector2i(Globals::TILE_SIZE), { 0, 0 }));
 
-    m_pSprite = std::make_unique<sf::Sprite>(*m_pTexture);
-    m_pSprite->setOrigin({ _vSpriteSize.x / 2, _vSpriteSize.y / 2 });
+//    m_pSprite->setOrigin({ _vSpriteSize.x / 2, _vSpriteSize.y / 2 });
 
-    m_vFrameRect  = Util::convert_vector<sf::Vector2i>(_vFrameRect);
+    m_vSheetSize  = Util::convert_vector<sf::Vector2i>(_vSheetSize);
     m_vSpriteSize = Util::convert_vector<sf::Vector2i>(_vSpriteSize);
 }
 
@@ -104,7 +107,7 @@ void Character::AttachAnimatedSprite(const std::string _sFilepath, glm::ivec2 _v
 void Character::AddAnimation(std::string _sName, glm::ivec2 _vStartIndex, glm::ivec2 _vEndIndex)
 {
     std::string sAnimName(sName + "_" + _sName);
-    AnimationManager::addAnimation(sAnimName, m_pSprite->getTexture(), m_vFrameRect, m_vSpriteSize);
+    AnimationManager::addAnimation(sAnimName, m_pSprite->GetTexture(), m_vSheetSize, m_vSpriteSize);
     AnimationManager::setAnimationStartingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vStartIndex));
     AnimationManager::setAnimationEndingIndex(sAnimName, Util::convert_vector<sf::Vector2i>(_vEndIndex));
 }
@@ -129,7 +132,7 @@ void Character::SetCurrentAnimation(std::string _sName)
     {
         AnimationManager::setAnimationIndex(m_sCurrentAnimation,
                                             AnimationManager::getAnimationStartingIndex(m_sCurrentAnimation));
-        AnimationManager::forceUpdate(m_sCurrentAnimation, *m_pSprite);
+        AnimationManager::forceUpdate(m_sCurrentAnimation, m_pSprite);
     }
 }
 
@@ -158,6 +161,13 @@ void Character::setVelocity(glm::vec2 _vVel, float fScalar)
     }
 
     m_vVelocity = glm::normalize(_vVel) * fScalar;
+}
+
+
+
+void Character::updateSprite()
+{
+    m_pSprite->SetPosition(vWorldPos);
 }
 
 

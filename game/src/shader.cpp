@@ -97,7 +97,7 @@ void GLShader::Unbind() const
 /**********************************/
 /*        Set Bool Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, bool value) const
+void GLShader::SetUniform(const std::string &name, const bool value) const
 {
     GLCall(glUniform1i(glGetUniformLocation(nID, name.c_str()), value));
 }
@@ -107,7 +107,7 @@ void GLShader::SetUniform(const std::string &name, bool value) const
 /******************************************/
 /*        Set Unsigned Int Uniform        */
 /******************************************/
-void GLShader::SetUniform(const std::string &name, unsigned int value) const
+void GLShader::SetUniform(const std::string &name, const unsigned int value) const
 {
     GLCall(glUniform1i(glGetUniformLocation(nID, name.c_str()), value));
 }
@@ -117,7 +117,7 @@ void GLShader::SetUniform(const std::string &name, unsigned int value) const
 /*********************************/
 /*        Set Int Uniform        */
 /*********************************/
-void GLShader::SetUniform(const std::string &name, int value) const
+void GLShader::SetUniform(const std::string &name, const int value) const
 {
     GLCall(glUniform1i(glGetUniformLocation(nID, name.c_str()), value));
 }
@@ -127,7 +127,7 @@ void GLShader::SetUniform(const std::string &name, int value) const
 /***********************************/
 /*        Set Float Uniform        */
 /***********************************/
-void GLShader::SetUniform(const std::string &name, float value) const
+void GLShader::SetUniform(const std::string &name, const float value) const
 {
     GLCall(glUniform1f(glGetUniformLocation(nID, name.c_str()), value));
 }
@@ -137,7 +137,7 @@ void GLShader::SetUniform(const std::string &name, float value) const
 /**********************************/
 /*        Set Vec2 Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, glm::vec2 vec) const
+void GLShader::SetUniform(const std::string &name, const glm::vec2 vec) const
 {
     GLCall(glUniform2fv(glGetUniformLocation(nID, name.c_str()), 1, glm::value_ptr(vec)));
 }
@@ -147,7 +147,7 @@ void GLShader::SetUniform(const std::string &name, glm::vec2 vec) const
 /**********************************/
 /*        Set Vec3 Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, glm::vec3 vec) const
+void GLShader::SetUniform(const std::string &name, const glm::vec3 vec) const
 {
     GLCall(glUniform3fv(glGetUniformLocation(nID, name.c_str()), 1, glm::value_ptr(vec)));
 }
@@ -157,7 +157,7 @@ void GLShader::SetUniform(const std::string &name, glm::vec3 vec) const
 /**********************************/
 /*        Set Vec4 Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, glm::vec4 vec) const
+void GLShader::SetUniform(const std::string &name, const glm::vec4 vec) const
 {
     GLCall(glUniform4fv(glGetUniformLocation(nID, name.c_str()), 1, glm::value_ptr(vec)));
 }
@@ -167,7 +167,7 @@ void GLShader::SetUniform(const std::string &name, glm::vec4 vec) const
 /**********************************/
 /*        Set Mat3 Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, glm::mat3 matrix) const
+void GLShader::SetUniform(const std::string &name, const glm::mat3 matrix) const
 {
     GLCall(glUniformMatrix3fv(glGetUniformLocation(nID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix)));
 }
@@ -177,7 +177,7 @@ void GLShader::SetUniform(const std::string &name, glm::mat3 matrix) const
 /**********************************/
 /*        Set Mat4 Uniform        */
 /**********************************/
-void GLShader::SetUniform(const std::string &name, glm::mat4 matrix) const
+void GLShader::SetUniform(const std::string &name, const glm::mat4 matrix) const
 {
     GLCall(glUniformMatrix4fv(glGetUniformLocation(nID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix)));
 }

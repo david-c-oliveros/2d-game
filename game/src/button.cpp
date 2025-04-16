@@ -22,8 +22,7 @@ Button::~Button()
 
 void Button::Draw()
 {
-//    Renderer::Draw(m_cShape);
-    //cWindow.draw(m_cShape);
+    Renderer::Draw(m_cShape);
     m_pLabel->Draw();
 }
 

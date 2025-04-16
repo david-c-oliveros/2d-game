@@ -46,11 +46,11 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
             continue;
         }
 
-        tile->pSprite->setTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
+        tile->pSprite->SetTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
                                                 sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
 
-        glm::vec2 _vSpritePos = (glm::vec2)tile->vWorldGridPos * Globals::GLM_TILE_SIZE;
-        tile->pSprite->setPosition(Util::convert_vector<sf::Vector2f>(_vSpritePos));
+        glm::vec2 vSpritePos = (glm::vec2)tile->vWorldGridPos * Globals::GLM_TILE_SIZE;
+        tile->pSprite->SetPosition(vSpritePos);
 
         /***********************************************/
         /***********************************************/
@@ -60,7 +60,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
         /***********************************************/
         const sf::Vector2f vWorldAbsPos = Util::convert_vector<sf::Vector2f>((glm::vec2)_vWorldGridPos * Globals::GLM_TILE_SIZE);
 
-        SpriteRenderer::Draw(*tile->pSprite, _vSpritePos, "map_shader");
+        SpriteRenderer::Draw(*tile->pSprite, "map_shader");
 
 
         /*****************************************************/
@@ -91,7 +91,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
         if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
         {
             uint32_t num = 40 * mDupeCount.at(glm::to_string(tile->vWorldGridPos));
-            tile->pSprite->setColor(sf::Color(150 - num, 150 - num, 150 - num));
+            tile->pSprite->SetColor(glm::vec4(150 - num, 150 - num, 150 - num, 1.0f));
         }
 
 //        Renderer::Draw(*tile->pSprite);
@@ -301,30 +301,29 @@ void Map::storeNavTile(std::shared_ptr<Tile> tile)
 
 
 
-sf::Sprite* Map::storeAndLoadImage(const std::string &image, const sf::Vector2f &_vPos)
+std::shared_ptr<GLSprite> Map::storeAndLoadImage(const std::string &sImageName, const glm::vec2 &_vPos)
 {
-    if (m_pTextures.count(image) == 0)
+    if (0 == m_pSprites.count(sImageName))
     {
-        fs::path path = m_basePath / image;
+        fs::path path = m_basePath / sImageName;
 
         if (fs::exists(path) && fs::is_regular_file(path))
         {
-            std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
+            //std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
             //std::unique_ptr<GLTexture> tex = std::make_unique<GLTexture>();
 
             // TODO - Properly pass in bAlpha
-            //RM::LoadTexture(path.generic_string(), true, image);
-            bool bImageFound = tex->loadFromFile(path.generic_string());
-            tex->setSmooth(false);
+            RM::LoadTexture(path.generic_string(), true, sImageName);
+            //bool bImageFound = tex->loadFromFile(path.generic_string());
+//            tex->setSmooth(false);
 
-            if (bImageFound)
-            {
-                std::unique_ptr<sf::Sprite> spr = std::make_unique<sf::Sprite>(*tex);
-//                spr->setTexture(*tex);
-                spr->setPosition(_vPos);
-                m_pTextures[image] = std::move(tex);
-                m_pSprites[image] = std::move(spr);
-            }
+            // TODO - May need refactoring as code scales
+            std::shared_ptr<GLSprite> spr = std::make_shared<GLSprite>(sImageName);
+            //std::unique_ptr<sf::Sprite> spr = std::make_unique<sf::Sprite>(*tex);
+            spr->SetPosition(_vPos);
+            spr->SetColor(glm::vec4(1.0f));
+            //m_pTextures[sImageName] = std::move(tex);
+            m_pSprites[sImageName] = std::move(spr);
         }
         else
         {
@@ -332,20 +331,62 @@ sf::Sprite* Map::storeAndLoadImage(const std::string &image, const sf::Vector2f 
         }
     }
 
-    if (m_pSprites.count(image) > 0)
+    if (0 < m_pSprites.count(sImageName))
     {
-        return m_pSprites[image].get();
+        return m_pSprites[sImageName];
     }
 
-    return nullptr;
+    return m_pSprites[sImageName];
 }
+
+
+
+//sf::Sprite* Map::storeAndLoadImage(const std::string &sImageName, const sf::Vector2f &_vPos)
+//{
+//    if (m_pTextures.count(sImageName) == 0)
+//    {
+//        fs::path path = m_basePath / sImageName;
+//
+//        if (fs::exists(path) && fs::is_regular_file(path))
+//        {
+//            //std::unique_ptr<sf::Texture> tex = std::make_unique<sf::Texture>();
+//            std::unique_ptr<GLTexture> tex = std::make_unique<GLTexture>();
+//
+//            // TODO - Properly pass in bAlpha
+//            RM::LoadTexture(path.generic_string(), true, sImageName);
+//            //bool bImageFound = tex->loadFromFile(path.generic_string());
+//            tex->setSmooth(false);
+//
+//            // TODO - May need refactoring as code scales
+//            if (bImageFound)
+//            {
+//                std::unique_ptr<GLSprite> spr = std::make_unique<GLSprite>(sImageName);
+//                //std::unique_ptr<sf::Sprite> spr = std::make_unique<sf::Sprite>(*tex);
+//                spr->SetPosition(_vPos);
+//                m_pTextures[sImageName] = std::move(tex);
+//                m_pSprites[sImageName] = std::move(spr);
+//            }
+//        }
+//        else
+//        {
+//            std::cout << "Could not find: " << path.generic_string() << std::endl;
+//        }
+//    }
+//
+//    if (m_pSprites.count(sImageName) > 0)
+//    {
+//        return m_pSprites[sImageName].get();
+//    }
+//
+//    return nullptr;
+//}
 
 
 
 std::vector<std::shared_ptr<Tile>>::iterator Map::getOccupiedTile(glm::ivec2 _vWorldGridPos)
 {
     auto vecEqual = [_vWorldGridPos](std::shared_ptr<Tile> t) { return t->vWorldGridPos.x == _vWorldGridPos.x &&
-                                                                   t->vWorldGridPos.y == _vWorldGridPos.y;
+                                                                       t->vWorldGridPos.y == _vWorldGridPos.y;
     };
 
     return std::find_if(aTiles.begin(), aTiles.end(), vecEqual);

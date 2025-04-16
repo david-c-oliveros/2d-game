@@ -31,6 +31,9 @@ class Renderer
         static void SetZoom(float fZoom, const std::string sShader);
         static void SetProjectionMatrix(const std::string sShader);
 
+        glm::mat4 GetProjectionMatrix();
+        static glm::mat4 GetViewMatrix();
+
         static void OnWindowResize(sf::Vector2u vNewSize);
 
         static glm::mat4 LookAtFromSFView();
@@ -43,8 +46,8 @@ class Renderer
             m_pWindow->popGLStates();
         }
 
-        static glm::mat4 m_mViewMatrix;
-
     private:
         static std::shared_ptr<sf::RenderWindow> m_pWindow;
+        static glm::mat4 m_mViewMatrix;
+        static glm::mat4 m_mProjectionMatrix;
 };

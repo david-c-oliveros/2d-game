@@ -11,6 +11,8 @@
 #include "globals.h"
 #include "util.h"
 #include "shader.h"
+#include "texture.h"
+#include "sprite.h"
 #include "renderer.h"
 #include "sprite_renderer.h"
 
@@ -21,7 +23,7 @@ struct Tile
     tson::Tileset *tileset;
     tson::Rect cTextureRect;
     glm::ivec2 vWorldGridPos;
-    sf::Sprite *pSprite;
+    std::shared_ptr<GLSprite> pSprite;
     bool bSolid;
     bool bCollided;
 };
@@ -50,7 +52,7 @@ class Map
     private:
         void storeMap();
         void storeNavTile(std::shared_ptr<Tile> tile);
-        sf::Sprite* storeAndLoadImage(const std::string &_image, const sf::Vector2f &_vPos);
+        std::shared_ptr<GLSprite> storeAndLoadImage(const std::string &sImageName, const glm::vec2 &_vPos);
         std::vector<std::shared_ptr<Tile>>::iterator getOccupiedTile(glm::ivec2 _vWorldPos);
 
     public:
@@ -60,8 +62,10 @@ class Map
         glm::ivec2 vMapSize;
 
     private:
-        std::map<std::string, std::unique_ptr<sf::Texture>> m_pTextures;
-        std::map<std::string, std::unique_ptr<sf::Sprite>> m_pSprites;
+//        std::map<std::string, std::unique_ptr<sf::Texture>> m_pTextures;
+//        std::vector<std::string> m_aTextures;
+//        std::map<std::string, std::unique_ptr<sf::Sprite>> m_pSprites;
+        std::map<std::string, std::shared_ptr<GLSprite>> m_pSprites;
 
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);
 

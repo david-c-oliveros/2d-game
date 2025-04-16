@@ -7,6 +7,7 @@
 
 std::shared_ptr<sf::RenderWindow> Renderer::m_pWindow;
 glm::mat4 Renderer::m_mViewMatrix;
+glm::mat4 Renderer::m_mProjectionMatrix;
 
 
 
@@ -32,8 +33,8 @@ int Renderer::CreateWindow(std::string sName, sf::Vector2u vDim, sf::State state
     gladLoadGL();
     std::cout << "- Activated render window\n";
 
-//    GLCall(glEnable(GL_BLEND));
-//    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    GLCall(glEnable(GL_BLEND));
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     GLCall(glViewport(0, 0, static_cast<GLsizei>(vDim.x), static_cast<GLsizei>(vDim.y)));
 
     std::cout << "- Set OpenGL viewport\n";
@@ -155,8 +156,24 @@ void Renderer::SetProjectionMatrix(const std::string sShader)
 
     glm::mat4 projection = glm::ortho<float>(fLeft, fRight, fBottom, fTop, -1000.0f, 1000.0f);
 
+    m_mProjectionMatrix = projection;
+
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Projection", projection);
+}
+
+
+
+glm::mat4 Renderer::GetProjectionMatrix()
+{
+    return m_mProjectionMatrix;
+}
+
+
+
+glm::mat4 Renderer::GetViewMatrix()
+{
+    return m_mViewMatrix;
 }
 
 

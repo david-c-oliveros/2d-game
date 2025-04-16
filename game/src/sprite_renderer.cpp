@@ -32,17 +32,11 @@ void SpriteRenderer::Draw(glm::vec2 vPos, const std::string sShader)
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Model", model);
 
-    // TODO - Figure out where textures should be handled (custom class or SFML)
-
-//    sf::Texture::bind(&cSprite.getTexture());
-//    glActiveTexture(GL_TEXTURE0);
-
     Renderer::DrawGL(nQuadVAO, RM::GetShader(sShader), 6);
-//    sf::Texture::bind(&cSprite.getTexture());
 }
 
 
-void SpriteRenderer::Draw(sf::Sprite &cSprite, glm::vec2 vPos, const std::string sShader)
+void SpriteRenderer::Draw(GLSprite &cSprite, const std::string sShader)
 {
     // TMP
 
@@ -51,37 +45,25 @@ void SpriteRenderer::Draw(sf::Sprite &cSprite, glm::vec2 vPos, const std::string
     float fRotation = 0.0f;
 
     // TODO - Figure out where sizing of the sprite should be done
-    model = glm::translate(model, glm::vec3(vPos, 0.0f));
+    model = glm::translate(model, glm::vec3(cSprite.GetPosition(), 0.0f));
 //    model = glm::translate(model, glm::vec3(0.5f * vSize.x, 0.5f * vSize.y, 0.0f));
     model = glm::rotate(model, glm::radians(fRotation), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, glm::vec3(vSize, 1.0f));
 
-    glm::vec2 vRectPos(Util::convert_vector<glm::vec2>(cSprite.getTextureRect().position));
-    glm::vec2 vRectSize(Util::convert_vector<glm::vec2>(cSprite.getTextureRect().size));
+    glm::vec2 vRectPos(Util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().position));
+    glm::vec2 vRectSize(Util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().size));
 
     RM::GetShader(sShader).Bind();
-
     RM::GetShader(sShader).SetUniform("u_Model", model);
-
-    std::cout << "Texture rect position: " << glm::to_string(vRectPos) << '\n';
-    std::cout << "Texture rect size:     " << glm::to_string(vRectSize) << '\n';
-
     RM::GetShader(sShader).SetUniform("u_TexRectPos", vRectPos);
     RM::GetShader(sShader).SetUniform("u_TexRectSize", vRectSize);
-    sf::Color c = cSprite.getColor();;
-    RM::GetShader(sShader).SetUniform("u_Color", glm::vec3(c.r, c.b, c.g));
-    RM::GetShader(sShader).SetUniform("u_Texture", cSprite.getTexture().getNativeHandle());
 
-    std::cout << "texture: " << cSprite.getTexture().getNativeHandle() << '\n';
-
-
-    // TODO - Figure out where textures should be handled (custom class or SFML)
-
-    sf::Texture::bind(&cSprite.getTexture());
-    glActiveTexture(GL_TEXTURE0);
+    glm::vec4 color = cSprite.GetColor();;
+    RM::GetShader(sShader).SetUniform("u_Color", color);
+    cSprite.GetTexture().Bind();
+    RM::GetShader(sShader).SetUniform("u_Texture", 0);
 
     Renderer::DrawGL(nQuadVAO, RM::GetShader(sShader), 6);
-//    sf::Texture::bind(&cSprite.getTexture());
 }
 
 

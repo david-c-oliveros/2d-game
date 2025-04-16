@@ -54,7 +54,8 @@ class Character : public Entity
         void DrawCollider();
 
 
-        void AttachAnimatedSprite(const std::string _sFilepath,
+        void AttachAnimatedSprite(const std::string _sSpritName,
+                                  const std::string sFilepath,
                                   glm::ivec2 _vSpriteSize,
                                   glm::ivec2 _vFrameRect);
 
@@ -71,6 +72,7 @@ class Character : public Entity
 
     protected:
         void setVelocity(glm::vec2 _vVel, float fScalar);
+        void updateSprite();
         void updateBoundingBox();
         void setAnimation();
 
@@ -89,14 +91,19 @@ class Character : public Entity
 
 
     protected:
-        std::unique_ptr<sf::Sprite> m_pSprite;
-        std::unique_ptr<sf::Texture> m_pTexture;
+        std::shared_ptr<GLSprite> m_pSprite;
+//        std::unique_ptr<sf::Texture> m_pTexture;
 
         std::string m_sCurrentAnimation;
         std::string m_sPreviousAnimation;
 
+        /**********************************************************/
+        /*        Note: Sheet size is in indices, so              */
+        /*        m_vSheetSize.x is the sprite image              */
+        /*        size in pixels divided by m_SpriteSize.x        */
+        /**********************************************************/
         sf::Vector2i m_vSpriteSize;
-        sf::Vector2i m_vFrameRect;
+        sf::Vector2i m_vSheetSize;
 
         CharState eState;
         MoveDir eDir;

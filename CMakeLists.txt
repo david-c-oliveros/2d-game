@@ -14,11 +14,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(${PROJECT_NAME}
     external/SFMLAnimation/src/AnimationManager.cpp
     external/glad/src/glad.c
+    external/stb/stb_image.c
     game/src/game.cpp
     game/src/gl_error_manager.cpp
     game/src/main.cpp
     game/src/resource_manager.cpp
+    game/src/texture.cpp
     game/src/shader.cpp
+    game/src/sprite.cpp
     game/src/renderer.cpp
     game/src/sprite_renderer.cpp
     game/src/map.cpp
@@ -46,6 +49,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC external/SFMLAnimation/src
     PUBLIC external/SSBMTonberry/tileson
     PUBLIC external/SFMLGlCheck
+    PUBLIC external/stb
     )
 
 
@@ -62,20 +66,3 @@ target_link_libraries(${PROJECT_NAME}
     SFML::System
     SFML::Audio
     )
-
-    #set_target_properties(${PROJECT_NAME}
-    #    PROPERTIES SUFFIX ".html"
-    #    LINK_FLAGS " --bind --emrun \
-    #    -s FORCE_FILESYSTEM \
-    #    -s FULL_ES3=1 \
-    #    -s EXPORT_ALL=1 \
-    #    -s MALLOC=emmalloc \
-    #    -s WASM=1 \
-    #    -s ALLOW_MEMORY_GROWTH=1 \
-    #    -Wemcc \
-    #    -s MIN_WEBGL_VERSION=2 \
-    #    -s USE_LIBPNG=1 \
-    #    -s USE_WEBGL2=1 \
-    #    -s USE_GLFW=3 \
-    #    --preload-file ../../res \
-    #    --preload-file ../../shaders")

@@ -32,7 +32,7 @@ void Camera::HandleMouseInput(std::optional<sf::Event> cEvent)
         if (mouseButtonPressed->button == sf::Mouse::Button::Middle)
         {
             bPanning  = true;
-            vOldPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseButtonPressed->position.x, mouseButtonPressed->position.y));
+            vOldPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseButtonPressed->position.x, mouseButtonPressed->position.y), m_cView);
         }
     }
 
@@ -49,13 +49,13 @@ void Camera::HandleMouseInput(std::optional<sf::Event> cEvent)
         if (!bPanning)
             return;
 
-        const sf::Vector2f vNewPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y));
+        const sf::Vector2f vNewPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y), m_cView);
         const sf::Vector2f vDeltaPos = vOldPos - vNewPos;
 
         m_cView.setCenter(m_cView.getCenter() + vDeltaPos);
         Renderer::SetView(m_cView);
 
-        vOldPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y));
+        vOldPos = Renderer::GetWindow().mapPixelToCoords(sf::Vector2i(mouseMoved->position.x, mouseMoved->position.y), m_cView);
 
 //        Renderer::SetProjectionMatrix("map_shader");
     }
@@ -136,7 +136,8 @@ void Camera::UpdateFollow(sf::Vector2f _vTarget)
     if (!bFollow || bPanning)
         return;
 
-    sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(m_cView.getCenter()), Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
+    sf::Vector2f vNewCenter(Util::convert_vector<sf::Vector2f>(glm::mix(Util::convert_vector<glm::vec2>(m_cView.getCenter()),
+                                                                        Util::convert_vector<glm::vec2>(_vTarget), 0.1f)));
     m_cView.setCenter(sf::Vector2f(vNewCenter.x, vNewCenter.y));
 }
 

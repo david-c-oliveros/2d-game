@@ -62,8 +62,7 @@ void Game::Start()
         {
             handleInputEvent(event);
             Camera::HandleMouseInput(event);
-
-            UI::HandleInput(event);
+//            UI::HandleInput(event);
         }
 
         Update();
@@ -115,7 +114,7 @@ void Game::Render()
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
         RenderDebug();
 
-    //RenderEntities();
+    RenderEntities();
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
     {
@@ -132,16 +131,33 @@ void Game::Render()
 
 void Game::RenderGameWorld()
 {
-    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
+    //DEBUG//////////////////////////
+//    glm::mat4 view = Renderer::GetViewMatrix();
+//    glm::mat4 model(1.0f);
+//
+//    model = glm::translate(model, glm::vec3(4 * 32, 4 * 32, 0));
+//    model = glm::scale(model, glm::vec3(Globals::GLM_TILE_SIZE, 1.0f));
+//    glm::vec2 vPos(0.0f, 1.0f);
+//
+//    glm::vec3 vFragPos = glm::vec3(view * model * glm::vec4(vPos, 0.0f, 1.0f));
+//
+//    std::cout << "Shader debug: " << glm::to_string(vFragPos) << '\n';
+    //////////////////////////
 
-    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec3(0.0f, 0.0f, 1.0f));
-    SpriteRenderer::Draw({ 0.0f, 0.0f }, "map_shader");
+    RM::GetShader("map_shader").Bind();
+    RM::GetShader("map_shader").SetUniform("u_LightPosition", m_pPlayer->vWorldPos);
+
+    sf::Vector2i _vCursorTile(GetCursorTile().x * Globals::TILE_SIZE.x, GetCursorTile().y * Globals::TILE_SIZE.y);
 
     glm::vec2 vCursorTile = Util::convert_vector<glm::vec2>(_vCursorTile);
 
-    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec3(0.0f, 1.0f, 0.0f));
+    RM::GetShader("map_shader").SetUniform("u_Color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
     SpriteRenderer::Draw(vCursorTile, "map_shader");
     m_cMap.Draw(m_pPlayer->vWorldGridPos, RM::GetShader("map_shader"));
+
+    RM::GetShader("map_shader").Bind();
+    cDebugSprite.SetPosition(vCursorTile);
+    SpriteRenderer::Draw(cDebugSprite, "map_shader");
 }
 
 
@@ -158,7 +174,7 @@ void Game::RenderEntities()
         if (e == nullptr)
             continue;
 
-        e->Draw("map_shader");
+//        e->Draw("map_shader");
     }
 }
 
@@ -246,9 +262,16 @@ void Game::LoadResources()
     UI::SetDefaultFont(font);
     UI::SetDefaultFontSize(40);
 
+////// DEBUG //////////////////////////
+    RM::LoadTexture("../../res/villager_npc_spritesheet/test_npc.png", true, "debug_image");
+    cDebugSprite.SetColor(glm::vec4(0.8f, 0.0f, 0.7f, 1.0f));
+    cDebugSprite.SetTexture("debug_image");
+    cDebugSprite.SetTextureRect( sf::IntRect( { 0, 0 }, { 32, 32 } ));
+//////////////////////////////////////
+
     m_cMap.LoadFromFile("sample map demo.json");
 
-    m_pPlayer->AttachAnimatedSprite("../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
+    m_pPlayer->AttachAnimatedSprite("walk_cycles", "../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
     m_pPlayer->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
     m_pPlayer->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
@@ -268,7 +291,7 @@ void Game::LoadResources()
     for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
     {
         std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(4, 2));
-        _c->AttachAnimatedSprite("../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
+        _c->AttachAnimatedSprite("walk_cycles", "../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
 
         _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
         _c->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
@@ -346,7 +369,6 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
         else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
         {
             m_bDebug = !m_bDebug;
-            //Update();
         }
     }
     else if (const auto resized = event->getIf<sf::Event::Resized>())

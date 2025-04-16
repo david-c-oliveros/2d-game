@@ -1,230 +1,181 @@
 #include "AnimationManager.hpp"
 
-// Map definitions
-map<string, Texture> AnimationManager::m_textures;
-map<string, Vector2i> AnimationManager::m_indices;
-map<string, Vector2i> AnimationManager::m_startingIndices;
-map<string, Vector2i> AnimationManager::m_endingIndices;
-map<string, Vector2i> AnimationManager::m_sheetSizes;
-map<string, Vector2i> AnimationManager::m_spriteSizes;
-map<string, int> AnimationManager::m_frequencies;
-map<string, int> AnimationManager::m_timesUpdated;
-map<string, int> AnimationManager::m_timesBetweenUpdate;
+std::map<std::string, GLTexture> AnimationManager::m_textures;
+std::map<std::string, sf::Vector2i> AnimationManager::m_indices;
+std::map<std::string, sf::Vector2i> AnimationManager::m_startingIndices;
+std::map<std::string, sf::Vector2i> AnimationManager::m_endingIndices;
+std::map<std::string, sf::Vector2i> AnimationManager::m_sheetSizes;
+std::map<std::string, sf::Vector2i> AnimationManager::m_spriteSizes;
+std::map<std::string, int> AnimationManager::m_frequencies;
+std::map<std::string, int> AnimationManager::m_timesUpdated;
+std::map<std::string, int> AnimationManager::m_timesBetweenUpdate;
+std::map<uint32_t, std::string> AnimationManager::m_animations;
 
-map<uint32_t, string> AnimationManager::m_animations;
 
-/*
-update(string animation, Sprite& sprite)
 
-animation - This is the string key that corresponds to the animation we are updating
-
-sprite - This sprite will have its texture changed to the next one in its
-  animation sequence
-*/
-void AnimationManager::forceUpdate(string animation, Sprite &sprite)
+void AnimationManager::forceUpdate(std::string animation, const std::shared_ptr<GLSprite> &sprite)
 {
     m_timesBetweenUpdate[animation] = m_frequencies[animation];
     update(animation, sprite);
 }
 
 
-bool AnimationManager::update(string animation, Sprite &sprite) {
-  if (m_timesBetweenUpdate[animation] < m_frequencies[animation])
-  {
-      m_timesBetweenUpdate[animation]++;
-      return false;
-  }
-  // First, we want to locate our animation in the map
-  // We look at the sheet size because that is the easiest indicator to tell if
-  // there is actually an entry
-  if (m_sheetSizes[animation] != Vector2i(0, 0)) {
-    // We want to do a few calculations to find the coordinates of the next frame
-//    IntRect rect(m_indices[animation].x * m_spriteSizes[animation].x,
-//        m_indices[animation].y * m_spriteSizes[animation].y,
-//        m_spriteSizes[animation].x, m_spriteSizes[animation].y);
+bool AnimationManager::update(std::string animation, const std::shared_ptr<GLSprite> &sprite)
+{
+    if (m_timesBetweenUpdate[animation] < m_frequencies[animation])
+    {
+        m_timesBetweenUpdate[animation]++;
+        return false;
+    }
 
-    /*******************************************************/
-    /*        Modification: Fix Rect template error        */
-    /*******************************************************/
-    IntRect rect(Vector2i(m_indices[animation].x * m_spriteSizes[animation].x,
+    if (m_sheetSizes[animation] != sf::Vector2i(0, 0))
+    {
+        sf::IntRect rect(sf::Vector2i(m_indices[animation].x * m_spriteSizes[animation].x,
         m_indices[animation].y * m_spriteSizes[animation].y),
         m_spriteSizes[animation]);
 
-    // Now we want to update the indices based on the format of our sheet
-    // If we are not at the bottom of a column, we just move down one in y
-//    if (m_indices[animation].y < m_sheetSizes[animation].y) {
-//      m_indices[animation].y++;
-//    } else {
-//      // Otherwise, we move over one column and go back to the top
-//      m_indices[animation].y = 0;
-//      m_indices[animation].x++;
-//      // And then reset the sheet if we are past the width of the sheet
-//      if (m_indices[animation].x >= m_sheetSizes[animation].x)
-//        m_indices[animation].x = 0;
-//    }
+        /*****************************************************************/
+        /*        Modification: Implement Starting/Ending Indices        */
+        /*****************************************************************/
+        if (m_indices[animation].y < m_sheetSizes[animation].y &&
+            m_indices[animation].y < m_endingIndices[animation].y)
+        {
+            m_indices[animation].y++;
+        }
+        else
+        {
+            // Otherwise, we move over one column and go back to the top
+            m_indices[animation].y = m_startingIndices[animation].y;
+            m_indices[animation].x++;
+            // And then reset the sheet if we are past the width of the sheet
+            if (m_indices[animation].x >= m_sheetSizes[animation].x ||
+                m_indices[animation].x >= m_endingIndices[animation].x)
+            {
+                m_indices[animation].x = m_startingIndices[animation].x;
+            }
+        }
 
-    /*****************************************************************/
-    /*        Modification: Implement Starting/Ending Indices        */
-    /*****************************************************************/
-    if (m_indices[animation].y < m_sheetSizes[animation].y &&
-        m_indices[animation].y < m_endingIndices[animation].y) {
-      m_indices[animation].y++;
-    } else {
-      // Otherwise, we move over one column and go back to the top
-      m_indices[animation].y = m_startingIndices[animation].y;
-      m_indices[animation].x++;
-      // And then reset the sheet if we are past the width of the sheet
-      if (m_indices[animation].x >= m_sheetSizes[animation].x ||
-          m_indices[animation].x >= m_endingIndices[animation].x)
-        m_indices[animation].x = m_startingIndices[animation].x;
+        sprite->SetTextureRect(rect);
+        m_timesBetweenUpdate[animation] = 0;
+    }
+    else
+    {
+        std::cout << "No animation entry found for \"" << animation << "\"!" << std::endl;
     }
 
-    // Now we update the texture on our sprite reference
-    //sprite.setTexture(m_textures[animation]);
-    sprite.setTextureRect(rect);
-
-    m_timesBetweenUpdate[animation] = 0;
-  } else {
-    // If we didn't find an entry
-    cout << "No animation entry found for \"" << animation << "\"!" << endl;
-  }
-
-  return true;
+    return true;
 }
 
-/*
-updateAll(map<string, Sprite> &map)
 
-map - This should be a map of string and sprite pairs, all of which that are found in the local map will be updated
+void AnimationManager::addAnimation(std::string animation, GLTexture texture,
+    sf::Vector2i sheetSize, sf::Vector2i spriteSize, sf::Vector2i index, int frequency,
+    sf::Vector2i startingIndex)
+{
+    // First, we make a entry to the animations map
+    animation = animation;
+    // Next, we want to make an entry in the texture map
+    m_textures[animation] = texture;
+    // Next, we make sheet size entry
+    m_sheetSizes[animation].x = sheetSize.x;
+    m_sheetSizes[animation].y = sheetSize.y;
 
-This is essentially just an extension of the previous method, in that it just
-iterates through
-*/
-void AnimationManager::updateAll(map<string, Sprite> &map) {
-  // Really not much to do here, most is in the previous method
-  for (auto element: map) {
-    update(element.first, element.second);
-  }
+    // Next, we make sprite size entry
+    m_spriteSizes[animation].x = spriteSize.x;
+    m_spriteSizes[animation].y = spriteSize.y;
+
+    // Our index vector
+    m_indices[animation].x = index.x;
+    m_indices[animation].y = index.y;
+
+    // Our starting index vector
+    m_startingIndices[animation].x = startingIndex.x;
+    m_startingIndices[animation].y = startingIndex.y;
+
+    // Our ending index vector
+    m_endingIndices[animation].x = sheetSize.x;
+    m_endingIndices[animation].y = sheetSize.y;
+
+    // Our update rate (frequency)
+    m_frequencies[animation] = frequency;
+    // We don't need to initialize the times udpated because its default is 0
 }
 
-/*
-ADDING & DELETING
-The following methods are for adding and deleting entries and animations
-*/
 
-/*
-addAnimation(string animation, Texture texture)
-
-animation - The string key for the animation we are adding
-texture - The spritesheet that will be associated with our animation
-sheetSize - The vector containing the number of animation frames in our image
-  - NOTE: all sheets must be rectangular
-*/
-void AnimationManager::addAnimation(string animation, Texture texture,
-   Vector2i sheetSize, Vector2i spriteSize, Vector2i index, int frequency,
-   Vector2i startingIndex) {
-  // First, we make a entry to the animations map
-  animation = animation;
-  // Next, we want to make an entry in the texture map
-  m_textures[animation] = texture;
-  // Next, we make sheet size entry
-  m_sheetSizes[animation].x = sheetSize.x;
-  m_sheetSizes[animation].y = sheetSize.y;
-
-  // Next, we make sprite size entry
-  m_spriteSizes[animation].x = spriteSize.x;
-  m_spriteSizes[animation].y = spriteSize.y;
-
-  // Our index vector
-  m_indices[animation].x = index.x;
-  m_indices[animation].y = index.y;
-
-  // Our starting index vector
-  m_startingIndices[animation].x = startingIndex.x;
-  m_startingIndices[animation].y = startingIndex.y;
-
-  // Our ending index vector
-  m_endingIndices[animation].x = sheetSize.x;
-  m_endingIndices[animation].y = sheetSize.y;
-
-  // Our update rate (frequency)
-  m_frequencies[animation] = frequency;
-  // We don't need to initialize the times udpated because its default is 0
+void AnimationManager::deleteAnimation(std::string animation)
+{
+    // We just erase each entry in every map
+    m_textures.erase(animation);
+    m_indices.erase(animation);
+    m_startingIndices.erase(animation);
+    m_sheetSizes.erase(animation);
+    m_spriteSizes.erase(animation);
+    m_frequencies.erase(animation);
+    m_timesUpdated.erase(animation);
+    m_endingIndices.erase(animation);
 }
 
-/*
-deleteAnimation(string animation)
 
-animation - The string key for the animation set we are removing
-
-Essentially this method just removes all entries for the animation provided
-If this is not called, there won't be a functional difference, but it *may*
-speed up the time it takes to run certain methods
-*/
-
-void AnimationManager::deleteAnimation(string animation) {
-  // We just erase each entry in every map
-  m_textures.erase(animation);
-  m_indices.erase(animation);
-  m_startingIndices.erase(animation);
-  m_sheetSizes.erase(animation);
-  m_spriteSizes.erase(animation);
-  m_frequencies.erase(animation);
-  m_timesUpdated.erase(animation);
-  m_endingIndices.erase(animation);
-  // Ez pz
+void AnimationManager::setAnimationFrequency(std::string animation, int frequency)
+{
+    m_frequencies[animation] = frequency;
 }
 
-/*
-Here are a whole bunch of setters for any given animation instance
-Nothing too special about any of them in particular, and they all follow the
-same form
-*/
 
-void AnimationManager::setAnimationFrequency(string animation, int frequency) {
-  m_frequencies[animation] = frequency;
+void AnimationManager::setAnimationIndex(std::string animation, sf::Vector2i index)
+{
+    m_indices[animation].x = index.x;
+    m_indices[animation].y = index.y;
 }
 
-void AnimationManager::setAnimationIndex(string animation, Vector2i index) {
-  m_indices[animation].x = index.x;
-  m_indices[animation].y = index.y;
+
+void AnimationManager::setAnimationSheetSize(std::string animation, sf::Vector2i size)
+{
+    m_sheetSizes[animation].x = size.x;
+    m_sheetSizes[animation].y = size.y;
 }
 
-void AnimationManager::setAnimationSheetSize(string animation, Vector2i size) {
-  m_sheetSizes[animation].x = size.x;
-  m_sheetSizes[animation].y = size.y;
+
+void AnimationManager::setAnimationSpriteSize(std::string animation, sf::Vector2i size)
+{
+    m_spriteSizes[animation].x = size.x;
+    m_spriteSizes[animation].y = size.y;
 }
 
-void AnimationManager::setAnimationSpriteSize(string animation, Vector2i size) {
-  m_spriteSizes[animation].x = size.x;
-  m_spriteSizes[animation].y = size.y;
+
+void AnimationManager::setAnimationTexture(std::string animation, GLTexture texture)
+{
+    m_textures[animation] = texture;
 }
 
-void AnimationManager::setAnimationTexture(string animation, Texture texture) {
-  m_textures[animation] = texture;
+
+void AnimationManager::resetAnimationIndex(std::string animation)
+{
+    m_indices[animation].x = m_startingIndices[animation].x;
+    m_indices[animation].y = m_startingIndices[animation].y;
 }
 
-void AnimationManager::resetAnimationIndex(string animation) {
-  m_indices[animation].x = m_startingIndices[animation].x;
-  m_indices[animation].y = m_startingIndices[animation].y;
+
+void AnimationManager::setAnimationStartingIndex(std::string animation, sf::Vector2i index)
+{
+    m_startingIndices[animation].x = index.x;
+    m_startingIndices[animation].y = index.y;
 }
 
-void AnimationManager::setAnimationStartingIndex(string animation, Vector2i index) {
-  m_startingIndices[animation].x = index.x;
-  m_startingIndices[animation].y = index.y;
+
+void AnimationManager::setAnimationEndingIndex(std::string animation, sf::Vector2i index)
+{
+    m_endingIndices[animation].x = index.x;
+    m_endingIndices[animation].y = index.y;
 }
 
-void AnimationManager::setAnimationEndingIndex(string animation, Vector2i index) {
-  m_endingIndices[animation].x = index.x;
-  m_endingIndices[animation].y = index.y;
-}
 
-sf::Vector2i AnimationManager::getAnimationStartingIndex(string animation)
+sf::Vector2i AnimationManager::getAnimationStartingIndex(std::string animation)
 {
     return m_startingIndices[animation];
 }
 
-sf::Vector2i AnimationManager::getAnimationEndingIndex(string animation)
+
+sf::Vector2i AnimationManager::getAnimationEndingIndex(std::string animation)
 {
     return m_endingIndices[animation];
 }

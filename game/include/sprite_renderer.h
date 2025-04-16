@@ -9,6 +9,7 @@
 #include "shader.h"
 #include "resource_manager.h"
 #include "renderer.h"
+#include "sprite.h"
 
 
 class SpriteRenderer
@@ -16,7 +17,7 @@ class SpriteRenderer
     public:
         static void InitRenderer();
         static void Draw(glm::vec2 vPos, const std::string sShader);
-        static void Draw(sf::Sprite &cSprite, glm::vec2 vPos, const std::string sShader);
+        static void Draw(GLSprite &cSprite, const std::string sShader);
 
 
     private:

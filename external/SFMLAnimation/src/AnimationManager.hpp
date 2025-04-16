@@ -26,7 +26,7 @@ std::string
 std::map
 sf::Sprite
 sf::Texture
-sf::Vector2i/f
+sf::sf::Vector2i/f
 
 */
 
@@ -36,120 +36,47 @@ sf::Vector2i/f
 #include <string>
 #include <iostream>
 
-using namespace std;
-using namespace sf;
-/*
-
-SPECIFICATIONS:
-SFML 2.5.1
-2018 Q4
-
-This class, which is to be used in conjunction with the SFML framework, will
-help to smoothly integrate animation into a large scale game or other application.
-
-Many of the functions of this class will not be especially complicated, though
-they will hopefully simplify and increase readability for simple actions such
-as character walking/moving animations, jumping animatimations, etc.
-
-The basis of the code below will be the sf::Sprite class, the current documentation
-for which is linked below:
-
-https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Sprite.php
-
-*/
+#include "texture.h"
+#include "sprite.h"
 
 class AnimationManager {
-/*
-The majority of information in this class will be contained in map types,
-where the key will be a user defined string identifying what type of animation
-is defiend there (walking, jumping, etc.)
-*/
-private:
-  /*
-  Since we don't know exactly what actions will be animated with this class, we
-  will allow the user to define their own identifiable sprite sheets
-  */
-  static map<string, Texture> m_textures;
-  /*
-  We will want to keep track of where we are in the spritesheet, again for each
-  user-defined sheet
-  We use a vector such that >1 column spritesheets can be used easily
-  In the case that we are using a 1 column sheet, we should be able to tell through
-  the size, and ignore the second index
-  */
-  static map<string, Vector2i> m_indices;
-
-  /*
-  Since some spritesheets will contain multiple sets of animations, we want to
-  define a start index for all of our entries (though it may just be (0,0) for most)
-  We also define where they end (which will usually just be the size of the sheet)
-  */
-  static map<string, Vector2i> m_startingIndices;
-  static map<string, Vector2i> m_endingIndices;
-
-  // The former will be for the number of frames in a sheet, while the latter
-  // is the actual size of each frame in the sheets
-  static map<string, Vector2i> m_sheetSizes;
-  static map<string, Vector2i> m_spriteSizes;
-
-  /*
-  Since we will assume that every sheet will be updated every frame, we will
-  allow for a frequency to be set such that we can control the speed of animations
-
-  This values will be integers of the form where 1 (or 0) means it is updated
-  every call, 2 is updated every other call, etc.
-  */
-  static map<string, int> m_frequencies;
-
-  /*
-  Because of the frequency issue, we also have to keep track of how many times
-  we have updated our sprites
-  */
-  static map<string, int> m_timesUpdated;
-
-  static map<string, int> m_timesBetweenUpdate;
-
-  /*
-   * This map stores the
-   */
-  static map<uint32_t, string> m_animations;
-public:
-
-  static void printTextures();
-  static void forceUpdate(string animation, Sprite &sprite);
-
-  static bool update(string animation, Sprite& sprite);
-
-  /*
-  This method may not be used, as it would require the game to organize all of
-  the animated sprites in a map, though it could be useful in a few situations,
-  so there's no harm in programming it now (it shouldn't be that hard)
-  */
-  static void updateAll(map<string, Sprite>& map);
-
-  /*
-  The overloaded methods below will be the main functionality as far as adding
-  animations to the manager. The first will take in all necessary variables and
-  create the entry at the same time, while the second will require supplementation
-  by the setter methods below, otherwise they will maintain default values
-  */
-  static void addAnimation(string animation, Texture texture, Vector2i sheetSize,
-     Vector2i spriteSize, Vector2i index = Vector2i(0, 0), int frequency = 0,
-    Vector2i startingIndex = Vector2i(0, 0));
-
-  static void deleteAnimation(string animation);
-
-  static void setAnimationFrequency(string animation, int frequency);
-  static void setAnimationSpriteSize(string animation, Vector2i size);
-  static void setAnimationSheetSize(string animation, Vector2i size);
-  static void setAnimationIndex(string animation, Vector2i index);
-  static void setAnimationTexture(string animation, Texture texture);
-  static void setAnimationStartingIndex(string animation, Vector2i index);
-  static void setAnimationEndingIndex(string animation, Vector2i index);
-
-  static sf::Vector2i getAnimationStartingIndex(string animation);
-  static sf::Vector2i getAnimationEndingIndex(string animation);
+    private:
+        static std::map<std::string, GLTexture> m_textures;
+        static std::map<std::string, sf::Vector2i> m_indices;
+        static std::map<std::string, sf::Vector2i> m_startingIndices;
+        static std::map<std::string, sf::Vector2i> m_endingIndices;
+        static std::map<std::string, sf::Vector2i> m_sheetSizes;
+        static std::map<std::string, sf::Vector2i> m_spriteSizes;
+        static std::map<std::string, int> m_frequencies;
+        static std::map<std::string, int> m_timesUpdated;
+        static std::map<std::string, int> m_timesBetweenUpdate;
+        static std::map<uint32_t, std::string> m_animations;
 
 
-  static void resetAnimationIndex(string animation);
+    public:
+
+        static void printTextures();
+        static void forceUpdate(std::string animation, const std::shared_ptr<GLSprite> &sprite);
+
+        static bool update(std::string animation, const std::shared_ptr<GLSprite> &sprite);
+
+        static void addAnimation(std::string animation, GLTexture texture, sf::Vector2i sheetSize,
+        sf::Vector2i spriteSize, sf::Vector2i index = sf::Vector2i(0, 0), int frequency = 0,
+        sf::Vector2i startingIndex = sf::Vector2i(0, 0));
+
+        static void deleteAnimation(std::string animation);
+
+        static void setAnimationFrequency(std::string animation, int frequency);
+        static void setAnimationSpriteSize(std::string animation, sf::Vector2i size);
+        static void setAnimationSheetSize(std::string animation, sf::Vector2i size);
+        static void setAnimationIndex(std::string animation, sf::Vector2i index);
+        static void setAnimationTexture(std::string animation, GLTexture texture);
+        static void setAnimationStartingIndex(std::string animation, sf::Vector2i index);
+        static void setAnimationEndingIndex(std::string animation, sf::Vector2i index);
+
+        static sf::Vector2i getAnimationStartingIndex(std::string animation);
+        static sf::Vector2i getAnimationEndingIndex(std::string animation);
+
+
+        static void resetAnimationIndex(std::string animation);
 };

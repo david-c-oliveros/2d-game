@@ -15,8 +15,7 @@ Label::~Label()
 
 void Label::Draw()
 {
-//    Renderer::Draw(*m_pText);
-    //cWindow.draw(*m_pText);
+    Renderer::Draw(*m_pText);
 }
 
 
