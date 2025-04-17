@@ -111,9 +111,9 @@ namespace util
         std::string sReset("\033[0m");
 
         if (bNewline)
-            std::cout << sGreen << "- " << sReset << ss.str() << '\n';
-        else
-            std::cout << sGreen << "- " << sReset << ss.str();
+            std::cout << sGreen << "- " << ss.str() << sReset << '\n';
+        else                                                  
+            std::cout << sGreen << "- " << ss.str() << sReset; 
     }
 
 

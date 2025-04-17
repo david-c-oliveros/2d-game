@@ -227,6 +227,7 @@ sf::Vector2i Game::GetCursorTile()
 
 void Game::LoadResources()
 {
+    RM::LoadEntityData("../../res/config/entities.json");
     sf::Font font;
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
         util::Log("ERROR loading font");
@@ -256,9 +257,6 @@ void Game::LoadResources()
     m_pPlayer->SetAnimationFrequency("walk_forward", 8);
 
     m_pPlayer->SetCurrentAnimation("walk_right");
-
-    util::Log("Current player animation: ", false);
-    util::Log(m_pPlayer->GetCurrentAnimation());
 
 
     for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)

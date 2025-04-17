@@ -3,10 +3,13 @@
 #include <filesystem>
 
 #include "util.h"
+#include "entity.h"
+#include "player.h"
 
 
 std::map<std::string, GLTexture> RM::mTextures;
 std::map<std::string, GLShader> RM::mShaders;
+uint32_t RM::m_nCurrentResourceID = 0;
 
 
 const GLShader& RM::LoadShader(const std::string vShaderFile,
@@ -138,4 +141,42 @@ GLShader RM::loadShaderFromFile(const std::string vShaderFile,
     cShader.Compile(vShaderCode, fShaderCode, gShaderFile != "" ? gShaderCode : nullptr);
 
     return cShader;
+}
+
+
+
+void RM::LoadEntityData(const std::string &sDataFile)
+{
+    std::ifstream e(sDataFile);
+
+    nlohmann::json cEntityData = nlohmann::json::parse(e);
+
+    for (auto e : cEntityData.at("entities").items())
+    {
+        std::unique_ptr<Player> pEntity = std::make_unique<Player>(getNewResourceID(),
+                                                                   e.value().at("name"),
+                                                                   glm::vec2(e.value().at("position")[0],
+                                                                             e.value().at("position")[1]));
+
+        pEntity->AttachAnimatedSprite(e.value().at("sprite_name"),
+                                      e.value().at("sprite_path"),
+                                      (glm::ivec2)Globals::GLM_TILE_SIZE,
+                                      glm::ivec2(e.value().at("sheet_size")[0],
+                                                 e.value().at("sheet_size")[1]));
+
+        for (auto anim : e.value().at("animations").items())
+        {
+            glm::ivec2 vStartIndex(anim.value().at("start_index")[0], anim.value().at("start_index")[1]);
+            glm::ivec2 vEndIndex(anim.value().at("start_index")[0], anim.value().at("start_index")[1]);
+            pEntity->AddAnimation(anim.key(), vStartIndex, vEndIndex);
+            pEntity->SetAnimationFrequency(anim.key(), anim.value().at("frequency"));
+        }
+    }
+}
+
+
+
+uint32_t RM::getNewResourceID()
+{
+    return m_nCurrentResourceID++;
 }

@@ -129,19 +129,19 @@ void Map::LoadFromFile(const std::string &_sFilepathStr)
         switch(pTsonMap->getStatus())
         {
             case tson::ParseStatus::FileNotFound:
-                util::Log("ERROR::TILESON::File not found");
+                util::LogError("ERROR::TILESON::File not found");
                 break;
             case tson::ParseStatus::ParseError:
-                util::Log("ERROR::TILESON::Parse error");
+                util::LogError("ERROR::TILESON::Parse error");
                 break;
             case tson::ParseStatus::MissingData:
-                util::Log("ERROR::TILESON::Missing data");
+                util::LogError("ERROR::TILESON::Missing data");
                 break;
             case tson::ParseStatus::DecompressionError:
-                util::Log("ERROR::TILESON::Decompression error");
+                util::LogError("ERROR::TILESON::Decompression error");
                 break;
             default:
-                util::Log("ERROR::TILESON::Other error");
+                util::LogError("ERROR::TILESON::Other error");
                 break;
         }
     }
@@ -280,8 +280,8 @@ std::shared_ptr<GLSprite> Map::storeAndLoadImage(const std::string &sImageName, 
         }
         else
         {
-            util::Log("ERROR::MAP::Could not find image: ", false);
-            util::Log(path.generic_string());
+            util::LogError("ERROR::MAP::Could not find image: ", false);
+            util::LogError(path.generic_string());
         }
     }
 
