@@ -1,5 +1,15 @@
 #include "character.h"
 #include "util.h"
+#include "collision.h"
+
+#include <glm/gtx/string_cast.hpp>
+
+
+
+Character::Character()
+{
+    eState = CharState::IDLE;
+}
 
 
 
@@ -23,6 +33,16 @@ Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
 
 Character::~Character()
 {
+}
+
+
+
+void Character::SetPosition(glm::vec2 _vWorldPos)
+{
+    // TODO - Use this function when updating character's position
+    util::Log("Character::SetPosition");
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    Entity::SetPosition(_vWorldPos);
 }
 
 

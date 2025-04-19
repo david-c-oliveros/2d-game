@@ -3,6 +3,13 @@
 
 
 
+Player::Player()
+{
+    eDir = MoveDir::BACK;
+}
+
+
+
 Player::Player(uint32_t _ID, glm::vec2 _vWorldPos)
     : Character(_ID, _vWorldPos)
 {

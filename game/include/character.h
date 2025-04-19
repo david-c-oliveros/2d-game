@@ -4,9 +4,12 @@
 
 #include "globals.h"
 #include "renderer.h"
-#include "map.h"
 #include "entity.h"
-#include "collision.h"
+#include "geometry.h"
+
+
+class Map;
+class Collision;
 
 
 
@@ -39,6 +42,7 @@ enum class CharState
 class Character : public Entity
 {
     public:
+        Character();
         Character(uint32_t _ID, glm::vec2 _vWorldPos);
 
         Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
@@ -46,6 +50,7 @@ class Character : public Entity
 
         std::shared_ptr<sf::Texture> GetTexture();
 
+        void SetPosition(glm::vec2 _vWorldPos);
         void Update();
         void Move(Map &cMap);
         void Draw(const std::string sShader);
@@ -86,7 +91,7 @@ class Character : public Entity
 
         bool bAnimated = false;
 
-        Circle cCollider{ vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
+        geometry::Circle cCollider{ vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
 
 
     protected:

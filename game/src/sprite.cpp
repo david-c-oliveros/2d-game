@@ -1,5 +1,7 @@
 #include "sprite.h"
 #include "util.h"
+#include "resource_manager.h"
+#include "texture.h"
 
 
 GLSprite::GLSprite()

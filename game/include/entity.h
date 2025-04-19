@@ -3,20 +3,22 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "shader.h"
-#include "map.h"
+class Shader;
+class Map;
 
 
 
 class Entity
 {
     public:
+        Entity() = default;
         Entity(uint32_t _ID, glm::vec2 _vWorldPos);
         ~Entity();
 
-        void Create();
         virtual void Update(Map &cMap) = 0;
         virtual void Draw(const std::string sShader) = 0;
+        void SetPosition(glm::vec2 _vWorldPos);
+        void SetID(uint32_t _ID);
 
 
     public:

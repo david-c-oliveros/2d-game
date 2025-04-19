@@ -1,14 +1,17 @@
 #pragma once
 
 #include "globals.h"
-#include "map.h"
 #include "character.h"
+
+
+class Map;
 
 
 
 class Player : public Character
 {
     public:
+        Player();
         Player(uint32_t _ID, glm::vec2 _vWorldPos);
         Player(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos);
         ~Player();

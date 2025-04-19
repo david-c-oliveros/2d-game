@@ -4,7 +4,11 @@
 
 #include "util.h"
 #include "entity.h"
+#include "character.h"
 #include "player.h"
+#include "npc.h"
+#include "texture.h"
+#include "shader.h"
 
 
 std::map<std::string, GLTexture> RM::mTextures;
@@ -145,33 +149,33 @@ GLShader RM::loadShaderFromFile(const std::string vShaderFile,
 
 
 
-void RM::LoadEntityData(const std::string &sDataFile)
+EntityCollection RM::LoadEntityData(const std::string &sDataFile)
 {
-    std::ifstream e(sDataFile);
+    std::ifstream file(sDataFile);
+    nlohmann::json cEntityData = nlohmann::json::parse(file);
+    EntityCollection sEntities;
 
-    nlohmann::json cEntityData = nlohmann::json::parse(e);
-
+    uint32_t index = 0;
     for (auto e : cEntityData.at("entities").items())
     {
-        std::unique_ptr<Player> pEntity = std::make_unique<Player>(getNewResourceID(),
-                                                                   e.value().at("name"),
-                                                                   glm::vec2(e.value().at("position")[0],
-                                                                             e.value().at("position")[1]));
-
-        pEntity->AttachAnimatedSprite(e.value().at("sprite_name"),
-                                      e.value().at("sprite_path"),
-                                      (glm::ivec2)Globals::GLM_TILE_SIZE,
-                                      glm::ivec2(e.value().at("sheet_size")[0],
-                                                 e.value().at("sheet_size")[1]));
-
-        for (auto anim : e.value().at("animations").items())
+        if ("player" == e.value().at("type").get<std::string>())
         {
-            glm::ivec2 vStartIndex(anim.value().at("start_index")[0], anim.value().at("start_index")[1]);
-            glm::ivec2 vEndIndex(anim.value().at("start_index")[0], anim.value().at("start_index")[1]);
-            pEntity->AddAnimation(anim.key(), vStartIndex, vEndIndex);
-            pEntity->SetAnimationFrequency(anim.key(), anim.value().at("frequency"));
+            sEntities.cPlayer = constructCharacter<Player>(e.value());
+            configCharacter(sEntities.cPlayer, e.value());
+            util::Log("Loaded " + sEntities.cPlayer.sName);
         }
+        else if ("npc" == e.value().at("type").get<std::string>())
+        {
+            sEntities.aNpcs.emplace_back(constructCharacter<Npc>(e.value()));
+            configCharacter(sEntities.aNpcs[index], e.value());
+            util::Log("Loaded " + sEntities.aNpcs[index].sName);
+
+            index++;
+        }
+
     }
+
+    return sEntities;
 }
 
 

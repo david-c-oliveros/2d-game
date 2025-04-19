@@ -8,8 +8,26 @@
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
-#include "texture.h"
-#include "shader.h"
+#include "character.h"
+#include "player.h"
+
+#include "util.h"
+
+
+
+class Entity;
+class Map;
+class Npc;
+class GLTexture;
+class GLShader;
+
+
+
+struct EntityCollection
+{
+    Player cPlayer;
+    std::vector<Npc> aNpcs;
+};
 
 
 class RM
@@ -24,7 +42,7 @@ class RM
 
         const static GLShader& GetShader(const std::string sName);
         static GLTexture GetTexture(const std::string sName);
-        static void LoadEntityData(const std::string &sDataFile);
+        static EntityCollection LoadEntityData(const std::string &sDataFile);
 
         static void Clear();
 
@@ -42,4 +60,12 @@ class RM
 
         static GLTexture loadTextureFromFile(const std::string sFile, bool bAlpha);
         static uint32_t getNewResourceID();
+
+        template <typename T>
+        static T constructCharacter(nlohmann::json chJson);
+
+        template <typename T>
+        static void configCharacter(T &ch, nlohmann::json chJson);
 };
+
+#include "resource_manager.inl"

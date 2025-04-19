@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
-add_compile_options(-Werror -w -O2 -fPIC -g -D_DEBUG)
+add_compile_options(-Werror -w -g -fPIC -D_DEBUG -fdiagnostics-color=always)
 
 project(game)
 

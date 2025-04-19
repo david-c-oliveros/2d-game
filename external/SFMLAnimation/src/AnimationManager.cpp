@@ -1,5 +1,7 @@
 #include "AnimationManager.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 std::map<std::string, GLTexture> AnimationManager::m_textures;
 std::map<std::string, sf::Vector2i> AnimationManager::m_indices;
 std::map<std::string, sf::Vector2i> AnimationManager::m_startingIndices;
@@ -37,6 +39,7 @@ bool AnimationManager::update(std::string animation, const std::shared_ptr<GLSpr
         /*****************************************************************/
         /*        Modification: Implement Starting/Ending Indices        */
         /*****************************************************************/
+        // TODO - verify that this is correct for animations that are greater than one row
         if (m_indices[animation].y < m_sheetSizes[animation].y &&
             m_indices[animation].y < m_endingIndices[animation].y)
         {

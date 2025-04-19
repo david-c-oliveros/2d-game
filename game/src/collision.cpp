@@ -147,7 +147,7 @@ glm::vec2 Collision::sweepResponseSlide(Hit sweepResult, glm::vec2 vEntityVel)
 
 
 
-glm::vec2 Collision::CircleSquare(Circle c, glm::vec2 vCircleVel, glm::vec2 &vGravVel, const std::vector<NavTile> &aNavTiles, glm::ivec2 vWorldSize)
+glm::vec2 Collision::CircleSquare(geometry::Circle c, glm::vec2 vCircleVel, glm::vec2 &vGravVel, const std::vector<NavTile> &aNavTiles, glm::ivec2 vWorldSize)
 {
     bool bHit = false;
 

@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include "resource_manager.h"
+
+class GLTexture;
 
 
 

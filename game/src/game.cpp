@@ -21,7 +21,6 @@ void Game::Create()
 {
     SpriteRenderer::InitRenderer();
 
-    m_pPlayer = std::make_unique<Player>(getNewID(), "Player", glm::vec2(0, 0));
     TimeManager::NewTimer("get_fps_interval", 6);
 
     RM::LoadShader("../../res/shaders/simple.vert",
@@ -43,10 +42,10 @@ void Game::Create()
     Camera::SetZoom(0.5f);
     Camera::EnableFollow();
 
-    UI::AddText("player_position", "Player Coords: " + glm::to_string(m_pPlayer->vWorldPos));
+    UI::AddText("player_position", "Player Coords: " + glm::to_string(m_cPlayer.vWorldPos));
     UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(GetCursorTile())));
     UI::AddText("cursor_world_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
-    UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_pPlayer->fAnimInterval));
+    UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_cPlayer.fAnimInterval));
     UI::AddText("fps", "FPS: ");
 
     UI::AddButton("My Button");
@@ -86,23 +85,23 @@ void Game::Update()
         UI::mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
     }
 
-    UI::mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_pPlayer->vWorldPos)));
+    UI::mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_cPlayer.vWorldPos)));
     UI::mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
-    UI::mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_pPlayer->nDebugTotal));
+    UI::mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_cPlayer.nDebugTotal));
     UI::mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
 
     UI::UpdateButtons(Renderer::GetCursorScreenPos());
 
-    m_pPlayer->Update(m_cMap);
+    m_cPlayer.Update(m_cMap);
 
-    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_pPlayer->vWorldPos + util::convert_vector<glm::vec2>(m_pPlayer->GetSpriteSize()) / 2.0f));
+    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_cPlayer.vWorldPos + util::convert_vector<glm::vec2>(m_cPlayer.GetSpriteSize()) / 2.0f));
 
     for (auto &e : aEntities)
     {
-        if (e == nullptr)
-            continue;
+        //if (e == nullptr)
+        //    continue;
 
-        e->Update(m_cMap);
+        e.Update(m_cMap);
     }
 }
 
@@ -124,8 +123,8 @@ void Game::Render()
 
     if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
     {
-        m_pPlayer->DrawBoundingBox();
-        m_pPlayer->DrawCollider();
+        m_cPlayer.DrawBoundingBox();
+        m_cPlayer.DrawCollider();
     }
 
     RenderUI();
@@ -138,9 +137,9 @@ void Game::Render()
 void Game::RenderGameWorld()
 {
     RM::GetShader("map_shader").Bind();
-    RM::GetShader("map_shader").SetUniform("u_LightPosition", m_pPlayer->vWorldPos);
+    RM::GetShader("map_shader").SetUniform("u_LightPosition", m_cPlayer.vWorldPos);
 
-    m_cMap.Draw(m_pPlayer->vWorldGridPos, RM::GetShader("map_shader"));
+    m_cMap.Draw(m_cPlayer.vWorldGridPos, RM::GetShader("map_shader"));
 }
 
 
@@ -150,14 +149,14 @@ void Game::RenderEntities()
     /*******************************/
     /*        Draw Entities        */
     /*******************************/
-    m_pPlayer->Draw("map_shader");
+    m_cPlayer.Draw("map_shader");
 
     for (auto &e : aEntities)
     {
-        if (e == nullptr)
-            continue;
+        //if (e == nullptr)
+        //    continue;
 
-        e->Draw("map_shader");
+        e.Draw("map_shader");
     }
 }
 
@@ -191,7 +190,7 @@ void Game::RenderDebug()
     /******************************************/
     /*        Draw Current Player Tile        */
     /******************************************/
-    sf::Vector2i _pos = util::convert_vector<sf::Vector2i>(m_pPlayer->vWorldGridPos);
+    sf::Vector2i _pos = util::convert_vector<sf::Vector2i>(m_cPlayer.vWorldGridPos);
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
@@ -227,7 +226,13 @@ sf::Vector2i Game::GetCursorTile()
 
 void Game::LoadResources()
 {
-    RM::LoadEntityData("../../res/config/entities.json");
+    EntityCollection sEC = RM::LoadEntityData("../../res/config/entities.json");
+
+    m_cPlayer = sEC.cPlayer;
+    aEntities = sEC.aNpcs;
+
+    // TODO - Handle case where aEntities[0] is not of type Player
+
     sf::Font font;
     if (!font.openFromFile("../../res/font/Pixel Game.otf"))
         util::Log("ERROR loading font");
@@ -235,64 +240,22 @@ void Game::LoadResources()
     UI::SetDefaultFont(font);
     UI::SetDefaultFontSize(40);
 
-////// DEBUG //////////////////////////
-    RM::LoadTexture("../../res/villager_npc_spritesheet/test_npc.png", true, "debug_image");
-    cDebugSprite.SetColor(glm::vec4(0.8f, 0.0f, 0.7f, 1.0f));
-    cDebugSprite.SetTexture("debug_image");
-    cDebugSprite.SetTextureRect( sf::IntRect( { 0, 0 }, { 32, 32 } ));
-//////////////////////////////////////
-
     m_cMap.LoadFromFile("sample map demo.json");
-
-    m_pPlayer->AttachAnimatedSprite("walk_cycles", "../../res/pipoya/Male 09-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
-
-    m_pPlayer->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
-    m_pPlayer->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
-    m_pPlayer->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
-    m_pPlayer->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
-
-    m_pPlayer->SetAnimationFrequency("walk_back", 8);
-    m_pPlayer->SetAnimationFrequency("walk_left", 8);
-    m_pPlayer->SetAnimationFrequency("walk_right", 8);
-    m_pPlayer->SetAnimationFrequency("walk_forward", 8);
-
-    m_pPlayer->SetCurrentAnimation("walk_right");
-
-
-    for (size_t i = 0; i < Globals::TOTAL_ENEMIES; i++)
-    {
-        std::unique_ptr<Npc> _c = std::make_unique<Npc>(getNewID(), "Enemy", glm::vec2(4, 2));
-        _c->AttachAnimatedSprite("walk_cycles", "../../res/pipoya/Enemy 01-1.png", glm::ivec2(32, 32), glm::ivec2(3, 4));
-
-        _c->AddAnimation("walk_back", glm::ivec2(0, 0), glm::ivec2(3, 0));
-        _c->AddAnimation("walk_left", glm::ivec2(0, 1), glm::ivec2(3, 1));
-        _c->AddAnimation("walk_right", glm::ivec2(0, 2), glm::ivec2(3, 2));
-        _c->AddAnimation("walk_forward", glm::ivec2(0, 3), glm::ivec2(3, 3));
-
-        _c->SetAnimationFrequency("walk_back", 8);
-        _c->SetAnimationFrequency("walk_left", 8);
-        _c->SetAnimationFrequency("walk_right", 8);
-        _c->SetAnimationFrequency("walk_forward", 8);
-
-        _c->SetCurrentAnimation("walk_forward");
-
-        AddEntity(std::move(_c));
-    }
 }
 
 
 
-void Game::AddEntity(std::unique_ptr<Entity> _pE)
-{
-    for (auto &entity : aEntities)
-    {
-        if (entity == nullptr)
-        {
-            entity = std::move(_pE);
-            break;
-        }
-    }
-}
+//void Game::AddEntity(std::unique_ptr<Entity> _pE)
+//{
+//    for (auto &entity : aEntities)
+//    {
+//        if (entity == nullptr)
+//        {
+//            entity = std::move(_pE);
+//            break;
+//        }
+//    }
+//}
 
 
 

@@ -19,14 +19,14 @@
 #include "shader.h"
 #include "renderer.h"
 #include "sprite_renderer.h"
-#include "resource_manager.h"
 #include "entity.h"
 #include "character.h"
 #include "npc.h"
-#include "player.h"
 #include "map.h"
+#include "player.h"
 #include "camera.h"
 #include "ui.h"
+#include "resource_manager.h"
 
 
 //typedef struct
@@ -76,7 +76,6 @@ class Game
         uint32_t getNewID();
 
     public:
-//        sf::RenderWindow cWindow;
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
         sf::Clock cClock;
@@ -84,11 +83,13 @@ class Game
         std::unique_ptr<sf::Text> cCurrentSpriteFrame;
         std::unique_ptr<sf::Sprite> pSprite;
 
-        std::array<std::unique_ptr<Entity>, Globals::TOTAL_ENEMIES> aEntities = { nullptr };
+        std::vector<Npc> aEntities;
+        //std::array<std::unique_ptr<Entity>, Globals::TOTAL_ENEMIES> aEntities = { nullptr };
 
     private:
         bool m_bRunning = true;
 
+        Player m_cPlayer;
         std::unique_ptr<Player> m_pPlayer;
 
         GLSprite cDebugSprite;
