@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -15,15 +17,15 @@
 class Button
 {
     public:
-        Button(std::string sLabelText, sf::Font &_cFont, uint32_t _nFontSize);
+        Button(std::string sLabelText, sf::Font &_cFont, uint32_t _nFontSize, sf::Rect<int> _cButtonRect);
         ~Button();
 
         void Draw();
         void SetFontSize(uint32_t size);
         bool Check(sf::Vector2i vCursorPos);
-        void Press();
-        void Release();
-        void PerformAction();
+        void OnPress();
+        void OnRelease(bool bPerformAction);
+        std::function<void()> Callback;
 
 
     private:
@@ -31,8 +33,10 @@ class Button
         void(*pFuncPtr)(std::string);
 
 
+    public:
+        bool bPressed = false;
+
     private:
-        bool m_bPressed = false;
         sf::Vector2i vVec;
         sf::Rect<int32_t> cButtonRect;
         sf::RectangleShape m_cShape;

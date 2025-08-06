@@ -16,8 +16,11 @@ Character::Character()
 Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
     : Entity(_ID, _vWorldPos)
 {
-    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    // Debug
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, util::convert_vector<sf::Vector2f>(m_vScale));
     eState = CharState::IDLE;
+    cCollider = geometry::Circle{ .vPos = vWorldPos / m_vScale,
+                                  .fRadius = 0.003125f * m_vScale.x };
 }
 
 
@@ -25,7 +28,7 @@ Character::Character(uint32_t _ID, glm::vec2 _vWorldPos)
 Character::Character(uint32_t _ID, std::string _sName, glm::vec2 _vWorldPos)
     : sName(_sName), Entity(_ID, _vWorldPos)
 {
-    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, util::convert_vector<sf::Vector2f>(m_vScale));
     eState = CharState::IDLE;
 }
 
@@ -41,7 +44,7 @@ void Character::SetPosition(glm::vec2 _vWorldPos)
 {
     // TODO - Use this function when updating character's position
     util::Log("Character::SetPosition");
-    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, Globals::TILE_SIZE);
+    cBox = sf::FloatRect({ _vWorldPos.x, _vWorldPos.y }, util::convert_vector<sf::Vector2f>(m_vScale));
     Entity::SetPosition(_vWorldPos);
 }
 
@@ -84,8 +87,8 @@ void Character::DrawBoundingBox()
 {
     sf::RectangleShape bb(cBox.size);
     bb.setPosition(cBox.position);
-    bb.setFillColor(sf::Color(0, 100, 0, 255));
-    bb.setOrigin({ Globals::TILE_SIZE.x / 2, Globals::TILE_SIZE.y / 2 });
+    bb.setFillColor(sf::Color(0, 100, 0, 180));
+//    bb.setOrigin({ m_vScale.x / 2, m_vScale.y / 2 });
 
     Renderer::Draw(bb);
 }
@@ -94,9 +97,9 @@ void Character::DrawBoundingBox()
 
 void Character::DrawCollider()
 {
-    sf::CircleShape cColShape(cCollider.fRadius * Globals::TILE_SIZE.x);
+    sf::CircleShape cColShape(cCollider.fRadius * m_vScale.x);
 
-    cColShape.setOrigin({ cCollider.fRadius * Globals::TILE_SIZE.x, cCollider.fRadius * Globals::TILE_SIZE.y });
+    cColShape.setOrigin({ cCollider.fRadius * m_vScale.x, cCollider.fRadius * m_vScale.y });
     cColShape.setPosition(util::convert_vector<sf::Vector2f>(cCollider.vPos * Globals::GLM_TILE_SIZE));
     cColShape.setFillColor(sf::Color(0, 0, 100, 255));
 
@@ -114,9 +117,12 @@ void Character::AttachAnimatedSprite(const std::string _sSpriteName, const std::
     RM::LoadTexture(sFilepath, true, sSpriteName);
     m_pSprite = std::make_unique<GLSprite>();
     
+    sf::Vector2i vTileSize = util::convert_vector<sf::Vector2i>(m_vScale);
+    m_pSprite->SetScale(m_vScale);
+
     m_pSprite->SetColor(glm::vec4(1.0f));
     m_pSprite->SetTexture(sSpriteName);
-    m_pSprite->SetTextureRect(sf::Rect<int>(sf::Vector2i(Globals::TILE_SIZE), { 0, 0 }));
+    m_pSprite->SetTextureRect(sf::Rect<int>({ 0, 0 }, vTileSize));
 
 //    m_pSprite->setOrigin({ _vSpriteSize.x / 2, _vSpriteSize.y / 2 });
 
@@ -174,6 +180,15 @@ sf::Vector2i Character::GetSpriteSize()
 
 
 
+glm::vec2 Character::GetScale()
+{
+    // TODO - Fix scaling system (right now there are two many
+    //        sources of truth for the size/scale)
+    return m_vScale;
+}
+
+
+
 void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 {
     if (_vVel == glm::vec2(0.0f))
@@ -189,15 +204,15 @@ void Character::setVelocity(glm::vec2 _vVel, float fScalar)
 
 void Character::updateSprite()
 {
-    m_pSprite->SetPosition(vWorldPos - Globals::GLM_TILE_SIZE * 0.5f);
+    m_pSprite->SetPosition(vWorldPos - m_vScale * 0.5f);
 }
 
 
 
 void Character::updateBoundingBox()
 {
-    cBox.position = sf::Vector2(vWorldPos.x - Globals::TILE_SIZE.y / 2,
-                                vWorldPos.y - Globals::TILE_SIZE.y / 2);
+    cBox.position = sf::Vector2(vWorldPos.x - m_vScale.x / 2,
+                                vWorldPos.y - m_vScale.y / 2);
 }
 
 

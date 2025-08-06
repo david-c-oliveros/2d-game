@@ -30,6 +30,8 @@ void SpriteRenderer::Draw(glm::vec2 vPos, const std::string sShader)
 
     RM::GetShader(sShader).Bind();
     RM::GetShader(sShader).SetUniform("u_Model", model);
+    glm::vec4 color(1.0f, 0.0f, 0.0f, 1.0f);
+    RM::GetShader(sShader).SetUniform("u_Color", color);
 
     Renderer::DrawGL(nQuadVAO, RM::GetShader(sShader), 6);
 }
@@ -42,7 +44,7 @@ void SpriteRenderer::Draw(GLSprite &cSprite, const std::string sShader)
 
     model = glm::translate(model, glm::vec3(cSprite.GetPosition(), 0.0f));
     model = glm::rotate(model, glm::radians(fRotation), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, glm::vec3(Globals::GLM_TILE_SIZE, 1.0f));
+    model = glm::scale(model, glm::vec3(cSprite.GetScale(), 1.0f));
 
     glm::vec2 vRectPos(util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().position));
     glm::vec2 vRectSize(util::convert_vector<glm::vec2>(cSprite.GetTexRectNorm().size));

@@ -35,6 +35,8 @@ add_executable(${PROJECT_NAME}
     game/src/npc.cpp
     game/src/time_manager.cpp
     game/src/collision.cpp
+    game/src/building.cpp
+    game/src/scene.cpp
     )
 
 include_directories(".")

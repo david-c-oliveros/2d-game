@@ -9,6 +9,7 @@
 #include "npc.h"
 #include "texture.h"
 #include "shader.h"
+#include "ui.h"
 
 
 std::map<std::string, GLTexture> RM::mTextures;
@@ -149,25 +150,57 @@ GLShader RM::loadShaderFromFile(const std::string vShaderFile,
 
 
 
-EntityCollection RM::LoadEntityData(const std::string &sDataFile)
+void RM::LoadSceneData(Scene &cScene, const std::string &sDataFile)
+{
+    std::ifstream file(sDataFile);
+    nlohmann::json cSceneData = nlohmann::json::parse(file);
+
+    cScene.sName = cSceneData.at("name");
+    for (auto &label : cSceneData.at("objects").at("labels").items())
+    {
+        UI::AddLabel(cScene, label.value().at("name"), label.value().at("text"));
+    }
+
+    for (auto &button : cSceneData.at("objects").at("buttons").items())
+    {
+        sf::Rect<int> cButtonRect;
+        cButtonRect.position.x = button.value().at("position")[0];
+        cButtonRect.position.y = button.value().at("position")[1];
+
+        cButtonRect.size.x = button.value().at("size")[0];
+        cButtonRect.size.y = button.value().at("size")[1];
+
+        UI::AddButton(cScene, button.value().at("name"), button.value().at("label_text"),
+                      button.value().at("callback_function"), cButtonRect);
+    }
+}
+
+
+
+/**********************************************************************************/
+/*        Loads Character data from json file and returns them as a struct        */
+/**********************************************************************************/
+CharacterCollection RM::LoadCharacterData(const std::string &sDataFile)
 {
     std::ifstream file(sDataFile);
     nlohmann::json cEntityData = nlohmann::json::parse(file);
-    EntityCollection sEntities;
+    CharacterCollection sEntities;
 
     uint32_t index = 0;
     for (auto e : cEntityData.at("entities").items())
     {
-        if ("player" == e.value().at("type").get<std::string>())
+        if (e.value().at("type").get<std::string>() == "player")
         {
             sEntities.cPlayer = constructCharacter<Player>(e.value());
             configCharacter(sEntities.cPlayer, e.value());
+
             util::Log("Loaded " + sEntities.cPlayer.sName);
         }
-        else if ("npc" == e.value().at("type").get<std::string>())
+        else if (e.value().at("type").get<std::string>() == "npc")
         {
             sEntities.aNpcs.emplace_back(constructCharacter<Npc>(e.value()));
             configCharacter(sEntities.aNpcs[index], e.value());
+
             util::Log("Loaded " + sEntities.aNpcs[index].sName);
 
             index++;
@@ -180,7 +213,7 @@ EntityCollection RM::LoadEntityData(const std::string &sDataFile)
 
 
 
-uint32_t RM::getNewResourceID()
+uint32_t RM::GetNewResourceID()
 {
     return m_nCurrentResourceID++;
 }

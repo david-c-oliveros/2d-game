@@ -2,6 +2,7 @@
 #include "util.h"
 #include "resource_manager.h"
 #include "texture.h"
+#include <glm/gtx/string_cast.hpp>
 
 
 GLSprite::GLSprite()
@@ -51,6 +52,12 @@ void GLSprite::SetPosition(glm::vec2 vPos)
 }
 
 
+void GLSprite::SetScale(glm::vec2 &_vScale)
+{
+    m_vScale = _vScale;
+}
+
+
 const sf::Rect<float> GLSprite::GetTexRectNorm() const
 {
     sf::Vector2f vTexSize = util::convert_vector<sf::Vector2f>(RM::GetTexture(m_sTexName).GetSize());
@@ -69,6 +76,12 @@ const sf::Rect<float> GLSprite::GetTexRectNorm() const
 const glm::vec2& GLSprite::GetPosition() const
 {
     return m_vPos;
+}
+
+
+const glm::vec2& GLSprite::GetScale() const
+{
+    return m_vScale;
 }
 
 

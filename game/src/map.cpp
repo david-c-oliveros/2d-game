@@ -19,33 +19,14 @@ Map::~Map()
 
 
 
-void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
+void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader, uint32_t _nLayer)
 {
-    /*********************************************************/
-    /*        Get Adjacent tiles to adjust highlight         */
-    /*        depending on how many tiles are stacked        */
-    /*********************************************************/
-    std::map<std::string, uint32_t> mDupeCount;
-    std::vector<std::shared_ptr<Tile>> aAdj = GetAdjacentTiles(_vWorldGridPos);
-
-    for (auto &tile : aAdj)
-    {
-        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
-        {
-            mDupeCount.at(glm::to_string(tile->vWorldGridPos))++;
-        }
-        else
-        {
-            mDupeCount[glm::to_string(tile->vWorldGridPos)] = 0;
-        }
-    }
-
     /****************************/
     /*        Draw tiles        */
     /****************************/
     for (auto &tile : aTiles)
     {
-        if (tile->pSprite == nullptr)
+        if (tile->pSprite == nullptr || tile->nLayer != _nLayer)
         {
             continue;
         }
@@ -53,7 +34,7 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
         tile->pSprite->SetTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
                                                 sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
 
-        glm::vec2 vSpritePos = (glm::vec2)tile->vWorldGridPos * Globals::GLM_TILE_SIZE;
+        glm::vec2 vSpritePos = (glm::vec2)tile->vWorldGridPos * tile->pSprite->GetScale();
         tile->pSprite->SetPosition(vSpritePos);
 
         SpriteRenderer::Draw(*tile->pSprite, "map_shader");
@@ -62,9 +43,31 @@ void Map::Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader)
 
 
 
-//void Map::DrawNavTiles()
-//{
-//}
+void Map::DrawDebug(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader, uint32_t _nLayer)
+{
+    /****************************/
+    /*        Draw tiles        */
+    /****************************/
+    for (auto &tile : aTiles)
+    {
+        if (tile->pSprite == nullptr || tile->nLayer != _nLayer || !tile->bSolid)
+        {
+            continue;
+        }
+
+        tile->pSprite->SetTextureRect(sf::Rect( sf::Vector2i(tile->cTextureRect.x, tile->cTextureRect.y),
+                                                sf::Vector2i(tile->cTextureRect.width, tile->cTextureRect.height)) );
+
+        glm::vec2 vSpritePos = (glm::vec2)tile->vWorldGridPos * tile->pSprite->GetScale();
+        tile->pSprite->SetPosition(vSpritePos);
+
+        sf::RectangleShape t(Globals::TILE_SIZE);
+        t.setPosition(util::convert_vector<sf::Vector2f>(vSpritePos));
+        t.setFillColor(sf::Color(100, 50, 0, 180));
+        Renderer::Draw(t);
+        //SpriteRenderer::Draw(vSpritePos, "color_shader");
+    }
+}
 
 
 
@@ -159,6 +162,7 @@ void Map::storeMap()
         if (_layer.getType() == tson::LayerType::TileLayer)
         {
             int current_layer_id = _layer.getId();
+            std::string sLayerName = _layer.getName();
 
             /*******************************************************/
             /*         Initialize size of Nav Tiles array          */
@@ -188,20 +192,23 @@ void Map::storeMap()
 
 
                 _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage(), {0, 0});
-                // TODO - Look into why this doesn't work in C++20
-//                _pTile->pSprite = storeAndLoadImage(_pTile->tileset->getImage().u8string(), {0, 0});
 
                 /********************************************/
                 /*        Set whether layer is solid        */
                 /********************************************/
                 // TODO - Make enum that contains ID's of all solid tile types
-                if (current_layer_id == 2)
+                if ("cliff" == sLayerName)
                 {
                     _pTile->bSolid = true;
                 }
                 else
                 {
                     _pTile->bSolid = false;
+                }
+
+                if ("trees" == sLayerName)
+                {
+                    _pTile->nLayer = 1;
                 }
 
                 storeNavTile(_pTile);
@@ -269,12 +276,22 @@ std::shared_ptr<GLSprite> Map::storeAndLoadImage(const std::string &sImageName, 
     {
         fs::path path = m_basePath / sImageName;
 
+        /*************************************************************/
+        /*        If the sprite is already loaded, return it,        */
+        /*        otherwise, load it from file                       */
+        /*************************************************************/
         if (fs::exists(path) && fs::is_regular_file(path))
         {
             // TODO - Properly pass in bAlpha
+            std::string sTexName("map_texture_atlas");
             RM::LoadTexture(path.generic_string(), true, sImageName);
             std::shared_ptr<GLSprite> spr = std::make_shared<GLSprite>(sImageName);
+
             spr->SetPosition(_vPos);
+
+            glm::vec2 vScale(Globals::GLM_TILE_SIZE);
+            spr->SetScale(vScale);
+
             spr->SetColor(glm::vec4(1.0f));
             m_pSprites[sImageName] = std::move(spr);
         }
@@ -318,4 +335,29 @@ sf::FloatRect Map::GetTileBox(Tile &tile)
 {
     sf::Vector2f _vTileWorldPos = util::convert_vector<sf::Vector2f>((glm::vec2)tile.vWorldGridPos * Globals::GLM_TILE_SIZE);
     return sf::FloatRect(_vTileWorldPos, Globals::TILE_SIZE);
+}
+
+
+
+
+std::map<std::string, uint32_t> Map::getDupeNumbers(glm::ivec2 _vWorldGridPos)
+{
+    /*********************************************************/
+    /*        Get Adjacent tiles to adjust highlight         */
+    /*        depending on how many tiles are stacked        */
+    /*********************************************************/
+    std::map<std::string, uint32_t> mDupeCount;
+    std::vector<std::shared_ptr<Tile>> aAdj = GetAdjacentTiles(_vWorldGridPos);
+
+    for (auto &tile : aAdj)
+    {
+        if (mDupeCount.count(glm::to_string(tile->vWorldGridPos)) > 0)
+        {
+            mDupeCount.at(glm::to_string(tile->vWorldGridPos))++;
+        }
+        else
+        {
+            mDupeCount[glm::to_string(tile->vWorldGridPos)] = 0;
+        }
+    }
 }

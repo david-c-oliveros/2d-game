@@ -6,7 +6,7 @@
 template <typename T>
 T RM::constructCharacter(nlohmann::json chJson)
 {
-    return T(getNewResourceID(),
+    return T(GetNewResourceID(),
              chJson.at("name"),
              glm::vec2(chJson.at("position")[0],
                        chJson.at("position")[1]));

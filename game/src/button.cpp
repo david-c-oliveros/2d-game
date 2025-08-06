@@ -3,16 +3,19 @@
 
 
 
-Button::Button(std::string _sLabelText, sf::Font &_cFont, uint32_t _nFontSize)
+Button::Button(std::string _sLabelText, sf::Font &_cFont, uint32_t _nFontSize, sf::Rect<int> _cButtonRect)
 {
-    sf::Vector2f vPos({ 40.0f, 400.0f });
-    cButtonRect = sf::Rect<int32_t>({ 40, 400}, { 160, 80 });
-    m_cShape = sf::RectangleShape({ 160.0f, 80.0f });
-    m_cShape.setPosition(vPos);
+//    cButtonRect = sf::Rect<int32_t>({ 40, 400}, { 160, 80 });
+
+    cButtonRect = _cButtonRect;
+
+    m_cShape = sf::RectangleShape(util::convert_vector<sf::Vector2f>(cButtonRect.size));
+    m_cShape.setFillColor(sf::Color::Cyan);
+    m_cShape.setPosition(util::convert_vector<sf::Vector2f>(cButtonRect.position));
 
     m_pLabel = std::make_unique<Label>(_sLabelText, _cFont);
     m_pLabel->SetFontSize(_nFontSize);
-    m_pLabel->SetPosition(vPos);
+    m_pLabel->SetPosition(util::convert_vector<sf::Vector2f>(cButtonRect.position));
 }
 
 
@@ -38,43 +41,40 @@ void Button::SetFontSize(uint32_t size)
 
 bool Button::Check(sf::Vector2i vCursorPos)
 {
-    if (isHovered(vCursorPos) && !m_bPressed)
+    if (isHovered(vCursorPos) && !bPressed)
     {
         m_cShape.setFillColor(sf::Color::Blue);
         return true;
     }
-    else if (isHovered(vCursorPos) && m_bPressed)
+    else if (isHovered(vCursorPos) && bPressed)
     {
         return true;
     }
 
+    bPressed = false;
     m_cShape.setFillColor(sf::Color::Cyan);
     return false;
 }
 
 
 
-void Button::Press()
+void Button::OnPress()
 {
-    pFuncPtr("This button");
-    PerformAction();
     m_cShape.setFillColor(sf::Color::Green);
-    m_bPressed = true;
+    bPressed = true;
 }
 
 
 
-void Button::Release()
+void Button::OnRelease(bool bPerformAction)
 {
+    util::Log("Button released");
     m_cShape.setFillColor(sf::Color::Cyan);
-    m_bPressed = false;
-}
 
-
-
-void Button::PerformAction()
-{
-    std::cout << "Doing button action\n";
+    if (bPressed)
+    {
+        Callback();
+    }
 }
 
 

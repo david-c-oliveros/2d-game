@@ -10,8 +10,7 @@
 
 #include "character.h"
 #include "player.h"
-
-#include "util.h"
+#include "scene.h"
 
 
 
@@ -23,7 +22,7 @@ class GLShader;
 
 
 
-struct EntityCollection
+struct CharacterCollection
 {
     Player cPlayer;
     std::vector<Npc> aNpcs;
@@ -42,7 +41,9 @@ class RM
 
         const static GLShader& GetShader(const std::string sName);
         static GLTexture GetTexture(const std::string sName);
-        static EntityCollection LoadEntityData(const std::string &sDataFile);
+        static void LoadSceneData(Scene &cScene, const std::string &sDataFile);
+        static CharacterCollection LoadCharacterData(const std::string &sDataFile);
+        static uint32_t GetNewResourceID();
 
         static void Clear();
 
@@ -59,7 +60,6 @@ class RM
                                            const std::string gShaderFile = "");
 
         static GLTexture loadTextureFromFile(const std::string sFile, bool bAlpha);
-        static uint32_t getNewResourceID();
 
         template <typename T>
         static T constructCharacter(nlohmann::json chJson);

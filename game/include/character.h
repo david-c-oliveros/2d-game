@@ -58,7 +58,7 @@ class Character : public Entity
         void DrawCollider();
 
 
-        void AttachAnimatedSprite(const std::string _sSpritName,
+        void AttachAnimatedSprite(const std::string _sSpriteName,
                                   const std::string sFilepath,
                                   glm::ivec2 _vSpriteSize,
                                   glm::ivec2 _vFrameRect);
@@ -72,6 +72,7 @@ class Character : public Entity
 
         std::string GetCurrentAnimation();
         sf::Vector2i GetSpriteSize();
+        glm::vec2 GetScale();
 
 
     protected:
@@ -91,7 +92,8 @@ class Character : public Entity
 
         bool bAnimated = false;
 
-        geometry::Circle cCollider{ vWorldPos / Globals::GLM_TILE_SIZE, 0.1f };
+        geometry::Circle cCollider{ .vPos = vWorldPos / Globals::GLM_TILE_SIZE,
+                                    .fRadius = 0.003125f * Globals::GLM_TILE_SIZE.x };
 
 
     protected:
@@ -113,6 +115,7 @@ class Character : public Entity
         MoveDir eDir;
 
         sf::FloatRect cBox;
+        glm::vec2 m_vScale = Globals::GLM_TILE_SIZE;
         glm::vec2 m_vVelocity = glm::vec2(0.0f);
         glm::vec2 m_vGravVel = glm::vec2(0.0f);
         glm::vec2 m_vDefaultScalar = glm::vec2(1.0f);

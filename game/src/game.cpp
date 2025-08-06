@@ -42,15 +42,6 @@ void Game::Create()
     Camera::SetZoom(0.5f);
     Camera::EnableFollow();
 
-    UI::AddText("player_position", "Player Coords: " + glm::to_string(m_cPlayer.vWorldPos));
-    UI::AddText("cursor_grid_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(GetCursorTile())));
-    UI::AddText("cursor_world_position", "Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
-    UI::AddText("player_anim_interval", "Player last anim: " + std::to_string(m_cPlayer.fAnimInterval));
-    UI::AddText("fps", "FPS: ");
-
-    UI::AddButton("My Button");
-//    UI::SetButtonCallback(&Game::ButtonPressed, std::string("My Button"));
-
     Renderer::SetProjectionMatrix("map_shader");
 }
 
@@ -66,7 +57,7 @@ void Game::Start()
         {
             handleInputEvent(event);
             Camera::HandleMouseInput(event);
-//            UI::HandleInput(event);
+            UI::HandleInput(*pScene, event);
         }
 
         Update();
@@ -82,19 +73,21 @@ void Game::Update()
     if (TimeManager::CheckTimer("get_fps_interval"))
     {
         TimeManager::TimerTimeout("get_fps_interval");
-        UI::mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
+//        pScene->mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
     }
 
-    UI::mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_cPlayer.vWorldPos)));
-    UI::mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
-    UI::mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_cPlayer.nDebugTotal));
-    UI::mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
+//    pScene->mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_cPlayer.vWorldPos)));
+//    pScene->mLabels.at("npc_position")->SetText("Npc position: " + glm::to_string(util::convert_vector<glm::vec2>(aEntities[0].vWorldPos)));
+//    pScene->mLabels.at("camera_center")->SetText("Camera center: " + glm::to_string(util::convert_vector<glm::vec2>(Camera::GetView().getCenter())));
+//    pScene->mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
+//    pScene->mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_cPlayer.nDebugTotal));
+//    pScene->mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
 
-    UI::UpdateButtons(Renderer::GetCursorScreenPos());
+    UI::UpdateButtons(*pScene, Renderer::GetCursorScreenPos());
 
     m_cPlayer.Update(m_cMap);
 
-    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_cPlayer.vWorldPos + util::convert_vector<glm::vec2>(m_cPlayer.GetSpriteSize()) / 2.0f));
+    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_cPlayer.vWorldPos));
 
     for (auto &e : aEntities)
     {
@@ -114,17 +107,23 @@ void Game::Render()
     Renderer::SetView(Camera::GetView());
     Renderer::SetViewMatrix("map_shader");
 
-    RenderGameWorld();
+    RM::GetShader("map_shader").Bind();
+    RM::GetShader("map_shader").SetUniform("u_LightPosition", m_cPlayer.vWorldPos);
 
-    if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
+    //RenderMapLayer(0);
+
+    if (m_bDebug)
         RenderDebug();
 
     RenderEntities();
+    RenderStructures();
+    //RenderMapLayer(1);
 
-    if (Globals::eDEBUG_LEVEL > Globals::DebugLevel::ZERO)
+    if (m_bDebug)
     {
         m_cPlayer.DrawBoundingBox();
         m_cPlayer.DrawCollider();
+        m_cMap.DrawDebug(m_cPlayer.vWorldGridPos, RM::GetShader("map_shader"), 0);
     }
 
     RenderUI();
@@ -134,21 +133,15 @@ void Game::Render()
 
 
 
-void Game::RenderGameWorld()
+void Game::RenderMapLayer(int32_t nLayer)
 {
-    RM::GetShader("map_shader").Bind();
-    RM::GetShader("map_shader").SetUniform("u_LightPosition", m_cPlayer.vWorldPos);
-
-    m_cMap.Draw(m_cPlayer.vWorldGridPos, RM::GetShader("map_shader"));
+    m_cMap.Draw(m_cPlayer.vWorldGridPos, RM::GetShader("map_shader"), nLayer);
 }
 
 
 
 void Game::RenderEntities()
 {
-    /*******************************/
-    /*        Draw Entities        */
-    /*******************************/
     m_cPlayer.Draw("map_shader");
 
     for (auto &e : aEntities)
@@ -162,11 +155,25 @@ void Game::RenderEntities()
 
 
 
+void Game::RenderStructures()
+{
+    if (m_bDebug)
+        m_pBuilding->DrawDebug("map_shader");
+    else
+        m_pBuilding->Draw("map_shader");
+//    for (auto &b : aBuildings)
+//    {
+//        b.Draw("map_shader");
+//    }
+}
+
+
+
 void Game::RenderUI()
 {
     Renderer::SetDefaultView();
 
-    UI::Render();
+    UI::Render(*pScene);
 }
 
 
@@ -190,7 +197,7 @@ void Game::RenderDebug()
     /******************************************/
     /*        Draw Current Player Tile        */
     /******************************************/
-    sf::Vector2i _pos = util::convert_vector<sf::Vector2i>(m_cPlayer.vWorldGridPos);
+    sf::Vector2i _pos = _vCursorTile;
     shape.setPosition(sf::Vector2f(_pos.x * Globals::TILE_SIZE.x, _pos.y * Globals::TILE_SIZE.y));
     shape.setFillColor(sf::Color(50, 100, 50, 100));
 
@@ -226,20 +233,52 @@ sf::Vector2i Game::GetCursorTile()
 
 void Game::LoadResources()
 {
-    EntityCollection sEC = RM::LoadEntityData("../../res/config/entities.json");
-
-    m_cPlayer = sEC.cPlayer;
-    aEntities = sEC.aNpcs;
-
-    // TODO - Handle case where aEntities[0] is not of type Player
-
+    /******************************/
+    /*        Load font(s)        */
+    /******************************/
     sf::Font font;
-    if (!font.openFromFile("../../res/font/Pixel Game.otf"))
+    std::string sFontFile = "../../res/font/Pixel Game.otf";
+
+    if (!font.openFromFile(sFontFile))
         util::Log("ERROR loading font");
 
     UI::SetDefaultFont(font);
     UI::SetDefaultFontSize(40);
 
+    UI::RegisterCallbacks();
+
+    std::string sSceneFilepath("../../res/config/debug_scene.json");
+    pScene = std::make_unique<Scene>(sSceneFilepath);
+
+//    UI::AddLabel(*pScene, "player_position", "Player Coords: " + glm::to_string(m_cPlayer.vWorldPos));
+//    UI::AddLabel(*pScene, "npc_position", "Npc position: " + glm::to_string(util::convert_vector<glm::vec2>(aEntities[0].vWorldPos)));
+//    UI::AddLabel(*pScene, "camera_center", "Camera center: " + glm::to_string(util::convert_vector<glm::vec2>(Camera::GetView().getCenter())));
+//    UI::AddLabel(*pScene, "cursor_grid_position", "Cursor World Grid Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(GetCursorTile())));
+//    UI::AddLabel(*pScene, "cursor_world_position", "Cursor World Absolute Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
+//    UI::AddLabel(*pScene, "player_anim_interval", "Player last anim: " + std::to_string(m_cPlayer.fAnimInterval));
+//    UI::AddLabel(*pScene, "fps", "FPS: ");
+
+    //std::string sButtonName = "My New Button";
+    //std::string sButtonText = "My Button";
+//    UI::AddButton(*pScene, sButtonName, sButtonText, sf::Rect<int>{{ 40, 400 }, { 160, 80 }}, std::bind(&Game::ButtonPressed, sButtonName));
+
+    /**********************************************/
+    /*        Load entities and structures        */
+    /**********************************************/
+    CharacterCollection sCC = RM::LoadCharacterData("../../res/config/entities.json");
+
+    m_cPlayer = sCC.cPlayer;
+    aEntities = sCC.aNpcs;
+
+    // TODO - Write proper move constructors for children of Entity!
+    m_pBuilding = std::make_unique<Building>(RM::GetNewResourceID(), "House", glm::vec2(5, 4));
+    m_pBuilding->AttachSprite("house", "../../res/tilemaps/structures/Roofs.png", { 0, 0 }, { 32, 32 });
+//    aBuildings.emplace_back(std::move(b));
+
+
+    /**************************/
+    /*        Load Map        */
+    /**************************/
     m_cMap.LoadFromFile("sample map demo.json");
 }
 
@@ -274,6 +313,7 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
         else if (keyPressed->scancode == sf::Keyboard::Scancode::Space)
         {
             m_bDebug = !m_bDebug;
+            util::Log(UI::m_sHoveredButton);
         }
     }
     else if (const auto resized = event->getIf<sf::Event::Resized>())
@@ -284,14 +324,14 @@ void Game::handleInputEvent(std::optional<sf::Event> event)
 
 
 
-uint32_t Game::getNewID()
-{
-    return m_nCurrentID++;
-}
-
-
-
-//void Game::ButtonPressed(std::string sButtonName)
+//uint32_t Game::getNewID()
 //{
-//    std::cout << sButtonName << " pressed\n";
+//    return m_nCurrentID++;
 //}
+
+
+
+void Game::ButtonPressed(std::string sButtonName)
+{
+    std::cout << sButtonName << " pressed\n";
+}

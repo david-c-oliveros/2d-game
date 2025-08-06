@@ -3,6 +3,10 @@
 #include "shader.h"
 #include "map.h"
 
+// Debug
+#include <glm/gtx/string_cast.hpp>
+//
+
 
 
 Entity::Entity(uint32_t _ID, glm::vec2 _vWorldPos)

@@ -9,7 +9,7 @@ GLTexture::GLTexture()
     : nWidth(0), nHeight(0),
       nInternal_Format(GL_RGBA), nImage_Format(GL_RGBA),
       nWrap_S(GL_REPEAT), nWrap_T(GL_REPEAT),
-      nFilter_Min(GL_LINEAR), nFilter_Max(GL_NEAREST)
+      nFilter_Min(GL_NEAREST), nFilter_Max(GL_NEAREST)
 {
     GLCall(glGenTextures(1, &nID));
 }

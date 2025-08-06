@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+
 class Shader;
 class Map;
 
@@ -22,6 +23,11 @@ class Entity
 
 
     public:
+        /**********************************************************************************/
+        /*        Note: Entity's word position is initialized to the                      */
+        /*        center of the given tile position when the entity is constructed        */
+        /*        (eg. { 0, 0 } tile position is { 16.0, 16.0 } world position            */
+        /**********************************************************************************/
         glm::vec2 vWorldPos;
         uint32_t m_ID;
 };

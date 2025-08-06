@@ -38,6 +38,7 @@ sf::sf::Vector2i/f
 
 #include "texture.h"
 #include "sprite.h"
+#include "util.h"
 
 class AnimationManager {
     private:

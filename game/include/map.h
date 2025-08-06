@@ -23,6 +23,7 @@ struct Tile
     std::shared_ptr<GLSprite> pSprite;
     bool bSolid;
     bool bCollided;
+    uint32_t nLayer = 0;
 };
 
 
@@ -41,7 +42,8 @@ class Map
         Map();
         ~Map();
 
-        void Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader);
+        void Draw(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader, uint32_t _nLayer);
+        void DrawDebug(const glm::ivec2 &_vWorldGridPos, const GLShader &cShader, uint32_t _nLayer);
         std::vector<std::shared_ptr<Tile>> GetCurrentTiles(const glm::ivec2 &_vWorldGridPos);
         std::vector<std::shared_ptr<Tile>> GetAdjacentTiles(const glm::ivec2 &_vWorldGridPos);
         void LoadFromFile(const std::string &_sFilepath);
@@ -51,6 +53,7 @@ class Map
         void storeNavTile(std::shared_ptr<Tile> tile);
         std::shared_ptr<GLSprite> storeAndLoadImage(const std::string &sImageName, const glm::vec2 &_vPos);
         std::vector<std::shared_ptr<Tile>>::iterator getOccupiedTile(glm::ivec2 _vWorldPos);
+        std::map<std::string, uint32_t> getDupeNumbers(glm::ivec2 _vWorldPos);
 
     public:
         std::unique_ptr<tson::Map> pTsonMap;

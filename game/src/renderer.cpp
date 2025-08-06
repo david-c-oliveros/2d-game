@@ -61,6 +61,7 @@ void Renderer::DrawGL(GLuint &vao, const GLShader &cShader, GLuint nNumVert)
     GLCall(glBindVertexArray(vao));
     GLCall(glDrawArrays(GL_TRIANGLES, 0, nNumVert));
     GLCall(glBindVertexArray(0));
+    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
 

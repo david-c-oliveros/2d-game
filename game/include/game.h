@@ -16,25 +16,20 @@
 #include "gl_error_manager.h"
 #include "globals.h"
 #include "util.h"
+#include "scene.h"
 #include "shader.h"
 #include "renderer.h"
 #include "sprite_renderer.h"
 #include "entity.h"
 #include "character.h"
 #include "npc.h"
+#include "building.h"
 #include "map.h"
 #include "player.h"
 #include "camera.h"
 #include "ui.h"
 #include "resource_manager.h"
 
-
-//typedef struct
-//{
-//    void (Game::*ButtonPressed) (std::string);
-//} MemberFuncPtr;
-
-void Log(const std::string sStr);
 
 
 class Game
@@ -50,8 +45,9 @@ class Game
         void Start();
         void Update();
         void Render();
-        void RenderGameWorld();
+        void RenderMapLayer(int32_t nLayer);
         void RenderEntities();
+        void RenderStructures();
         void RenderUI();
         void RenderDebug();
 
@@ -69,27 +65,26 @@ class Game
                         const std::filesystem::path &fsFragPath);
         void AddEntity(std::unique_ptr<Entity> _pE);
 
-//        void ButtonPressed(std::string sButtonName);
+        static void ButtonPressed(std::string sButtonName);
 
     private:
         void handleInputEvent(std::optional<sf::Event> event);
-        uint32_t getNewID();
+//        uint32_t getNewID();
 
     public:
         sf::RectangleShape shape;
         sf::Texture pSpritesheet;
         sf::Clock cClock;
 
-        std::unique_ptr<sf::Text> cCurrentSpriteFrame;
-        std::unique_ptr<sf::Sprite> pSprite;
-
+        std::unique_ptr<Scene> pScene;
         std::vector<Npc> aEntities;
-        //std::array<std::unique_ptr<Entity>, Globals::TOTAL_ENEMIES> aEntities = { nullptr };
+        std::vector<Building> aBuildings;
 
     private:
         bool m_bRunning = true;
 
         Player m_cPlayer;
+        std::unique_ptr<Building> m_pBuilding;
         std::unique_ptr<Player> m_pPlayer;
 
         GLSprite cDebugSprite;
