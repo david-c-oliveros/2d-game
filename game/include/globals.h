@@ -6,6 +6,12 @@
 
 namespace Globals
 {
+    enum class Scene
+    {
+        MENU,
+        GAME
+    };
+
     enum class DebugLevel
     {
         ZERO,

@@ -5,8 +5,6 @@
 
 Button::Button(std::string _sLabelText, sf::Font &_cFont, uint32_t _nFontSize, sf::Rect<int> _cButtonRect)
 {
-//    cButtonRect = sf::Rect<int32_t>({ 40, 400}, { 160, 80 });
-
     cButtonRect = _cButtonRect;
 
     m_cShape = sf::RectangleShape(util::convert_vector<sf::Vector2f>(cButtonRect.size));
@@ -15,7 +13,19 @@ Button::Button(std::string _sLabelText, sf::Font &_cFont, uint32_t _nFontSize, s
 
     m_pLabel = std::make_unique<Label>(_sLabelText, _cFont);
     m_pLabel->SetFontSize(_nFontSize);
-    m_pLabel->SetPosition(util::convert_vector<sf::Vector2f>(cButtonRect.position));
+
+    sf::FloatRect cTextRect = m_pLabel->GetSFText().getLocalBounds();
+    sf::Vector2f vTextOrigin(cTextRect.position.x + cTextRect.size.x / 2.0f,
+                             cTextRect.position.y + cTextRect.size.y / 2.0f);
+
+    m_pLabel->SetOrigin(vTextOrigin);
+
+    sf::Vector2f vLabelPos;
+
+    vLabelPos.x = cButtonRect.position.x + (cButtonRect.size.x / 2);
+    vLabelPos.y = cButtonRect.position.y + (cButtonRect.size.y / 2);
+
+    m_pLabel->SetPosition(util::convert_vector<sf::Vector2f>(vLabelPos));
 }
 
 
@@ -27,6 +37,7 @@ Button::~Button()
 void Button::Draw()
 {
     Renderer::Draw(m_cShape);
+    Renderer::Draw(m_cTextRectShape);
     m_pLabel->Draw();
 }
 
@@ -74,6 +85,7 @@ void Button::OnRelease(bool bPerformAction)
     if (bPressed)
     {
         Callback();
+        bPressed = false;
     }
 }
 

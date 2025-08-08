@@ -76,7 +76,8 @@ class Game
         sf::Texture pSpritesheet;
         sf::Clock cClock;
 
-        std::unique_ptr<Scene> pScene;
+        Globals::Scene eCurrentScene;
+        std::map<Globals::Scene, std::unique_ptr<Scene>> mScenes;
         std::vector<Npc> aEntities;
         std::vector<Building> aBuildings;
 

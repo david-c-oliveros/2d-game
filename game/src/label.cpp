@@ -1,5 +1,8 @@
 #include "label.h"
 
+#include <glm/gtx/string_cast.hpp>
+#include "util.h"
+
 
 
 Label::Label(std::string _sText, sf::Font &_cFont)
@@ -37,7 +40,19 @@ void Label::SetFontSize(uint32_t size)
 }
 
 
+void Label::SetOrigin(sf::Vector2f vOrigin)
+{
+    m_pText->setOrigin(vOrigin);
+}
+
+
 void Label::SetPosition(sf::Vector2f _vPos)
 {
     m_pText->setPosition(_vPos);
+}
+
+
+sf::Text Label::GetSFText()
+{
+    return *m_pText;
 }

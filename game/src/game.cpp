@@ -43,6 +43,8 @@ void Game::Create()
     Camera::EnableFollow();
 
     Renderer::SetProjectionMatrix("map_shader");
+
+    eCurrentScene = Globals::Scene::MENU;
 }
 
 
@@ -57,7 +59,7 @@ void Game::Start()
         {
             handleInputEvent(event);
             Camera::HandleMouseInput(event);
-            UI::HandleInput(*pScene, event);
+            UI::HandleInput(*mScenes[eCurrentScene], event);
         }
 
         Update();
@@ -69,32 +71,39 @@ void Game::Start()
 
 void Game::Update()
 {
-    TimeManager::Update();
-    if (TimeManager::CheckTimer("get_fps_interval"))
+    switch(eCurrentScene)
     {
-        TimeManager::TimerTimeout("get_fps_interval");
-//        pScene->mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
-    }
+        case Globals::Scene::MENU:
+            UI::UpdateButtons(*mScenes[eCurrentScene], Renderer::GetCursorScreenPos());
+            break;
 
-//    pScene->mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_cPlayer.vWorldPos)));
-//    pScene->mLabels.at("npc_position")->SetText("Npc position: " + glm::to_string(util::convert_vector<glm::vec2>(aEntities[0].vWorldPos)));
-//    pScene->mLabels.at("camera_center")->SetText("Camera center: " + glm::to_string(util::convert_vector<glm::vec2>(Camera::GetView().getCenter())));
-//    pScene->mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
-//    pScene->mLabels.at("player_anim_interval")->SetText("Player last anim: " + std::to_string(m_cPlayer.nDebugTotal));
-//    pScene->mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
+        case Globals::Scene::GAME:
+            TimeManager::Update();
+            if (TimeManager::CheckTimer("get_fps_interval"))
+            {
+                TimeManager::TimerTimeout("get_fps_interval");
+                mScenes[eCurrentScene]->mLabels["fps"]->SetText("FPS: " + std::to_string(TimeManager::GetFPS()));
+            }
 
-    UI::UpdateButtons(*pScene, Renderer::GetCursorScreenPos());
+            mScenes[eCurrentScene]->mLabels.at("player_position")->SetText("Player position: " + glm::to_string(util::convert_vector<glm::vec2>(m_cPlayer.vWorldPos)));
+            mScenes[eCurrentScene]->mLabels.at("npc_position")->SetText("Npc position: " + glm::to_string(util::convert_vector<glm::vec2>(aEntities[0].vWorldPos)));
+            mScenes[eCurrentScene]->mLabels.at("camera_center")->SetText("Camera center: " + glm::to_string(util::convert_vector<glm::vec2>(Camera::GetView().getCenter())));
+            mScenes[eCurrentScene]->mLabels.at("cursor_grid_position")->SetText("Cursor Grid Coords: " + glm::to_string(util::convert_vector<glm::vec2>(GetCursorTile())));
+            mScenes[eCurrentScene]->mLabels.at("cursor_world_position")->SetText("Cursor World Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
 
-    m_cPlayer.Update(m_cMap);
+            UI::UpdateButtons(*mScenes[eCurrentScene], Renderer::GetCursorScreenPos());
+            m_cPlayer.Update(m_cMap);
 
-    Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_cPlayer.vWorldPos));
+            Camera::UpdateFollow(util::convert_vector<sf::Vector2f>(m_cPlayer.vWorldPos));
 
-    for (auto &e : aEntities)
-    {
-        //if (e == nullptr)
-        //    continue;
+            for (auto &e : aEntities)
+            {
+                //if (e == nullptr)
+                //    continue;
 
-        e.Update(m_cMap);
+                e.Update(m_cMap);
+            }
+            break;
     }
 }
 
@@ -173,7 +182,7 @@ void Game::RenderUI()
 {
     Renderer::SetDefaultView();
 
-    UI::Render(*pScene);
+    UI::Render(*mScenes[eCurrentScene]);
 }
 
 
@@ -243,24 +252,15 @@ void Game::LoadResources()
         util::Log("ERROR loading font");
 
     UI::SetDefaultFont(font);
-    UI::SetDefaultFontSize(40);
+    UI::SetDefaultFontSize(80);
 
     UI::RegisterCallbacks();
 
-    std::string sSceneFilepath("../../res/config/debug_scene.json");
-    pScene = std::make_unique<Scene>(sSceneFilepath);
+    std::string sGameSceneFile("../../res/config/debug_scene.json");
+    std::string sMenuSceneFile("../../res/config/menu.json");
+    mScenes[Globals::Scene::MENU] = std::make_unique<Scene>(sMenuSceneFile);
+    mScenes[Globals::Scene::GAME] = std::make_unique<Scene>(sGameSceneFile);
 
-//    UI::AddLabel(*pScene, "player_position", "Player Coords: " + glm::to_string(m_cPlayer.vWorldPos));
-//    UI::AddLabel(*pScene, "npc_position", "Npc position: " + glm::to_string(util::convert_vector<glm::vec2>(aEntities[0].vWorldPos)));
-//    UI::AddLabel(*pScene, "camera_center", "Camera center: " + glm::to_string(util::convert_vector<glm::vec2>(Camera::GetView().getCenter())));
-//    UI::AddLabel(*pScene, "cursor_grid_position", "Cursor World Grid Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(GetCursorTile())));
-//    UI::AddLabel(*pScene, "cursor_world_position", "Cursor World Absolute Coords: " + glm::to_string(util::convert_vector<glm::ivec2>(Renderer::GetCursorWorldPos(Camera::GetView()))));
-//    UI::AddLabel(*pScene, "player_anim_interval", "Player last anim: " + std::to_string(m_cPlayer.fAnimInterval));
-//    UI::AddLabel(*pScene, "fps", "FPS: ");
-
-    //std::string sButtonName = "My New Button";
-    //std::string sButtonText = "My Button";
-//    UI::AddButton(*pScene, sButtonName, sButtonText, sf::Rect<int>{{ 40, 400 }, { 160, 80 }}, std::bind(&Game::ButtonPressed, sButtonName));
 
     /**********************************************/
     /*        Load entities and structures        */

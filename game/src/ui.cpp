@@ -77,13 +77,11 @@ void UI::AddButton(Scene &cScene, std::string sName, std::string sLabelText,
 
     if (sCallbackFunc != "")
     {
-        util::Log("Setting custom callback");
         cScene.mButtons[sName]->Callback = std::dynamic_pointer_cast<Invoker<void(std::string)>>(
                 mFunctionRegistry[sCallbackFunc])->bind(sName);
     }
     else
     {
-        util::Log("Setting default callback");
         cScene.mButtons[sName]->Callback = std::dynamic_pointer_cast<Invoker<void(std::string)>>(
                 mFunctionRegistry["ButtonPressed"])->bind(sName);
     }

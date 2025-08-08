@@ -4,6 +4,7 @@
 #include <string>
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
@@ -21,7 +22,9 @@ class Label
         void SetText(std::string _cText);
         void SetFont(sf::Font &_cFont);
         void SetFontSize(uint32_t size);
+        void SetOrigin(sf::Vector2f vOrigin);
         void SetPosition(sf::Vector2f _vPos);
+        sf::Text GetSFText();
 
 
     private:

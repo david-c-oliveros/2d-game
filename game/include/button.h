@@ -40,5 +40,6 @@ class Button
         sf::Vector2i vVec;
         sf::Rect<int32_t> cButtonRect;
         sf::RectangleShape m_cShape;
+        sf::RectangleShape m_cTextRectShape;
         std::unique_ptr<Label> m_pLabel;
 };
